@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Core", "Dapper-Layers-Generator.Core\Dapper-Layers-Generator.Core.csproj", "{AFD9B307-2F84-4904-AF2C-BE442180386C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Console", "Dapper-Layers-Generator.Console\Dapper-Layers-Generator.Console.csproj", "{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Data", "Dapper-Layers-Generator.Data\Dapper-Layers-Generator.Data.csproj", "{B45C4D01-6A4A-4511-9AA0-4C2630759361}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFD9B307-2F84-4904-AF2C-BE442180386C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFD9B307-2F84-4904-AF2C-BE442180386C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFD9B307-2F84-4904-AF2C-BE442180386C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFD9B307-2F84-4904-AF2C-BE442180386C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DBAB464B-56FC-418F-AA09-D9EDBCF44679}
+	EndGlobalSection
+EndGlobal
