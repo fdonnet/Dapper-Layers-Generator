@@ -13,54 +13,36 @@ namespace Dapper_Layers_Generator.Data.Reader
 
     public interface IReaderDapperContext : IDisposable
     {
-
         IDbConnection Connection { get; }
-        IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; }
-
+        IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; set; }
     }
     
-    public interface IDbReaderDapperContextFactory
-    {
-        IReaderDapperContext Create();
-    }
-
     public class ReaderDapperContext : IReaderDapperContext
     {
         protected readonly IConfiguration? _config;
 
         protected IDbConnection _cn = null!;
-        private bool _disposed = false;
+        protected string[] _schemas;
 
+        protected bool _disposed = false;
 
         public IDbConnection Connection
         {
             get => _cn;
         }
 
-        protected IDatabaseDefinitionsRepo? _databaseDefinitionsRepo;
-        public IDatabaseDefinitionsRepo DatabaseDefinitionsRepo
-        {
-            get
-            {
-                _databaseDefinitionsRepo ??= new DatabaseDefinitionsRepo(this);
+        protected IDatabaseDefinitionsRepo _databaseDefinitionsRepo;
+        public virtual IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; set; } = default!;
 
-                return _databaseDefinitionsRepo;
-            }
-        }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ReaderDapperContext(IConfiguration config)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             _config = config;
+            _schemas = _config.GetSection("DB:Schemas").Get<string[]>();
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.Settings.CommandTimeout = 60000;
-            _cn = new MySqlConnection(_config.GetConnectionString("Default"));
-        }
-
-        public ReaderDapperContext(string connectionString)
-        {
-            DefaultTypeMap.MatchNamesWithUnderscores = true;
-            SqlMapper.Settings.CommandTimeout = 60000;
-            _cn = new MySqlConnection(connectionString);
         }
 
         public void Dispose()
@@ -69,7 +51,7 @@ namespace Dapper_Layers_Generator.Data.Reader
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!_disposed)
             {
@@ -84,21 +66,4 @@ namespace Dapper_Layers_Generator.Data.Reader
 
     }
 
-    public class DbReaderDapperContextFactory : IDbReaderDapperContextFactory
-    {
-        protected readonly string _conStr;
-        protected readonly IConfiguration _config = null!;
-
-        public DbReaderDapperContextFactory(IConfiguration config)
-        {
-            _config = config;
-            _conStr = _config.GetConnectionString("Default");
-        }
-
-        public IReaderDapperContext Create()
-        {
-            return new ReaderDapperContext(_conStr);
-        }
-
-    }
 }
