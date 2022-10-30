@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dapper.FluentMap;
 using Dapper_Layers_Generator.Data.POCO;
 using Dapper_Layers_Generator.Data.POCO.MySql;
 using System;
@@ -11,6 +12,14 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
     public class MySqlDefinitionRepo : DatabaseDefinitionsRepoBase, IDatabaseDefinitionsRepo
     {
+        static MySqlDefinitionRepo()
+        {
+            //FluentMapper.Initialize(config =>
+            //{
+            //    config.AddMap<MySqlTable>(new MySqlTableMap());
+            //});
+        }
+
         public MySqlDefinitionRepo(ReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
         {
             

@@ -16,7 +16,7 @@ namespace Dapper_Layers_Generator.Data.Reader
         IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; set; }
         void InitFluentMap();
     }
-    
+
     public class ReaderDapperContext : IReaderDapperContext
     {
         protected readonly IConfiguration? _config;
@@ -39,12 +39,12 @@ namespace Dapper_Layers_Generator.Data.Reader
         public ReaderDapperContext(IConfiguration config)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            InitFluentMap();
             _config = config;
             _schemas = _config["DB:Schemas"];
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.Settings.CommandTimeout = 60000;
-           
+            InitFluentMap();
+
         }
 
         public virtual void InitFluentMap()
