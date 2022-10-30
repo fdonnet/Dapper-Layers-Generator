@@ -15,35 +15,32 @@ using static System.Net.Mime.MediaTypeNames;
 ConsoleService _consoleService;
 
 
+//////////////////////////////////////////////////
+//MAIN
+/////////////////////////////////////////////////
+
+//Configuration
 IConfiguration config = new ConfigurationBuilder()
         .AddUserSecrets<Program>()
         .AddEnvironmentVariables()
         .Build();
 
-var conf = new ServiceCollection()
+var services = new ServiceCollection()
     .AddSingleton(config);
 
-Console.WriteLine(
-
-@$"Welcome, you will generate layers from your DB
--- Choose your DB provider, (mysql) :");
+//Welcome (choose your DB provider)
+Console.WriteLine(WelcomeMsg());
 
 var dbProvider = Console.ReadLine();
 
-//Inject the correct context based on user response
-if(dbProvider == "mysql")
-{
-    conf.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
-}
+//Services conf
+dbProvider = dbProvider ?? "";
+var builder = ServicesConfig(dbProvider, services);
 
-//Check if provider is a valid value
-if (dbProvider == "mysql")
+if(builder != null)
 {
-    conf.AddSingleton<ReaderDBDefinitionService>();
-    conf.AddSingleton<ConsoleService>();
-    var builder = conf.BuildServiceProvider();
     _consoleService = builder.GetRequiredService<ConsoleService>();
-    
+
     //Summary
     Console.Clear();
     Console.WriteLine(_consoleService.BeginSummaryPrint(dbProvider));
@@ -54,12 +51,50 @@ if (dbProvider == "mysql")
 }
 else
 {
-    Console.WriteLine(@$"Provider not supported, app will shut down ...");
+    Console.WriteLine(@$"Provider not supported or services problem, app will shut down ...");
 }
+
+
+
+//////////////////////////////////////////////////
+//Services config
+/////////////////////////////////////////////////
+ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
+{
+    //MySql
+    if (dbProvider == "mysql")
+    {
+        services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
+    }
+
+    //If accepted dbProvider
+    if (dbProvider == "mysql")
+    {
+        services.AddSingleton<ReaderDBDefinitionService>();
+        services.AddSingleton<ConsoleService>();
+        return services.BuildServiceProvider();
+    }
+
+    return null;
+
+}
+
 
 //////////////////////////////////////////////////
 //Console Steps
 /////////////////////////////////////////////////
+
+//Welcome
+static string WelcomeMsg()
+{
+    return @$"
+******************************************************
+*** Welcome, you will generate layers from your DB ***
+******************************************************
+
+-- Choose your DB provider, (mysql) :";
+
+}
 
 //DB Loading
 async Task LoadDBDefintionStep()
@@ -68,11 +103,9 @@ async Task LoadDBDefintionStep()
     Console.WriteLine(await _consoleService.LoadDBDefinitionsAsync());
     var k = Console.ReadKey().Key;
 
-    if(k==ConsoleKey.Y)
+    if (k == ConsoleKey.Y)
     {
         Console.Write(_consoleService.PrintDBDefintionAsync());
     }
 }
-
-
 

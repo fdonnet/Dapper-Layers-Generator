@@ -27,10 +27,10 @@ namespace Dapper_Layers_Generator.Console
             var schmeas = _config["DB:Schemas"];
             var msg =
 
-@$"Hello, you will run Dapper Layers Generator on :
+@$"Hello, based on your config injection you will run Dapper Layers Generator on:
 DBPROVIDER : {dbProvider}
 
-and you defined source DB schemas in your config like this : 
+and for this source DB schemas: 
 SCHEMAS : {schmeas}";
 
             return msg;
