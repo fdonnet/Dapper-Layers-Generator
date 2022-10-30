@@ -11,7 +11,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
     public class MySqlDefinitionRepo : DatabaseDefinitionsRepoBase, IDatabaseDefinitionsRepo
     {
-        public MySqlDefinitionRepo(ReaderDapperContext dbContext, string[] schemas) : base(dbContext, schemas)
+        public MySqlDefinitionRepo(ReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
         {
             
         }
@@ -19,7 +19,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
         public async Task<IEnumerable<ITable>> GetAllTablesAsync()
         {
             var p = new DynamicParameters();
-            p.Add("@shemas", _schemas);
+            p.Add("@shemas", _sourceSchemas);
 
             var sql = @"SELECT table_schema,table_name
                         FROM tables

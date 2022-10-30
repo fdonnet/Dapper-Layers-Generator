@@ -1,10 +1,13 @@
 ﻿
+using Dapper.FluentMap;
+using Dapper_Layers_Generator.Data.POCO.MySql;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 using static System.Net.Mime.MediaTypeNames;
+
 
 IConfiguration config = new ConfigurationBuilder()
         .AddUserSecrets<Program>()
@@ -13,6 +16,7 @@ IConfiguration config = new ConfigurationBuilder()
 
 using var builder = new ServiceCollection()
     .AddSingleton<IReaderDapperContext, MysqlReaderDapperContext>()
+    .AddSingleton(config)
     .BuildServiceProvider();
 
 

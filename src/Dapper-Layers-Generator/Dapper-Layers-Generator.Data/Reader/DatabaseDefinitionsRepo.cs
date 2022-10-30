@@ -15,12 +15,14 @@ namespace Dapper_Layers_Generator.Data.Reader
     public class DatabaseDefinitionsRepoBase
     {
         protected ReaderDapperContext _dbContext = null!;
-        protected string[] _schemas = default!;
+        protected string _schemas = string.Empty;
+        protected string[] _sourceSchemas;
 
-        public DatabaseDefinitionsRepoBase(ReaderDapperContext dbContext, string[] schemas)
+        public DatabaseDefinitionsRepoBase(ReaderDapperContext dbContext, string schemas)
         {
             _dbContext = dbContext;
             _schemas = schemas;
+            _sourceSchemas = _schemas.Split(",");
         }
     }
 }

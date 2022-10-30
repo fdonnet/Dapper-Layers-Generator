@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,6 +14,7 @@ namespace Dapper_Layers_Generator.Data.Reader
     {
         IDbConnection Connection { get; }
         IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; set; }
+        void InitFluentMap();
     }
     
     public class ReaderDapperContext : IReaderDapperContext
@@ -22,7 +22,7 @@ namespace Dapper_Layers_Generator.Data.Reader
         protected readonly IConfiguration? _config;
 
         protected IDbConnection _cn = null!;
-        protected string[] _schemas;
+        protected string _schemas;
 
         protected bool _disposed = false;
 
@@ -39,10 +39,17 @@ namespace Dapper_Layers_Generator.Data.Reader
         public ReaderDapperContext(IConfiguration config)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
+            InitFluentMap();
             _config = config;
-            _schemas = _config.GetSection("DB:Schemas").Get<string[]>();
+            _schemas = _config["DB:Schemas"];
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.Settings.CommandTimeout = 60000;
+           
+        }
+
+        public virtual void InitFluentMap()
+        {
+
         }
 
         public void Dispose()
