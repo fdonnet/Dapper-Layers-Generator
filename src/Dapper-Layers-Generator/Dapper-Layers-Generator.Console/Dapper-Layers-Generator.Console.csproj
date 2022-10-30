@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dapper-Layers-Generator.Core\Dapper-Layers-Generator.Core.csproj" />
     <ProjectReference Include="..\Dapper-Layers-Generator.Data\Dapper-Layers-Generator.Data.csproj" />
   </ItemGroup>
 

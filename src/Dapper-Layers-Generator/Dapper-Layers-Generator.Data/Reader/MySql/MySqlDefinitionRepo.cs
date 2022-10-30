@@ -12,7 +12,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
     public class MySqlDefinitionRepo : DatabaseDefinitionsRepoBase, IDatabaseDefinitionsRepo
     {
-        public MySqlDefinitionRepo(ReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
+        public MySqlDefinitionRepo(IReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
         {
             
         }
@@ -25,7 +25,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             var sql = @"SELECT table_schema,table_name
                         FROM tables
                         WHERE table_schema in @schemas
-                        ORDER by table_name, table_schema";
+                        ORDER by table_schema, table_name";
 
             var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql,p);
 
