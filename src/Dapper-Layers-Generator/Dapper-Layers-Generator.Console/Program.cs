@@ -29,31 +29,36 @@ var services = new ServiceCollection()
     .AddSingleton(config);
 
 //Welcome (choose your DB provider)
-Console.WriteLine(WelcomeMsg());
+var welcome = WelcomeMsg(config);
+Console.WriteLine(welcome);
 
+if (welcome.Contains("ERROR"))
+    Environment.Exit(0);
+
+
+//Read db provider choice
 var dbProvider = Console.ReadLine();
 
 //Services conf
 dbProvider = dbProvider ?? "";
 var builder = ServicesConfig(dbProvider, services);
 
-if(builder != null)
-{
-    _consoleService = builder.GetRequiredService<ConsoleService>();
-
-    //Summary
-    Console.Clear();
-    Console.WriteLine(_consoleService.BeginSummaryPrint(dbProvider));
-
-    //Load DB definitions
-    await LoadDBDefintionStep();
-
-}
-else
+//Cannot build the services (bye)
+if (builder == null)
 {
     Console.WriteLine(@$"Provider not supported or services problem, app will shut down ...");
+    Environment.Exit(0);
 }
 
+//From now (services are runing, we can use the console service to print)
+_consoleService = builder.GetRequiredService<ConsoleService>();
+
+//Summary
+Console.Clear();
+Console.WriteLine(_consoleService.BeginSummaryPrint(dbProvider));
+
+//Load DB definitions
+await LoadDBDefinitionsStep();
 
 
 //////////////////////////////////////////////////
@@ -85,19 +90,44 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
 /////////////////////////////////////////////////
 
 //Welcome
-static string WelcomeMsg()
+static string WelcomeMsg(IConfiguration config)
 {
-    return @$"
+    var error = @$"
+ERROR cannot read the config(connection string and or schemas choice)
+ConnectionString: Default / DB:Schemas, app will exit";
+
+    if (config != null)
+    {
+        try
+        {
+            var connectionStr = config.GetConnectionString("Default");
+            var schemas = config["DB:Schemas"];
+
+            if (!string.IsNullOrEmpty(connectionStr) && !string.IsNullOrEmpty(schemas))
+                return @$"
 ******************************************************
 *** Welcome, you will generate layers from your DB ***
 ******************************************************
 
--- Choose your DB provider, (mysql) :";
+DB connection: FOUND !
+DB Schemas specified for the generator: {schemas}
 
+
+-- Choose your DB provider, (mysql) :";
+            else
+                return error;
+        }
+        catch
+        {
+            return error;
+
+        }
+    }
+    return error;
 }
 
 //DB Loading
-async Task LoadDBDefintionStep()
+async Task LoadDBDefinitionsStep()
 {
     Console.Clear();
     Console.WriteLine(await _consoleService.LoadDBDefinitionsAsync());
