@@ -26,17 +26,20 @@ if(dbProvider == "mysql")
     conf.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
 }
 
-var builder = conf.BuildServiceProvider();
 
-
-var testMysql = builder.GetRequiredService<IReaderDapperContext>();
-var tables = await testMysql.DatabaseDefinitionsRepo.GetAllTablesAsync();
-
-Console.WriteLine("List of tables:");
-foreach(var table in tables)
+if (dbProvider == "mysql")
 {
-    Console.WriteLine(table.Schema + " " + table.Name);
+    var builder = conf.BuildServiceProvider();
+    var testMysql = builder.GetRequiredService<IReaderDapperContext>();
+    var tables = await testMysql.DatabaseDefinitionsRepo.GetAllTablesAsync();
+
+    Console.WriteLine("List of tables:");
+    foreach (var table in tables)
+    {
+        Console.WriteLine(table.Schema + " " + table.Name);
+    }
+
 }
 
-// See https://aka.ms/new-console-template for more information
+
 

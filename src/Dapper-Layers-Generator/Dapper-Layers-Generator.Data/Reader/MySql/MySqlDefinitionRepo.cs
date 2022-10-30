@@ -12,14 +12,6 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
     public class MySqlDefinitionRepo : DatabaseDefinitionsRepoBase, IDatabaseDefinitionsRepo
     {
-        static MySqlDefinitionRepo()
-        {
-            //FluentMapper.Initialize(config =>
-            //{
-            //    config.AddMap<MySqlTable>(new MySqlTableMap());
-            //});
-        }
-
         public MySqlDefinitionRepo(ReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
         {
             
@@ -32,7 +24,8 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var sql = @"SELECT table_schema,table_name
                         FROM tables
-                        WHERE table_schema in @schemas";
+                        WHERE table_schema in @schemas
+                        ORDER by table_name, table_schema";
 
             var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql,p);
 

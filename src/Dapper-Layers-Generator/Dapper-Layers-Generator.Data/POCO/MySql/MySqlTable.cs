@@ -9,7 +9,6 @@ using System.Xml.Linq;
 
 namespace Dapper_Layers_Generator.Data.POCO.MySql
 {
-    [Table("TABLES")]
     public class MySqlTable :ITable
     {
         public string Schema { get; set; } = null!;
@@ -20,8 +19,8 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
     {
         internal MySqlTableMap()
         {
-            Map(t => t.Schema).ToColumn("TABLE_SCHEMA");
-            Map(t => t.Name).ToColumn("TABLE_NAME");
+            Map(t => t.Schema).ToColumn("table_schema");
+            Map(t => t.Name).ToColumn("table_name");
         }
     }
 }
