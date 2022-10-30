@@ -19,13 +19,13 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
         public async Task<IEnumerable<ITable>> GetAllTablesAsync()
         {
             var p = new DynamicParameters();
-            p.Add("@shemas", _sourceSchemas);
+            p.Add("@schemas", _sourceSchemas);
 
             var sql = @"SELECT table_schema,table_name
                         FROM tables
                         WHERE table_schema in @schemas";
 
-            var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql, p);
+            var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql,p);
 
             return tables;
 

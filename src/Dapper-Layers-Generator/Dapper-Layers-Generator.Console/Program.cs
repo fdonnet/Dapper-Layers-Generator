@@ -15,7 +15,7 @@ IConfiguration config = new ConfigurationBuilder()
         .Build();
 
 using var builder = new ServiceCollection()
-    .AddSingleton<IReaderDapperContext, MysqlReaderDapperContext>()
+    .AddTransient<IReaderDapperContext, MysqlReaderDapperContext>()
     .AddSingleton(config)
     .BuildServiceProvider();
 

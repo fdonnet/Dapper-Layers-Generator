@@ -1,5 +1,6 @@
 ﻿using Dapper.FluentMap;
 using Dapper_Layers_Generator.Data.POCO.MySql;
+using Dapper_Layers_Generator.Data;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
