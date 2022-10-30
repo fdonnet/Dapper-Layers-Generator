@@ -11,6 +11,7 @@ namespace Dapper_Layers_Generator.Data.POCO
     {
         public string Schema { get; set; }
         public string Name { get; set; } 
+        public IEnumerable<IColumn>? Columns { get; set; }
     }
 
     public interface ITableMap : IEntityMap<ITable>

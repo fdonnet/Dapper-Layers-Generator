@@ -13,6 +13,8 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
     {
         public string Schema { get; set; } = null!;
         public string Name { get; set; } = null!;
+        public IEnumerable<IColumn>? Columns { get; set; }
+
     }
 
     internal class MySqlTableMap : EntityMap<MySqlTable> , ITableMap

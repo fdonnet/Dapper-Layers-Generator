@@ -34,6 +34,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             FluentMapper.Initialize(config =>
             {
                 config.AddMap<MySqlTable>(new MySqlTableMap());
+                config.AddMap<MySqlColumn>(new MySqlColumnMap());
             });
         }
     }

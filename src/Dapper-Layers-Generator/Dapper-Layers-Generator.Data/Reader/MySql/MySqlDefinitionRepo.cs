@@ -32,5 +32,20 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             return tables;
 
         }
+
+        public async Task<IEnumerable<IColumn>> GetAllColumnsAsync()
+        {
+            var p = new DynamicParameters();
+            p.Add("@schemas", _sourceSchemas);
+
+            var sql = @"SELECT table_name,column_name
+                        FROM columns
+                        WHERE table_schema in @schemas";
+
+            var columns = await _dbContext.Connection.QueryAsync<MySqlColumn>(sql, p);
+
+            return columns;
+
+        }
     }
 }

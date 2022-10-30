@@ -57,16 +57,21 @@ else
     Console.WriteLine(@$"Provider not supported, app will shut down ...");
 }
 
-
+//////////////////////////////////////////////////
 //Console Steps
+/////////////////////////////////////////////////
+
+//DB Loading
 async Task LoadDBDefintionStep()
 {
     Console.Clear();
-    Console.WriteLine(await _consoleService.LoadDBDefinitions());
-    var k = Console.ReadKey();
+    Console.WriteLine(await _consoleService.LoadDBDefinitionsAsync());
+    var k = Console.ReadKey().Key;
 
-
-
+    if(k==ConsoleKey.Y)
+    {
+        Console.Write(_consoleService.PrintDBDefintionAsync());
+    }
 }
 
 

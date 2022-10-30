@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Dapper_Layers_Generator.Console
 {
@@ -35,7 +37,7 @@ SCHEMAS : {schmeas}";
 
         }
 
-        public async Task<string> LoadDBDefinitions()
+        public async Task<string> LoadDBDefinitionsAsync()
         {
             var msg = string.Empty;
             try
@@ -59,6 +61,19 @@ TRACE: {ex.StackTrace}";
             }
 
             return msg;
+        }
+
+        public string PrintDBDefintionAsync()
+        {
+            var option = new JsonSerializerOptions() { WriteIndented = true };
+            var jsonExtract = JsonSerializer.Serialize(_reader.TablesDefinitions,option);
+            var msg =
+$@"JSON extract of your table defintions:
+
+{jsonExtract}";
+
+            return msg;
+
         }
     }
 }
