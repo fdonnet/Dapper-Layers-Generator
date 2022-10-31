@@ -7,15 +7,14 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Data.POCO
 {
-    public interface IColumn
+    public interface ISchema
     {
-        public string Schema { get; set; }
-        public string Table { get; set; }
         public string Name { get; set; }
+        public IEnumerable<ITable>? Tables { get; set; }
     }
-    public interface IColumnMap : IEntityMap<IColumn>
+
+    public interface ISchemaMap : IEntityMap<ISchema>
     {
 
     }
-
 }

@@ -9,6 +9,7 @@ namespace Dapper_Layers_Generator.Data.Reader
 {
     public interface IDatabaseDefinitionsRepo
     {
+        Task<IEnumerable<ISchema>> GetAllSchemasAsync();
         Task<IEnumerable<ITable>> GetAllTablesAsync();
         Task<IEnumerable<IColumn>> GetAllColumnsAsync();
     }

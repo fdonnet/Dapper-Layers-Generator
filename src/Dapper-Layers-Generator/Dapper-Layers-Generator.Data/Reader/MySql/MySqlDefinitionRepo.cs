@@ -17,6 +17,22 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             
         }
 
+        public async Task<IEnumerable<ISchema>> GetAllSchemasAsync()
+        {
+            var p = new DynamicParameters();
+            p.Add("@schemas", _sourceSchemas);
+
+            var sql = @"SELECT schema_name
+                        FROM schemata
+                        WHERE schema_name in @schemas
+                        ORDER by schema_name";
+
+            var tables = await _dbContext.Connection.QueryAsync<MySqlSchema>(sql, p);
+
+            return tables;
+
+        }
+
         public async Task<IEnumerable<ITable>> GetAllTablesAsync()
         {
             var p = new DynamicParameters();
@@ -24,8 +40,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var sql = @"SELECT table_schema,table_name
                         FROM tables
-                        WHERE table_schema in @schemas
-                        ORDER by table_schema, table_name";
+                        WHERE table_schema in @schemas";
 
             var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql,p);
 
@@ -38,7 +53,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
 
-            var sql = @"SELECT table_name,column_name
+            var sql = @"SELECT table_name,column_name, table_schema
                         FROM columns
                         WHERE table_schema in @schemas";
 

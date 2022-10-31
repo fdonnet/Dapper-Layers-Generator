@@ -1,6 +1,5 @@
 ﻿
 using Dapper.FluentMap;
-using Dapper_Layers_Generator.Console;
 using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Data.POCO.MySql;
 using Dapper_Layers_Generator.Data.Reader;
@@ -8,57 +7,177 @@ using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Security;
+using Spectre.Console;
 using System;
 using System.Data;
+using System.Reflection.PortableExecutable;
+using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
-ConsoleService _consoleService;
-
+string _dbProvider = string.Empty;
+ServiceProvider? _builder = null;
+IConfiguration? _config = null;
+ReaderDBDefinitionService? _dataService = null;
 
 //////////////////////////////////////////////////
 //MAIN
 /////////////////////////////////////////////////
 
 //Configuration
-IConfiguration config = new ConfigurationBuilder()
+_config = new ConfigurationBuilder()
         .AddUserSecrets<Program>()
         .AddEnvironmentVariables()
         .Build();
 
 var services = new ServiceCollection()
-    .AddSingleton(config);
+    .AddSingleton(_config);
 
-//Welcome (choose your DB provider)
-var welcome = WelcomeMsg(config);
-Console.WriteLine(welcome);
+//Welcome
+WelcomeMsg();
 
-if (welcome.Contains("ERROR"))
-    Environment.Exit(0);
+//Choose dbprovider and build service
+ProviderChoice();
+
+////Load DB definitions
+await InitAndLoadDbDefinitions();
 
 
-//Read db provider choice
-var dbProvider = Console.ReadLine();
+//////////////////////////////////////////////////
+//Console Steps
+/////////////////////////////////////////////////
 
-//Services conf
-dbProvider = dbProvider ?? "";
-var builder = ServicesConfig(dbProvider, services);
-
-//Cannot build the services (bye)
-if (builder == null)
+void WelcomeMsg()
 {
-    Console.WriteLine(@$"Provider not supported or services problem, app will shut down ...");
-    Environment.Exit(0);
+    //var errMsg = @$"
+    //ERROR cannot read the config(connection string and or schemas choice)
+    //ConnectionString: Default / DB:Schemas, app will exit";
+
+    string schemas = string.Empty;
+    bool isOk = false;
+
+    AnsiConsole.Write(
+        new FigletText("Dapper Layers Generator")
+        .Centered());
+
+    AnsiConsole.Status()
+        .Start("Loading your connection string in config", ctx =>
+        {
+            try
+            {
+                if (_config != null)
+                {
+                    if (string.IsNullOrEmpty(_config.GetConnectionString("Default")))
+                    {
+                        AnsiConsole.MarkupLine("Cannot read your ConnectionStrings:Default connection string ...");
+                    }
+                    else
+                    {
+
+                        schemas = _config["DB:Schemas"];
+
+                        if (string.IsNullOrEmpty(schemas))
+                        {
+                            AnsiConsole.MarkupLine("Cannot read your DB:Schemas config string ...");
+                        }
+                        else
+                        {
+                            var info =
+$@"
+Connection string loading: SUCCESS !
+Schemas specified:  {schemas}
+";
+                            var panel = new Panel(info);
+                            AnsiConsole.Write(panel);
+
+                            isOk = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                isOk = false;
+                AnsiConsole.WriteException(ex);
+            }
+        });
+
+    if (!isOk)
+    {
+        AnsiConsole.MarkupLine($"App will exit (10sec) ...");
+        Thread.Sleep(10000);
+        Environment.Exit(0);
+    }
 }
 
-//From now (services are runing, we can use the console service to print)
-_consoleService = builder.GetRequiredService<ConsoleService>();
+void ProviderChoice()
+{
+    _dbProvider = AnsiConsole.Prompt(
+    new SelectionPrompt<string>()
+        .Title("Choose your dbprovider:")
+        .PageSize(10)
+        .AddChoices(new[] {
+            "mysql",
+        }));
 
-//Summary
-Console.Clear();
-Console.WriteLine(_consoleService.BeginSummaryPrint(dbProvider));
+    try
+    {
+        _builder = ServicesConfig(_dbProvider, services);
+        AnsiConsole.MarkupLine("DbProvider loading: SUCCESS !");
+    }
+    catch (Exception ex)
+    {
+        AnsiConsole.WriteException(ex);
+    }
 
-//Load DB definitions
-await LoadDBDefinitionsStep();
+    if (_builder == null)
+    {
+        AnsiConsole.WriteLine(@$"Provider not supported or services problem, app will shut down (10sec) ...");
+        Thread.Sleep(10000);
+        Environment.Exit(0);
+    }
+
+}
+
+async Task InitAndLoadDbDefinitions()
+{
+    try
+    {
+        AnsiConsole.Clear();
+
+        _dataService = _builder!.GetRequiredService<ReaderDBDefinitionService>();
+
+        await AnsiConsole.Status()
+            .StartAsync(
+                "Loading DB definitions...",
+                    _ =>  _dataService.ReadAllDBDefinitionsStepAsync());
+
+        AnsiConsole.WriteLine("DB definitions loaded.");
+        if (AnsiConsole.Confirm("Do you want to print all definitions ?"))
+        {
+            var option = new JsonSerializerOptions() { WriteIndented = true };
+            string extract = string.Empty;
+            AnsiConsole.Status()
+            .Start("Printing DB definitions...", ctx =>
+            {
+                extract = JsonSerializer.Serialize(_dataService.SchemaDefinitions, option);
+                AnsiConsole.WriteLine(extract);
+
+                AnsiConsole.MarkupLine("Print finished !");
+            });
+        }
+
+    }
+    catch (Exception ex)
+    {
+        AnsiConsole.WriteException(ex);
+        AnsiConsole.WriteLine(@$"Cannot read DB or print DB definition, app will shut down (10sec) ...");
+        Thread.Sleep(10000);
+        Environment.Exit(0);
+    }
+
+}
+
+
 
 
 //////////////////////////////////////////////////
@@ -76,66 +195,10 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     if (dbProvider == "mysql")
     {
         services.AddSingleton<ReaderDBDefinitionService>();
-        services.AddSingleton<ConsoleService>();
         return services.BuildServiceProvider();
     }
 
     return null;
 
-}
-
-
-//////////////////////////////////////////////////
-//Console Steps
-/////////////////////////////////////////////////
-
-//Welcome
-static string WelcomeMsg(IConfiguration config)
-{
-    var error = @$"
-ERROR cannot read the config(connection string and or schemas choice)
-ConnectionString: Default / DB:Schemas, app will exit";
-
-    if (config != null)
-    {
-        try
-        {
-            var connectionStr = config.GetConnectionString("Default");
-            var schemas = config["DB:Schemas"];
-
-            if (!string.IsNullOrEmpty(connectionStr) && !string.IsNullOrEmpty(schemas))
-                return @$"
-******************************************************
-*** Welcome, you will generate layers from your DB ***
-******************************************************
-
-DB connection: FOUND !
-DB Schemas specified for the generator: {schemas}
-
-
--- Choose your DB provider, (mysql) :";
-            else
-                return error;
-        }
-        catch
-        {
-            return error;
-
-        }
-    }
-    return error;
-}
-
-//DB Loading
-async Task LoadDBDefinitionsStep()
-{
-    Console.Clear();
-    Console.WriteLine(await _consoleService.LoadDBDefinitionsAsync());
-    var k = Console.ReadKey().Key;
-
-    if (k == ConsoleKey.Y)
-    {
-        Console.Write(_consoleService.PrintDBDefintionAsync());
-    }
 }
 

@@ -11,11 +11,13 @@ namespace Dapper_Layers_Generator.Core
 {
     public class ReaderDBDefinitionService
     {
-        public IEnumerable<ITable>? TablesDefinitions { get; private set; }
+        public IEnumerable<ISchema>? SchemaDefinitions { get; private set; }
 
         private IReaderDapperContext _context;
         private IConfiguration _config;
-        
+        private IEnumerable<ITable>? _tables;
+        private IEnumerable<IColumn>? _columns;
+
         public ReaderDBDefinitionService(IConfiguration config, IReaderDapperContext context)
         {
             _config = config;
@@ -25,25 +27,29 @@ namespace Dapper_Layers_Generator.Core
         //Can manage para connection to dot it via DBContext Factory
         public async Task ReadAllDBDefinitionsStepAsync()
         {
-            await ReadTableDefinitionsAsync();
-            await ReadColumnDefinitionsAsync();
+            SchemaDefinitions = await _context.DatabaseDefinitionsRepo.GetAllSchemasAsync();
+            _tables = await _context.DatabaseDefinitionsRepo.GetAllTablesAsync();
+            _columns = await _context.DatabaseDefinitionsRepo.GetAllColumnsAsync();
+
+            LinkDbDefinitions();
         }
 
-        private async Task ReadTableDefinitionsAsync()
+        private void LinkDbDefinitions()
         {
-            TablesDefinitions = await _context.DatabaseDefinitionsRepo.GetAllTablesAsync();
-        }
-
-        private async Task ReadColumnDefinitionsAsync()
-        {
-            var _columnDefintions = await _context.DatabaseDefinitionsRepo.GetAllColumnsAsync();
-
-            //Link columns to tables (better way to do that with linq, no time)
-            if(TablesDefinitions != null)
+            //Very bad loop => can do it better with linq
+            if(SchemaDefinitions != null)
             {
-                foreach (var table in TablesDefinitions)
+                foreach (var schema in SchemaDefinitions)
                 {
-                    table.Columns = _columnDefintions.Where(c => c.Table == table.Name);
+                    schema.Tables = _tables?.Where(t => t.Schema == schema.Name);
+                    
+                    if (schema.Tables != null)
+                    {
+                        foreach (var table in schema.Tables)
+                        {
+                            table.Columns = _columns?.Where(c => c.Schema == schema.Name && c.Table == table.Name);
+                        }
+                    }
                 }
             }
         }

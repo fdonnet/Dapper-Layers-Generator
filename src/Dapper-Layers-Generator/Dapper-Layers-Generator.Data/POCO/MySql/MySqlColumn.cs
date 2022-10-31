@@ -9,6 +9,7 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
 {
     public class MySqlColumn : IColumn
     {
+        public string Schema { get; set; } = null!;
         public string Table { get; set; } = null!;
         public string Name { get; set; } = null!;
     }
@@ -17,6 +18,7 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
     {
         internal MySqlColumnMap()
         {
+            Map(t => t.Schema).ToColumn("table_schema");
             Map(t => t.Table).ToColumn("table_name");
             Map(t => t.Name).ToColumn("column_name");
         }
