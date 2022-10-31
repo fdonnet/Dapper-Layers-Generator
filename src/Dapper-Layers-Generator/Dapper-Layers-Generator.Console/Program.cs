@@ -154,16 +154,7 @@ async Task InitAndLoadDbDefinitions()
         AnsiConsole.WriteLine("DB definitions loaded.");
         if (AnsiConsole.Confirm("Do you want to print all definitions ?"))
         {
-            var option = new JsonSerializerOptions() { WriteIndented = true };
-            string extract = string.Empty;
-            AnsiConsole.Status()
-            .Start("Printing DB definitions...", ctx =>
-            {
-                extract = JsonSerializer.Serialize(_dataService.SchemaDefinitions, option);
-                AnsiConsole.WriteLine(extract);
-
-                AnsiConsole.MarkupLine("Print finished !");
-            });
+            PrintDbDefinitions();
         }
 
     }
@@ -177,7 +168,20 @@ async Task InitAndLoadDbDefinitions()
 
 }
 
+void PrintDbDefinitions()
+{
+    AnsiConsole.Clear();
+    var option = new JsonSerializerOptions() { WriteIndented = true };
+    string extract = string.Empty;
+    AnsiConsole.Status()
+    .Start("Printing DB definitions...", ctx =>
+    {
+        extract = JsonSerializer.Serialize(_dataService.SchemaDefinitions, option);
+        AnsiConsole.WriteLine(extract);
 
+        AnsiConsole.MarkupLine("Print finished !");
+    });
+}
 
 
 //////////////////////////////////////////////////

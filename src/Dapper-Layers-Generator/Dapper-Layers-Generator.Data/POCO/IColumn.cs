@@ -12,6 +12,9 @@ namespace Dapper_Layers_Generator.Data.POCO
         public string Schema { get; set; }
         public string Table { get; set; }
         public string Name { get; set; }
+        public int Position { get; set; }
+        public bool IsNullable { get; set; }
+
     }
     public interface IColumnMap : IEntityMap<IColumn>
     {

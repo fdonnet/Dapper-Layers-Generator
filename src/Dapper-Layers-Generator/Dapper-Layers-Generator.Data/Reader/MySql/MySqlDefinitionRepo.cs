@@ -53,7 +53,11 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
 
-            var sql = @"SELECT table_name,column_name, table_schema
+            var sql = @"SELECT table_name
+                        ,column_name
+                        ,table_schema
+                        ,ordinal_position
+                        ,is_nullable
                         FROM columns
                         WHERE table_schema in @schemas";
 

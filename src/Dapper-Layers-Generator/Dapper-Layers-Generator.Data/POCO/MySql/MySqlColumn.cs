@@ -1,9 +1,11 @@
 ﻿using Dapper.FluentMap.Mapping;
+using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Dapper_Layers_Generator.Data.POCO.MySql
 {
@@ -12,15 +14,7 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
         public string Schema { get; set; } = null!;
         public string Table { get; set; } = null!;
         public string Name { get; set; } = null!;
-    }
-
-    internal class MySqlColumnMap : EntityMap<MySqlColumn>, IColumnMap
-    {
-        internal MySqlColumnMap()
-        {
-            Map(t => t.Schema).ToColumn("table_schema");
-            Map(t => t.Table).ToColumn("table_name");
-            Map(t => t.Name).ToColumn("column_name");
-        }
+        public int Position { get; set; }
+        public bool IsNullable { get; set; }
     }
 }
