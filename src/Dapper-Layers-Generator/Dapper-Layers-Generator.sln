@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Core", "Dapper-Layers-Generator.Core\Dapper-Layers-Generator.Core.csproj", "{AFD9B307-2F84-4904-AF2C-BE442180386C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper-Layers-Generator.Core", "Dapper-Layers-Generator.Core\Dapper-Layers-Generator.Core.csproj", "{AFD9B307-2F84-4904-AF2C-BE442180386C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Console", "Dapper-Layers-Generator.Console\Dapper-Layers-Generator.Console.csproj", "{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper-Layers-Generator.Console", "Dapper-Layers-Generator.Console\Dapper-Layers-Generator.Console.csproj", "{E11E2BFC-3FAE-4005-8F49-C18D36D9F793}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Data", "Dapper-Layers-Generator.Data\Dapper-Layers-Generator.Data.csproj", "{B45C4D01-6A4A-4511-9AA0-4C2630759361}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper-Layers-Generator.Data", "Dapper-Layers-Generator.Data\Dapper-Layers-Generator.Data.csproj", "{B45C4D01-6A4A-4511-9AA0-4C2630759361}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
