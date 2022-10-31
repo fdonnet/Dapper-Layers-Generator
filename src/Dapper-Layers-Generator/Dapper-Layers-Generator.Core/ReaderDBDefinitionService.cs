@@ -17,6 +17,7 @@ namespace Dapper_Layers_Generator.Core
         private IConfiguration _config;
         private IEnumerable<ITable>? _tables;
         private IEnumerable<IColumn>? _columns;
+        private IEnumerable<IKey>? _keys;
 
         public ReaderDBDefinitionService(IConfiguration config, IReaderDapperContext context)
         {
@@ -30,6 +31,7 @@ namespace Dapper_Layers_Generator.Core
             SchemaDefinitions = (await _context.DatabaseDefinitionsRepo.GetAllSchemasAsync()).ToList();
             _tables = await _context.DatabaseDefinitionsRepo.GetAllTablesAsync();
             _columns = await _context.DatabaseDefinitionsRepo.GetAllColumnsAsync();
+            _keys = await _context.DatabaseDefinitionsRepo.GetAllPrimaryAndUniqueKeys();
 
             LinkDbDefinitions();
         }
@@ -48,6 +50,23 @@ namespace Dapper_Layers_Generator.Core
                         foreach (var table in schema.Tables)
                         {
                             table.Columns = _columns?.Where(c => c.Schema == schema.Name && c.Table == table.Name).ToList();
+
+                            if(table.Columns != null)
+                            {
+                                foreach (var col in table.Columns)
+                                {
+                                    col.IsPrimary = _keys?.Where(k => k.Schema == col.Schema
+                                                                && k.Table == col.Table
+                                                                && k.Column == col.Name
+                                                                && k.Type == KeyType.Primary).Any() ?? false;
+
+                                    col.HasUniqueIndex = _keys?.Where(k => k.Schema == col.Schema
+                                                                && k.Table == col.Table
+                                                                && k.Column == col.Name
+                                                                && k.Type == KeyType.Unique).Any() ?? false;
+
+                                }
+                            }
                         }
                     }
                 }

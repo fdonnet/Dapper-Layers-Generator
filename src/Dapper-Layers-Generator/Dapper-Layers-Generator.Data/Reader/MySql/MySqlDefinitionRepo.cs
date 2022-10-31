@@ -72,6 +72,11 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                         ,table_schema
                         ,ordinal_position
                         ,is_nullable
+                        ,data_type
+                        ,character_maximum_length
+                        ,numeric_precision
+                        ,numeric_scale
+                        ,extra
                         FROM columns
                         WHERE table_schema in @schemas";
 
@@ -83,11 +88,44 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                 Table = c.table_name,
                 Name = c.column_name,
                 Position = (int)c.ordinal_position,
-                IsNullable = c.is_nullable == "Yes" ? true : false
+                IsNullable = c.is_nullable == "Yes" ? true : false,
+                DataType = c.data_type,
+                Length = (int?)c.character_maximum_length ?? 0,
+                Precision = (int?)c.numeric_precision ?? 0,
+                Scale = (int?)c.numeric_scale ?? 0,
+                IsAutoIncrement = c.extra == "auto_increment" ? true : false
             });
 
             return columns;
-
         }
+
+        public async Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeys()
+        {
+            var p = new DynamicParameters();
+            p.Add("@schemas", _sourceSchemas);
+
+            var sql = @"SELECT table_schema
+                        ,table_name
+                        ,column_name
+                        ,index_name
+                        FROM statistics
+                        WHERE table_schema in @schemas
+                        AND non_unique = 0";
+
+            var constraintsDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
+
+            var keys = constraintsDyna.Select(c => new MySqlKey()
+            {
+                Schema = c.table_schema,
+                Table = c.table_name,
+                Column = c.column_name,
+                Name = c.index_name,
+                Type = c.index_name == "PRIMARY" ? KeyType.Primary : KeyType.Unique
+            });
+
+            return keys;
+        }
+
+
     }
 }
