@@ -1,13 +1,16 @@
 ﻿using Dapper_Layers_Generator.Core;
+using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO.MySql;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Security;
 using Spectre.Console;
 using System;
 using System.Data;
+using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
@@ -16,6 +19,8 @@ string _dbProvider = string.Empty;
 ServiceProvider? _builder = null;
 IConfiguration? _config = null;
 ReaderDBDefinitionService? _dataService = null;
+GeneratorService? _generatorService = null;
+var _jsonOption = new JsonSerializerOptions() { WriteIndented = true };
 
 //////////////////////////////////////////////////
 //MAIN
@@ -154,21 +159,21 @@ async Task InitAndLoadDbDefinitions()
 
         _dataService = _builder!.GetRequiredService<ReaderDBDefinitionService>();
 
-       await AnsiConsole.Status()
-            .StartAsync(
-                "Loading DB definitions...",
-                     async ctx =>
-                    {
-                        await _dataService.ReadAllDBDefinitionsStepAsync();
-                    });
-        
+        await AnsiConsole.Status()
+             .StartAsync(
+                 "Loading DB definitions...",
+                      async ctx =>
+                     {
+                         await _dataService.ReadAllDBDefinitionsStepAsync();
+                     });
+
         AnsiConsole.WriteLine("DB definitions loaded.");
-        if (AnsiConsole.Confirm("Do you want to print all definitions ?",false))
+        if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
         {
-            PrintDbDefinitions();
+            await PrintDbDefinitions();
         }
         else
-            MainMenu();
+            await MainMenu();
 
     }
     catch (Exception ex)
@@ -181,30 +186,28 @@ async Task InitAndLoadDbDefinitions()
 
 }
 
-void PrintDbDefinitions()
+async Task PrintDbDefinitions()
 {
     AnsiConsole.Clear();
-    var option = new JsonSerializerOptions() { WriteIndented = true };
+
     string extract = string.Empty;
     AnsiConsole.Status()
     .Start("Printing DB definitions...", ctx =>
     {
-        extract = JsonSerializer.Serialize(_dataService.SchemaDefinitions, option);
+        extract = JsonSerializer.Serialize(_dataService!.SchemaDefinitions, _jsonOption);
         AnsiConsole.WriteLine(extract);
         AnsiConsole.MarkupLine("Print finished !");
     });
 
-    AnsiConsole.Write("Press any key to be redirected to the main menu");
-
-    Console.ReadKey();
-
-    MainMenu();
+    await ReturnToMain();
 }
 
 
 //MAIN MENU PART/////////////////////////////////////////////
-void MainMenu()
+async Task MainMenu()
 {
+    _generatorService = _builder!.GetRequiredService<GeneratorService>();
+
     AnsiConsole.Clear();
     MainTitle();
 
@@ -212,22 +215,146 @@ void MainMenu()
     new SelectionPrompt<string>()
         .Title("MENU")
         .AddChoices(new[] {
-            "1) Re-print DB definition (JSON)", 
-            "2) Begin the general config wizard",
+            "Re-print DB definition (JSON)",
+            "Load settings from file",
+            "See global settings",
+            "Save settings to file",
+            "Quit, don't forget to save your config !!!",
         }));
 
     switch (menu)
     {
-        case "1) Re-print DB definition (JSON)":
-            PrintDbDefinitions();
+        case "Re-print DB definition (JSON)":
+            await PrintDbDefinitions();
             break;
-
-            
+        case "Load settings from file":
+            var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");
+            try
+            {
+                _generatorService.GlobalGeneratorSettings = await SettingsGlobal.LoadFromFile(pathLoad) ?? new SettingsGlobal();
+                AnsiConsole.WriteLine("File loaded !");
+                await ReturnToMain();
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.Write("Error during save !");
+                AnsiConsole.WriteException(ex);
+                await ReturnToMain();
+            }
+            break;
+        case "See global settings":
+            await SeeGlobalSettings();
+            break;
+        case "Save settings to file":
+            var pathSave = AnsiConsole.Ask<string>(@"Specify a complete filepath to save your config:");
+            try
+            {
+                await _generatorService.GlobalGeneratorSettings.SaveToFile(pathSave);
+                AnsiConsole.WriteLine("File saved !");
+                await ReturnToMain();
+            }
+            catch(Exception ex)
+            {
+                AnsiConsole.WriteLine("Error during save !");
+                AnsiConsole.WriteException(ex);
+                await ReturnToMain();
+            }
+            break;
+        case "Quit, don't forget to save your config !!!":
+            AnsiConsole.WriteLine("BYE !!!");
+            Thread.Sleep(2000);
+            Environment.Exit(0);
+            break;
+        default:
+            await MainMenu();
+            break;
     }
 
 }
 
+async Task SeeGlobalSettings()
+{
+    AnsiConsole.Clear();
+    string extract = string.Empty;
+    var schemas = _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas
+                    ? _config["DB:Schemas"]
+                    : _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas != null
+                                ? String.Join(",", _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas!)
+                                : "";
 
+    AnsiConsole.WriteLine("Choose the value you want to change:");
+
+    var table = new Table();
+    // Add some columns
+    table.AddColumn("Settings");
+    table.AddColumn("Value");
+    // Add some rows
+    table.AddRow("1) Selected schemas to be generated:", schemas);
+    table.AddRow("2) Author name:", _generatorService.GlobalGeneratorSettings.AuthorName);
+    table.AddRow("3) Namespace used for the POCOs:", _generatorService.GlobalGeneratorSettings.Namespace_POCO);
+    table.AddRow("4) Namespace used for the Repos:", _generatorService.GlobalGeneratorSettings.Namespace_Repo);
+    table.AddRow("5) Namespace used for the Context:", _generatorService.GlobalGeneratorSettings.Namespace_Context);
+
+    AnsiConsole.Write(table);
+
+    var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
+
+    if (value == "q")
+        await MainMenu();
+
+    if (value != null && (new string[] { "1", "2", "3", "4", "5" }).Any(value.Contains))
+    {
+        switch (value)
+        {
+            case "1":
+                AnsiConsole.WriteLine("");
+                _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas =
+                    AnsiConsole.Prompt(
+                        new MultiSelectionPrompt<string>()
+                            .Title("Choose at least one schema to be generated: ")
+                            .AddChoices(_config["DB:Schemas"].Split(","))
+                            .Required());
+
+                if (_generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas.Count < _config["DB:Schemas"].Split(",").Count())
+                    _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas = false;
+                else
+                {
+                    _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas = true;
+                    _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas = new List<string>();
+                }
+
+                break;
+            case "2":
+                _generatorService.GlobalGeneratorSettings.AuthorName = AnsiConsole.Ask<string>("New author name");
+                break;
+
+            case "3":
+                _generatorService.GlobalGeneratorSettings.Namespace_POCO = AnsiConsole.Ask<string>("New Namespace for POCO:");
+                break;
+            case "4":
+                _generatorService.GlobalGeneratorSettings.Namespace_Repo = AnsiConsole.Ask<string>("New Namespace for repo:");
+                break;
+
+            case "5":
+                _generatorService.GlobalGeneratorSettings.Namespace_Context = AnsiConsole.Ask<string>("New Namespace for Context:");
+                break;
+
+            default:
+                await SeeGlobalSettings();
+                break;
+        }
+
+    }
+
+    await SeeGlobalSettings();
+}
+
+async Task ReturnToMain()
+{
+    AnsiConsole.Write("Press any key to be redirected to the main menu");
+    Console.ReadKey();
+    await MainMenu();
+}
 
 //////////////////////////////////////////////////
 //Services config
@@ -244,6 +371,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     if (dbProvider == "mysql")
     {
         services.AddSingleton<ReaderDBDefinitionService>();
+        services.AddSingleton<GeneratorService>();
         return services.BuildServiceProvider();
     }
 
