@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Dapper.FluentMap;
 using Dapper_Layers_Generator.Data.POCO;
 using Dapper_Layers_Generator.Data.POCO.MySql;
 using System;
@@ -10,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
+
+    /// <summary>
+    /// Simple linq to MAP (auto mapper can do the job... tried fluentmap but have some limitations)
+    /// </summary>
     public class MySqlDefinitionRepo : DatabaseDefinitionsRepoBase, IDatabaseDefinitionsRepo
     {
         public MySqlDefinitionRepo(IReaderDapperContext dbContext, string schemas) : base(dbContext, schemas)
@@ -27,9 +30,14 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                         WHERE schema_name in @schemas
                         ORDER by schema_name";
 
-            var tables = await _dbContext.Connection.QueryAsync<MySqlSchema>(sql, p);
+            var schemasDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
 
-            return tables;
+            var schemas = schemasDyna.Select(s => new MySqlSchema()
+            {
+                Name = s.schema_name
+            });
+
+            return schemas;
 
         }
 
@@ -42,7 +50,13 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                         FROM tables
                         WHERE table_schema in @schemas";
 
-            var tables = await _dbContext.Connection.QueryAsync<MySqlTable>(sql,p);
+            var tablesDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql,p);
+
+            var tables = tablesDyna.Select(t => new MySqlTable()
+            {
+                Schema = t.table_schema,
+                Name = t.table_name
+            });
 
             return tables;
 
@@ -61,7 +75,16 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                         FROM columns
                         WHERE table_schema in @schemas";
 
-            var columns = await _dbContext.Connection.QueryAsync<MySqlColumn>(sql, p);
+            var columnsDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
+
+            var columns = columnsDyna.Select(c => new MySqlColumn()
+            {
+                Schema = c.table_schema,
+                Table = c.table_name,
+                Name = c.column_name,
+                Position = (int)c.ordinal_position,
+                IsNullable = c.is_nullable == "Yes" ? true : false
+            });
 
             return columns;
 

@@ -1,5 +1,4 @@
-﻿using Dapper.FluentMap;
-using Dapper_Layers_Generator.Data.POCO.MySql;
+﻿using Dapper_Layers_Generator.Data.POCO.MySql;
 using Dapper_Layers_Generator.Data;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
@@ -22,21 +21,10 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
         {
             get
             {
-                if (_databaseDefinitionsRepo == null)
-                    _databaseDefinitionsRepo = new MySqlDefinitionRepo(this,_schemas);
+                _databaseDefinitionsRepo ??= new MySqlDefinitionRepo(this,_schemas);
 
                 return _databaseDefinitionsRepo;
             }
-        }
-
-        public override void InitFluentMap()
-        {
-            FluentMapper.Initialize(config =>
-            {
-                config.AddMap<MySqlSchema>(new MySqlSchemaMap());
-                config.AddMap<MySqlTable>(new MySqlTableMap());
-                config.AddMap<MySqlColumn>(new MySqlColumnMap());
-            });
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Dapper.FluentMap.Mapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,10 +13,6 @@ namespace Dapper_Layers_Generator.Data.POCO
         public string Name { get; set; }
         public int Position { get; set; }
         public bool IsNullable { get; set; }
-
-    }
-    public interface IColumnMap : IEntityMap<IColumn>
-    {
 
     }
 

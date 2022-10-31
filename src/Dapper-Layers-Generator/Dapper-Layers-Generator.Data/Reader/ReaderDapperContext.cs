@@ -14,7 +14,6 @@ namespace Dapper_Layers_Generator.Data.Reader
     {
         IDbConnection Connection { get; }
         IDatabaseDefinitionsRepo DatabaseDefinitionsRepo { get; set; }
-        void InitFluentMap();
     }
 
     public class ReaderDapperContext : IReaderDapperContext
@@ -43,13 +42,6 @@ namespace Dapper_Layers_Generator.Data.Reader
             _schemas = _config["DB:Schemas"];
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.Settings.CommandTimeout = 60000;
-            InitFluentMap();
-
-        }
-
-        public virtual void InitFluentMap()
-        {
-
         }
 
         public void Dispose()

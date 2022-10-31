@@ -1,6 +1,4 @@
-﻿
-using Dapper.FluentMap;
-using Dapper_Layers_Generator.Core;
+﻿using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Data.POCO.MySql;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
@@ -40,6 +38,9 @@ ProviderChoice();
 
 ////Load DB definitions
 await InitAndLoadDbDefinitions();
+
+
+
 
 
 //////////////////////////////////////////////////
@@ -146,11 +147,14 @@ async Task InitAndLoadDbDefinitions()
 
         _dataService = _builder!.GetRequiredService<ReaderDBDefinitionService>();
 
-        await AnsiConsole.Status()
+       await AnsiConsole.Status()
             .StartAsync(
                 "Loading DB definitions...",
-                    _ =>  _dataService.ReadAllDBDefinitionsStepAsync());
-
+                     async ctx =>
+                    {
+                        await _dataService.ReadAllDBDefinitionsStepAsync();
+                    });
+        
         AnsiConsole.WriteLine("DB definitions loaded.");
         if (AnsiConsole.Confirm("Do you want to print all definitions ?"))
         {
@@ -178,7 +182,6 @@ void PrintDbDefinitions()
     {
         extract = JsonSerializer.Serialize(_dataService.SchemaDefinitions, option);
         AnsiConsole.WriteLine(extract);
-
         AnsiConsole.MarkupLine("Print finished !");
     });
 }

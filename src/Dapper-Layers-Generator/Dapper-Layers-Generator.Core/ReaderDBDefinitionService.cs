@@ -11,7 +11,7 @@ namespace Dapper_Layers_Generator.Core
 {
     public class ReaderDBDefinitionService
     {
-        public IEnumerable<ISchema>? SchemaDefinitions { get; private set; }
+        public IList<ISchema>? SchemaDefinitions { get; private set; }
 
         private IReaderDapperContext _context;
         private IConfiguration _config;
@@ -27,7 +27,7 @@ namespace Dapper_Layers_Generator.Core
         //Can manage para connection to dot it via DBContext Factory
         public async Task ReadAllDBDefinitionsStepAsync()
         {
-            SchemaDefinitions = await _context.DatabaseDefinitionsRepo.GetAllSchemasAsync();
+            SchemaDefinitions = (await _context.DatabaseDefinitionsRepo.GetAllSchemasAsync()).ToList();
             _tables = await _context.DatabaseDefinitionsRepo.GetAllTablesAsync();
             _columns = await _context.DatabaseDefinitionsRepo.GetAllColumnsAsync();
 
@@ -39,15 +39,15 @@ namespace Dapper_Layers_Generator.Core
             //Very bad loop => can do it better with linq
             if(SchemaDefinitions != null)
             {
-                foreach (var schema in SchemaDefinitions)
+                foreach (ISchema schema in SchemaDefinitions)
                 {
-                    schema.Tables = _tables?.Where(t => t.Schema == schema.Name);
+                    schema.Tables = _tables?.Where(t => t.Schema == schema.Name).ToList();
                     
                     if (schema.Tables != null)
                     {
                         foreach (var table in schema.Tables)
                         {
-                            table.Columns = _columns?.Where(c => c.Schema == schema.Name && c.Table == table.Name);
+                            table.Columns = _columns?.Where(c => c.Schema == schema.Name && c.Table == table.Name).ToList();
                         }
                     }
                 }
