@@ -39,14 +39,16 @@ ProviderChoice();
 ////Load DB definitions
 await InitAndLoadDbDefinitions();
 
+//====> Go in the main menu section
 
-
+//END OF PROG---------------------------------------------------
 
 
 //////////////////////////////////////////////////
-//Console Steps
+//Console functions
 /////////////////////////////////////////////////
 
+//INIT PART/////////////////////////////////////////////
 void WelcomeMsg()
 {
     //var errMsg = @$"
@@ -56,9 +58,7 @@ void WelcomeMsg()
     string schemas = string.Empty;
     bool isOk = false;
 
-    AnsiConsole.Write(
-        new FigletText("Dapper Layers Generator")
-        .Centered());
+    MainTitle();
 
     AnsiConsole.Status()
         .Start("Loading your connection string in config", ctx =>
@@ -139,6 +139,13 @@ void ProviderChoice()
 
 }
 
+void MainTitle()
+{
+    AnsiConsole.Write(
+    new FigletText("Dapper Layers Generator")
+    .Centered());
+}
+
 async Task InitAndLoadDbDefinitions()
 {
     try
@@ -156,10 +163,12 @@ async Task InitAndLoadDbDefinitions()
                     });
         
         AnsiConsole.WriteLine("DB definitions loaded.");
-        if (AnsiConsole.Confirm("Do you want to print all definitions ?"))
+        if (AnsiConsole.Confirm("Do you want to print all definitions ?",false))
         {
             PrintDbDefinitions();
         }
+        else
+            MainMenu();
 
     }
     catch (Exception ex)
@@ -184,7 +193,40 @@ void PrintDbDefinitions()
         AnsiConsole.WriteLine(extract);
         AnsiConsole.MarkupLine("Print finished !");
     });
+
+    AnsiConsole.Write("Press any key to be redirected to the main menu");
+
+    Console.ReadKey();
+
+    MainMenu();
 }
+
+
+//MAIN MENU PART/////////////////////////////////////////////
+void MainMenu()
+{
+    AnsiConsole.Clear();
+    MainTitle();
+
+    var menu = AnsiConsole.Prompt(
+    new SelectionPrompt<string>()
+        .Title("MENU")
+        .AddChoices(new[] {
+            "1) Re-print DB definition (JSON)", 
+            "2) Begin the general config wizard",
+        }));
+
+    switch (menu)
+    {
+        case "1) Re-print DB definition (JSON)":
+            PrintDbDefinitions();
+            break;
+
+            
+    }
+
+}
+
 
 
 //////////////////////////////////////////////////
