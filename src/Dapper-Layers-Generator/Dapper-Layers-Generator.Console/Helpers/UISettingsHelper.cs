@@ -19,12 +19,12 @@ namespace Dapper_Layers_Generator.Console.Helpers
         {
             var dic = new Dictionary<int, SettingsKeyVal>();
 
-            foreach (var stringProp in settings.GetType().GetProperties())
+            foreach (var curProp in settings.GetType().GetProperties())
             {
-                if (stringProp.PropertyType == typeof(string))
+                if (curProp.PropertyType == typeof(string) || curProp.PropertyType == typeof(bool))
                 {
                     //Get property attributes
-                    var attributes = stringProp.GetCustomAttribute(typeof(SettingsAttribute), false);
+                    var attributes = curProp.GetCustomAttribute(typeof(SettingsAttribute), false);
                     if (attributes != null)
                     {
                         SettingsAttribute attr = (SettingsAttribute)attributes;
@@ -32,10 +32,11 @@ namespace Dapper_Layers_Generator.Console.Helpers
                         dic.Add(attr.Position, new SettingsKeyVal()
                         {
                             Label = $"{attr.Position}) {attr.Message}",
-                            Settings = stringProp.GetValue(settings, null)?.ToString() ?? "",
-                            PropertyName = stringProp.Name,
+                            Settings = curProp.GetValue(settings, null)?.ToString() ?? "",
+                            PropertyName = curProp.Name,
                             ChildOf = attr.ChildOf,
-                            Position = attr.Position
+                            Position = attr.Position,
+                            Type = curProp.GetType()
                         });
                     }
                 }

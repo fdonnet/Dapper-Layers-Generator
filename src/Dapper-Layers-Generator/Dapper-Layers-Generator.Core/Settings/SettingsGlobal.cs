@@ -11,6 +11,7 @@ namespace Dapper_Layers_Generator.Core.Settings
 {
     public class SettingsGlobal
     {
+        //Settings strings (custom attribute for reflection)
         [SettingsAttribute(Message ="Selected schema:", Position =1)]
         public string SelectedSchema { get; set; } = string.Empty;
 
@@ -46,13 +47,17 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Db context class name:", Position = 12)]
         public string DbContextClassName { get; set; } = "DbContext";
 
+        [SettingsAttribute(Message = "Enable PascalCase transform for all table & column names:", Position = 13)]
+        public bool UsePascalTransform { get; set; } = true;
+
+        //Tables selection to be generated (all or list of table names)
         public bool RunGeneratorForAllTables { get; set; } = true;
         public List<string> RunGeneratorForSelectedTables { get; set; } = new List<string>();
 
         //Global table settings 
         public SettingsTable TableGlobalSettings { get; set; } = new SettingsTable();
 
-        //Override table global seetings
+        //Override table global seetings (table_name key / table_seetings)
         public Dictionary<string, SettingsTable> TableSettings { get; set; } = new Dictionary<string, SettingsTable>();
 
         public async Task SaveToFile(string configPath)

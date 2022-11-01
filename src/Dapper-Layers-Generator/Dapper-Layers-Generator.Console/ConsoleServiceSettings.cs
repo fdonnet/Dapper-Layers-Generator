@@ -44,7 +44,8 @@ internal partial class ConsoleService
             {
                 newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
 
-                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath")
+                ///(Need to be string type prop or boom)
+                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath") 
                 {
                     if (AnsiConsole.Confirm("Do you want to try to update child namespaces"))
                     {
@@ -52,9 +53,9 @@ internal partial class ConsoleService
                         foreach(var item in tmpDic)
                         {
                             var oldChildValue = item.Value.Settings;
-                            if(oldChildValue.Contains(dic[intValue].Settings))
+                            if (oldChildValue.ToString()!.Contains(dic[intValue].Settings.ToString()!))
                             {
-                                var newChildValue = oldChildValue.Replace(dic[intValue].Settings, newValue);
+                                var newChildValue = oldChildValue.ToString()!.Replace(dic[intValue].Settings.ToString()!, newValue);
                                 globalSettings = UISettingsHelper.SetGlobalSettingsStringValue(globalSettings, item.Value.PropertyName, newChildValue);
                             }
                         }
@@ -68,7 +69,7 @@ internal partial class ConsoleService
         await ShowSettingsAsync();
     }
 
-    private void InitSettingsUI()
+    private static void InitSettingsUI()
     {
         AnsiConsole.Clear();
         string extract = string.Empty;
@@ -77,18 +78,18 @@ internal partial class ConsoleService
 
     private async Task<int> InitTableAndWaitUserChoice(Dictionary<int,SettingsKeyVal>dic)
     {
-        var table = new Spectre.Console.Table();
+        var tableUI = new Spectre.Console.Table();
 
-        table.AddColumn("Settings");
-        table.AddColumn("Value");
+        tableUI.AddColumn("Settings");
+        tableUI.AddColumn("Value");
 
         // Add some rows
         foreach (var entry in dic)
         {
-            table.AddRow(entry.Value.Label, entry.Value.Settings);
+            tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
         }
 
-        AnsiConsole.Write(table);
+        AnsiConsole.Write(tableUI);
 
         //Manage user inputs
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
