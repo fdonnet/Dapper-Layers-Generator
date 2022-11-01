@@ -1,5 +1,4 @@
 ﻿using Dapper_Layers_Generator.Core;
-using Microsoft.Extensions.Configuration;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -7,25 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-internal class SettingsConfig
+internal partial class ConsoleService
 {
-    public event Action? OnBackToMainMenu;
-
-    private readonly GeneratorService _generatorService = null!;
-    private readonly IConfiguration _config;
-
-    public SettingsConfig(GeneratorService generatorService, IConfiguration config)
-    {
-        _generatorService = generatorService;
-        _config = config;
-    }
-
-    internal async Task ShowAsync()
+    internal async Task ShowSettingsAsync()
     {
         AnsiConsole.Clear();
         string extract = string.Empty;
         var schemas = _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas
-                        ? _config["DB:Schemas"]
+        ? _config["DB:Schemas"]
                         : _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas != null
                                     ? String.Join(",", _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas!)
                                     : "";
@@ -48,7 +36,7 @@ internal class SettingsConfig
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
 
         if (value == "q")
-            BackToMainMenu();
+            await ShowMainMenuAsync();
 
         if (value != null && (new string[] { "1", "2", "3", "4", "5" }).Any(value.Contains))
         {
@@ -61,7 +49,7 @@ internal class SettingsConfig
                             new MultiSelectionPrompt<string>()
                                 .Title("Choose at least one schema to be generated: ")
                                 .AddChoices(_config["DB:Schemas"].Split(","))
-                                .Required());
+                    .Required());
 
                     if (_generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas.Count < _config["DB:Schemas"].Split(",").Length)
                         _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas = false;
@@ -88,18 +76,13 @@ internal class SettingsConfig
                     break;
 
                 default:
-                    await ShowAsync();
+                    await ShowSettingsAsync();
                     break;
             }
 
         }
 
-        await ShowAsync();
-    }
-
-
-    private void BackToMainMenu()
-    {
-        OnBackToMainMenu?.Invoke();
+        await ShowSettingsAsync();
     }
 }
+

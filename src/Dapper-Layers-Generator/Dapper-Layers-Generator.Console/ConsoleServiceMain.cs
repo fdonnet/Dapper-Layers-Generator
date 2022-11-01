@@ -8,34 +8,63 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper_Layers_Generator.Core.Settings;
+using Microsoft.Extensions.Configuration;
 
-internal class MainMenu
+internal partial class ConsoleService
 {
-    public event Action? OnGoToSettingsConfig;
-
     private readonly ReaderDBDefinitionService _dataService = null!;
     private readonly GeneratorService _generatorService = null!;
     private readonly JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
+    private readonly IConfiguration _config;
     
-    public MainMenu(ReaderDBDefinitionService dataService, GeneratorService generatorService)
+    public ConsoleService(ReaderDBDefinitionService dataService, GeneratorService generatorService, IConfiguration config)
     {
         _dataService = dataService;
         _generatorService = generatorService;
+        _config = config;
     }
 
-    internal async Task InitAsync()
+    internal async Task InitAndLoadDbDefinitionsAsync()
     {
-        await InitAndLoadDbDefinitionsAsync();
+        try
+        {
+            AnsiConsole.Clear();
+
+            await AnsiConsole.Status()
+                 .StartAsync(
+                     "Loading DB definitions...",
+                          async ctx =>
+                          {
+                              await _dataService.ReadAllDBDefinitionsStepAsync();
+                          });
+
+            AnsiConsole.WriteLine("DB definitions loaded.");
+            if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
+            {
+                await PrintDbDefinitionsAsync();
+            }
+            else
+                await ShowMainMenuAsync();
+
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.WriteException(ex);
+            AnsiConsole.WriteLine(@$"Cannot read DB or print DB definition, app will shut down (10sec) ...");
+            Thread.Sleep(10000);
+            Environment.Exit(0);
+        }
+
     }
 
     internal async Task ReturnToMainMenuAsync()
     {
         AnsiConsole.Write("Main menu redirection, press any key");
         Console.ReadKey();
-        await ShowAsync();
+        await ShowMainMenuAsync();
     }
 
-    internal async Task ShowAsync()
+    internal async Task ShowMainMenuAsync()
     {
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
@@ -73,7 +102,7 @@ internal class MainMenu
                 break;
             case "See global settings":
                 AnsiConsole.Clear();
-                GoToSettingsConfig();
+                await ShowSettingsAsync();
                 break;
             case "Save settings to file":
                 var pathSave = AnsiConsole.Ask<string>(@"Specify a complete filepath to save your config:");
@@ -96,42 +125,9 @@ internal class MainMenu
                 Environment.Exit(0);
                 break;
             default:
-                await Refresh();
+                await ShowMainMenuAsync();
                 break;
         }
-    }
-
-    private async Task InitAndLoadDbDefinitionsAsync()
-    {
-        try
-        {
-            AnsiConsole.Clear();
-
-            await AnsiConsole.Status()
-                 .StartAsync(
-                     "Loading DB definitions...",
-                          async ctx =>
-                          {
-                              await _dataService.ReadAllDBDefinitionsStepAsync();
-                          });
-
-            AnsiConsole.WriteLine("DB definitions loaded.");
-            if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
-            {
-               await PrintDbDefinitionsAsync();
-            }
-            else
-                await Refresh();
-
-        }
-        catch (Exception ex)
-        {
-            AnsiConsole.WriteException(ex);
-            AnsiConsole.WriteLine(@$"Cannot read DB or print DB definition, app will shut down (10sec) ...");
-            Thread.Sleep(10000);
-            Environment.Exit(0);
-        }
-
     }
 
     private async Task PrintDbDefinitionsAsync()
@@ -148,16 +144,6 @@ internal class MainMenu
         });
 
         await ReturnToMainMenuAsync();
-    }
-
-    private async Task Refresh()
-    {
-        await ShowAsync();
-    }
-
-    private void GoToSettingsConfig()
-    {
-        OnGoToSettingsConfig?.Invoke();
     }
 
 }
