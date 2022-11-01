@@ -1,8 +1,12 @@
-﻿using Dapper_Layers_Generator.Core;
+﻿using Dapper_Layers_Generator.Console.Helpers;
+using Dapper_Layers_Generator.Core;
+using Dapper_Layers_Generator.Core.Settings;
+using MySqlX.XDevAPI.Relational;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,79 +14,96 @@ internal partial class ConsoleService
 {
     internal async Task ShowSettingsAsync()
     {
+        InitSettingsUI();
+
+        var globalSettings = _generatorService.GlobalGeneratorSettings;
+
+        //Set first schema from config
+        globalSettings.SelectedSchema = string.IsNullOrEmpty(_generatorService.GlobalGeneratorSettings.SelectedSchema)
+             ? globalSettings.SelectedSchema = _config["DB:Schemas"].Split(",")[0]
+             : globalSettings.SelectedSchema;
+
+        //Init settings div
+        var dic = UISettingsHelper.SettingsDic(globalSettings);
+
+        int intValue = await InitTableAndWaitUserChoice(dic);
+
+        //Change settings values
+        if (dic.ContainsKey(intValue))
+        {
+            string newValue = string.Empty;
+            if (dic[intValue].PropertyName == "SelectedSchema")
+            {
+                AnsiConsole.WriteLine("");
+                newValue = AnsiConsole.Prompt(
+                         new SelectionPrompt<string>()
+                             .Title("Choose at least one schema to be generated: ")
+                             .AddChoices(_config["DB:Schemas"].Split(",")));
+            }
+            else
+            {
+                newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
+
+                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath")
+                {
+                    if (AnsiConsole.Confirm("Do you want to try to update child namespaces"))
+                    {
+                        var tmpDic = dic.Where(d => d.Value.ChildOf == dic[intValue].PropertyName);
+                        foreach(var item in tmpDic)
+                        {
+                            var oldChildValue = item.Value.Settings;
+                            if(oldChildValue.Contains(dic[intValue].Settings))
+                            {
+                                var newChildValue = oldChildValue.Replace(dic[intValue].Settings, newValue);
+                                globalSettings = UISettingsHelper.SetGlobalSettingsStringValue(globalSettings, item.Value.PropertyName, newChildValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+            globalSettings = UISettingsHelper.SetGlobalSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
+        }
+
+        await ShowSettingsAsync();
+    }
+
+    private void InitSettingsUI()
+    {
         AnsiConsole.Clear();
         string extract = string.Empty;
-        var schemas = _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas
-        ? _config["DB:Schemas"]
-                        : _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas != null
-                                    ? String.Join(",", _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas!)
-                                    : "";
-
         AnsiConsole.WriteLine("Choose the value you want to change:");
+    }
 
-        var table = new Table();
-        // Add some columns
+    private async Task<int> InitTableAndWaitUserChoice(Dictionary<int,SettingsKeyVal>dic)
+    {
+        var table = new Spectre.Console.Table();
+
         table.AddColumn("Settings");
         table.AddColumn("Value");
+
         // Add some rows
-        table.AddRow("1) Selected schemas to be generated:", schemas);
-        table.AddRow("2) Author name:", _generatorService.GlobalGeneratorSettings.AuthorName);
-        table.AddRow("3) Namespace used for the POCOs:", _generatorService.GlobalGeneratorSettings.Namespace_POCO);
-        table.AddRow("4) Namespace used for the Repos:", _generatorService.GlobalGeneratorSettings.Namespace_Repo);
-        table.AddRow("5) Namespace used for the Context:", _generatorService.GlobalGeneratorSettings.Namespace_Context);
+        foreach (var entry in dic)
+        {
+            table.AddRow(entry.Value.Label, entry.Value.Settings);
+        }
 
         AnsiConsole.Write(table);
 
+        //Manage user inputs
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
 
         if (value == "q")
             await ShowMainMenuAsync();
 
-        if (value != null && (new string[] { "1", "2", "3", "4", "5" }).Any(value.Contains))
-        {
-            switch (value)
-            {
-                case "1":
-                    AnsiConsole.WriteLine("");
-                    _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas =
-                        AnsiConsole.Prompt(
-                            new MultiSelectionPrompt<string>()
-                                .Title("Choose at least one schema to be generated: ")
-                                .AddChoices(_config["DB:Schemas"].Split(","))
-                    .Required());
+        int intValue;
 
-                    if (_generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas.Count < _config["DB:Schemas"].Split(",").Length)
-                        _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas = false;
-                    else
-                    {
-                        _generatorService.GlobalGeneratorSettings.RunGeneratorForAllSchemas = true;
-                        _generatorService.GlobalGeneratorSettings.RunGeneratorForSelectedSchemas = new List<string>();
-                    }
+        if (!int.TryParse(value, out intValue))
+            await ShowSettingsAsync();
 
-                    break;
-                case "2":
-                    _generatorService.GlobalGeneratorSettings.AuthorName = AnsiConsole.Ask<string>("New author name");
-                    break;
-
-                case "3":
-                    _generatorService.GlobalGeneratorSettings.Namespace_POCO = AnsiConsole.Ask<string>("New Namespace for POCO:");
-                    break;
-                case "4":
-                    _generatorService.GlobalGeneratorSettings.Namespace_Repo = AnsiConsole.Ask<string>("New Namespace for repo:");
-                    break;
-
-                case "5":
-                    _generatorService.GlobalGeneratorSettings.Namespace_Context = AnsiConsole.Ask<string>("New Namespace for Context:");
-                    break;
-
-                default:
-                    await ShowSettingsAsync();
-                    break;
-            }
-
-        }
-
-        await ShowSettingsAsync();
+        return intValue;
     }
+
+
 }
 

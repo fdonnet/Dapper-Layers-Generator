@@ -1,5 +1,4 @@
 ﻿using Dapper_Layers_Generator.Core;
-using Dapper_Layers_Generator;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.Configuration;
+using Dapper_Layers_Generator.Console.Helpers;
 
 internal partial class ConsoleService
 {

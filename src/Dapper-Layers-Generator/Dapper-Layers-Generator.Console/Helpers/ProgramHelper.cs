@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dapper_Layers_Generator
+namespace Dapper_Layers_Generator.Console.Helpers
 {
     internal static class ProgramHelper
     {

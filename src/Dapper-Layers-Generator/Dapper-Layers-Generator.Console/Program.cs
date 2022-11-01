@@ -1,4 +1,4 @@
-﻿using Dapper_Layers_Generator;
+﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
