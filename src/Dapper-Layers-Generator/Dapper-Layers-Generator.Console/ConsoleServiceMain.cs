@@ -22,6 +22,7 @@ internal partial class ConsoleService
         _dataService = dataService;
         _generatorService = generatorService;
         _config = config;
+        _generatorService.GlobalGeneratorSettings.SelectedSchema = _config["DB:Schemas"].Split(",")[0];
     }
 
     internal async Task InitAndLoadDbDefinitionsAsync()
@@ -74,8 +75,9 @@ internal partial class ConsoleService
             .Title("MENU")
             .AddChoices(new[] {
                     "Re-print DB definition (JSON)",
-                    "Load settings from file",
                     "See global settings",
+                    "Select tables generation",
+                    "Load settings from file",
                     "Save settings to file",
                     "Quit, don't forget to save your config !!!",
             }));
@@ -86,8 +88,10 @@ internal partial class ConsoleService
                 await PrintDbDefinitionsAsync();
                 break;
             case "See global settings":
-                AnsiConsole.Clear();
                 await ShowSettingsAsync();
+                break;
+            case "Select tables generation":
+                await ShowSelectTablesAsync();
                 break;
             case "Load settings from file":
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");
