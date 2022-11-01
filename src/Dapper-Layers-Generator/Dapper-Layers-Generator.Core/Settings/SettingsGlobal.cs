@@ -41,7 +41,13 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Target folder for DB contect file:", Position = 10, ChildOf = "TargetProjectPath")]
         public string TargetFolderForDBContext { get; set; } = @"c:\temp\MyTestProject\DbContext\";
 
+        [SettingsAttribute(Message = "Connection string name for configuration injection (ex Default):", Position = 11)]
+        public string ConnectionStringName { get; set; } = "Default";
+        [SettingsAttribute(Message = "Db context class name:", Position = 12)]
+        public string DbContextClassName { get; set; } = "DbContext";
 
+        public bool RunGeneratorForAllTables { get; set; } = true;
+        public List<string> RunGeneratorForSelectedTables { get; set; } = new List<string>();
 
         //Global table settings 
         public SettingsTable TableGlobalSettings { get; set; } = new SettingsTable();

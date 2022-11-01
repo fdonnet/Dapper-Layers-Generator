@@ -85,6 +85,10 @@ internal partial class ConsoleService
             case "Re-print DB definition (JSON)":
                 await PrintDbDefinitionsAsync();
                 break;
+            case "See global settings":
+                AnsiConsole.Clear();
+                await ShowSettingsAsync();
+                break;
             case "Load settings from file":
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");
                 try
@@ -99,10 +103,6 @@ internal partial class ConsoleService
                     AnsiConsole.WriteException(ex);
                     await ReturnToMainMenuAsync();
                 }
-                break;
-            case "See global settings":
-                AnsiConsole.Clear();
-                await ShowSettingsAsync();
                 break;
             case "Save settings to file":
                 var pathSave = AnsiConsole.Ask<string>(@"Specify a complete filepath to save your config:");

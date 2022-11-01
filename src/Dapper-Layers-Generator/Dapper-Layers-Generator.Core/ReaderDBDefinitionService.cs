@@ -60,10 +60,10 @@ namespace Dapper_Layers_Generator.Core
                                                                 && k.Column == col.Name
                                                                 && k.Type == KeyType.Primary).Any() ?? false;
 
-                                    col.HasUniqueIndex = _keys?.Where(k => k.Schema == col.Schema
+                                    col.UniqueIndexNames = _keys?.Where(k => k.Schema == col.Schema
                                                                 && k.Table == col.Table
                                                                 && k.Column == col.Name
-                                                                && k.Type == KeyType.Unique).Any() ?? false;
+                                                                && k.Type == KeyType.Unique).Select(k=>k.Name).ToList();
 
                                 }
                             }

@@ -20,7 +20,7 @@ namespace Dapper_Layers_Generator.Data.POCO.MySql
         public int Precision { get; set; }
         public int Scale { get; set; }
         public bool IsPrimary { get; set; }
-        public bool HasUniqueIndex { get; set; }
+        public List<string>? UniqueIndexNames { get; set; }
         public bool IsAutoIncrement { get; set; }
     }
 }
