@@ -77,7 +77,7 @@ internal partial class ConsoleService
                                         .InstructionsText(
                                             "[grey](Press [blue]<space>[/] to toggle a table, " +
                                             "[green]<enter>[/] to accept)[/]")
-                                        .AddChoices(tables.Select(t => t.Name)));
+                                        .AddChoices(tables.Select(t => t.Name).OrderBy(t=>t)));
             return tablesStrings;
 
         }
