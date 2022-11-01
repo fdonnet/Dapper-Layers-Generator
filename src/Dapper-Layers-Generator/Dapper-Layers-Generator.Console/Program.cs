@@ -28,8 +28,8 @@ ProviderChoice();
 BuildServices();
 
 //Run the real APP after base config (services etc)
-var console = _builder!.GetRequiredService<MainMenu>();
-await console.RunAsync();
+var console = _builder!.GetRequiredService<NavigationService>();
+await console.InitDBAndMainMenuAsync();
 
 
 //*****************************
@@ -136,8 +136,9 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     {
         services.AddSingleton<ReaderDBDefinitionService>();
         services.AddSingleton<GeneratorService>();
-        services.AddTransient<MainMenu>();
-        services.AddTransient<SettingsConfig>();
+        services.AddSingleton<MainMenu>();
+        services.AddSingleton<SettingsConfig>();
+        services.AddSingleton<NavigationService>();
         return services.BuildServiceProvider();
     }
 

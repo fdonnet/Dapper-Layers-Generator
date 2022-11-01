@@ -11,24 +11,31 @@ using Dapper_Layers_Generator.Core.Settings;
 
 internal class MainMenu
 {
-    private ReaderDBDefinitionService _dataService = null!;
-    private GeneratorService _generatorService = null!;
-    private JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
-    private SettingsConfig _settingsConfig = null!;
+    public event Action? OnGoToSettingsConfig;
 
-    public MainMenu(ReaderDBDefinitionService dataService, GeneratorService generatorService, SettingsConfig settingsConfig)
+    private readonly ReaderDBDefinitionService _dataService = null!;
+    private readonly GeneratorService _generatorService = null!;
+    private readonly JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
+    
+    public MainMenu(ReaderDBDefinitionService dataService, GeneratorService generatorService)
     {
         _dataService = dataService;
         _generatorService = generatorService;
-        _settingsConfig = settingsConfig;
     }
 
-    internal async Task RunAsync()
+    internal async Task InitAsync()
     {
-        await InitAndLoadDbDefinitions();
+        await InitAndLoadDbDefinitionsAsync();
     }
 
-    internal async Task ShowMenu()
+    internal async Task ReturnToMainMenuAsync()
+    {
+        AnsiConsole.Write("Main menu redirection, press any key");
+        Console.ReadKey();
+        await ShowAsync();
+    }
+
+    internal async Task ShowAsync()
     {
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
@@ -47,7 +54,7 @@ internal class MainMenu
         switch (menu)
         {
             case "Re-print DB definition (JSON)":
-                await PrintDbDefinitions();
+                await PrintDbDefinitionsAsync();
                 break;
             case "Load settings from file":
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");
@@ -55,17 +62,18 @@ internal class MainMenu
                 {
                     _generatorService.GlobalGeneratorSettings = await SettingsGlobal.LoadFromFile(pathLoad) ?? new SettingsGlobal();
                     AnsiConsole.WriteLine("File loaded !");
-                    await ReturnToMain();
+                    await ReturnToMainMenuAsync();
                 }
                 catch (Exception ex)
                 {
-                    AnsiConsole.Write("Error during save !");
+                    AnsiConsole.Write("Error during load !");
                     AnsiConsole.WriteException(ex);
-                    await ReturnToMain();
+                    await ReturnToMainMenuAsync();
                 }
                 break;
             case "See global settings":
-                await _settingsConfig.SeeGlobalSettings();
+                AnsiConsole.Clear();
+                GoToSettingsConfig();
                 break;
             case "Save settings to file":
                 var pathSave = AnsiConsole.Ask<string>(@"Specify a complete filepath to save your config:");
@@ -73,13 +81,13 @@ internal class MainMenu
                 {
                     await _generatorService.GlobalGeneratorSettings.SaveToFile(pathSave);
                     AnsiConsole.WriteLine("File saved !");
-                    await ReturnToMain();
+                    await ReturnToMainMenuAsync();
                 }
                 catch (Exception ex)
                 {
                     AnsiConsole.WriteLine("Error during save !");
                     AnsiConsole.WriteException(ex);
-                    await ReturnToMain();
+                    await ReturnToMainMenuAsync();
                 }
                 break;
             case "Quit, don't forget to save your config !!!":
@@ -88,12 +96,12 @@ internal class MainMenu
                 Environment.Exit(0);
                 break;
             default:
-                await ShowMenu();
+                await Refresh();
                 break;
         }
     }
 
-    private async Task InitAndLoadDbDefinitions()
+    private async Task InitAndLoadDbDefinitionsAsync()
     {
         try
         {
@@ -110,10 +118,10 @@ internal class MainMenu
             AnsiConsole.WriteLine("DB definitions loaded.");
             if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
             {
-                await PrintDbDefinitions();
+               await PrintDbDefinitionsAsync();
             }
             else
-                await ShowMenu();
+                await Refresh();
 
         }
         catch (Exception ex)
@@ -126,7 +134,7 @@ internal class MainMenu
 
     }
 
-    private async Task PrintDbDefinitions()
+    private async Task PrintDbDefinitionsAsync()
     {
         AnsiConsole.Clear();
 
@@ -139,14 +147,17 @@ internal class MainMenu
             AnsiConsole.MarkupLine("Print finished !");
         });
 
-        await ReturnToMain();
+        await ReturnToMainMenuAsync();
     }
 
-    private async Task ReturnToMain()
+    private async Task Refresh()
     {
-        AnsiConsole.Write("Press any key to be redirected to the main menu");
-        Console.ReadKey();
-        await ShowMenu();
+        await ShowAsync();
+    }
+
+    private void GoToSettingsConfig()
+    {
+        OnGoToSettingsConfig?.Invoke();
     }
 
 }

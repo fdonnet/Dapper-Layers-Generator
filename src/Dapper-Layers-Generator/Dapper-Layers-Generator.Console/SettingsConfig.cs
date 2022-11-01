@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 internal class SettingsConfig
 {
+    public event Action? OnBackToMainMenu;
+
     private readonly GeneratorService _generatorService = null!;
     private readonly IConfiguration _config;
 
@@ -18,7 +20,7 @@ internal class SettingsConfig
         _config = config;
     }
 
-    internal async Task SeeGlobalSettings()
+    internal async Task ShowAsync()
     {
         AnsiConsole.Clear();
         string extract = string.Empty;
@@ -46,7 +48,7 @@ internal class SettingsConfig
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
 
         if (value == "q")
-            return;
+            BackToMainMenu();
 
         if (value != null && (new string[] { "1", "2", "3", "4", "5" }).Any(value.Contains))
         {
@@ -86,12 +88,18 @@ internal class SettingsConfig
                     break;
 
                 default:
-                    await SeeGlobalSettings();
+                    await ShowAsync();
                     break;
             }
 
         }
 
-        await SeeGlobalSettings();
+        await ShowAsync();
+    }
+
+
+    private void BackToMainMenu()
+    {
+        OnBackToMainMenu?.Invoke();
     }
 }
