@@ -73,18 +73,20 @@ internal partial class ConsoleService
         await ShowGlobalSettingsAsync();
     }
 
-    internal async Task ShowGlobalTableSettingsAsync()
+    internal async Task ShowTableSettingsAsync()
     {
         InitSettingsUI("Tables and columns global settings");
 
         //Global tab settings
-        var tableGlobalsettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings;
-        var dicTable = UISettingsHelper.SettingsDic(tableGlobalsettings);
+        var tableSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings;
+        var dicTable = UISettingsHelper.SettingsDic(tableSettings);
         InitTable(dicTable,"Table settings");
 
+        AnsiConsole.WriteLine(string.Empty);
+
         //Global col settings
-        var colGlobalSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings.ColumnGlobalSettings;
-        var dicColumns = UISettingsHelper.SettingsDic(colGlobalSettings);
+        var colSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings.ColumnGlobalSettings;
+        var dicColumns = UISettingsHelper.SettingsDic(colSettings);
         InitTable(dicColumns, "Columns settings");
 
         
@@ -93,17 +95,17 @@ internal partial class ConsoleService
         //Change settings values
         if (dicTable.ContainsKey(intValue))
         {
-            ChangeValue<SettingsTable>(dicTable[intValue], tableGlobalsettings);
+            ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
         }
         else
         {
             if (dicColumns.ContainsKey(intValue))
             {
-                ChangeValue<SettingsColumn>(dicColumns[intValue], colGlobalSettings);
+                ChangeValue<SettingsColumn>(dicColumns[intValue], colSettings);
             }
         }
 
-        await ShowGlobalTableSettingsAsync();
+        await ShowTableSettingsAsync();
     }
 
     private static void InitSettingsUI(string settingsType)
@@ -125,9 +127,18 @@ internal partial class ConsoleService
         tableUI.AddColumn("Settings");
         tableUI.AddColumn("Value");
 
+        var section = string.Empty;
+
         // Add some rows
         foreach (var entry in dic)
         {
+            if(section != entry.Value.Group)
+            {
+                tableUI.AddRow(string.Empty);
+                tableUI.AddRow("---------" + entry.Value.Group + "-----------");
+                section = entry.Value.Group;
+            }
+
             if(advancedColumnMode)
                 tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
             else
@@ -168,7 +179,7 @@ internal partial class ConsoleService
 
 
         if (!int.TryParse(value, out int intValue))
-            await ShowGlobalTableSettingsAsync();
+            await ShowTableSettingsAsync();
 
         return intValue;
     }
