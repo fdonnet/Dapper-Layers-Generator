@@ -130,10 +130,40 @@ internal partial class ConsoleService
             : await ManageUserInputForTableSettingsAsync();
 
 
+
+
         //Change settings values
         if (dicTable.ContainsKey(intValue))
         {
-            ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
+            if(advancedMode && dicTable[intValue].IsColumnListChoice)
+            {
+                var possibleColumns = _dataService.SchemaDefinitions?.FirstOrDefault(s => s.Name == _generatorService.GlobalGeneratorSettings.SelectedSchema)
+                                        ?.Tables?.Where(t => t.Name == tableName).SingleOrDefault()?.Columns?.OrderBy(c => c.Position).Select(c=>c.Name);
+
+                if (possibleColumns != null)
+                {
+                    AnsiConsole.WriteLine("");
+                    var colString = AnsiConsole.Prompt(
+                        new MultiSelectionPrompt<string>()
+                            .Title("Select the columns you want for this specific config")
+                            .PageSize(15)
+                            .MoreChoicesText("[grey](Move up and down to reveal more tables)[/]")
+                            .InstructionsText(
+                                "[grey](Press [blue]<space>[/] to toggle a table, " +
+                                "[green]<enter>[/] to accept)[/]")
+                            .AddChoices(possibleColumns));
+
+                    UISettingsHelper.SetSettingsStringValue(tableSettings, dicTable[intValue].PropertyName, String.Join(",", colString));
+
+                }
+                else
+                {
+                    ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
+                }
+                
+            }
+            else
+                ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
         }
         else
         {
@@ -329,7 +359,7 @@ or (q) to return to table advanced settings");
     {
         string newValue = setValue.Type == typeof(bool)
             ? AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False"
-            : AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
+                : AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
 
         _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
     }

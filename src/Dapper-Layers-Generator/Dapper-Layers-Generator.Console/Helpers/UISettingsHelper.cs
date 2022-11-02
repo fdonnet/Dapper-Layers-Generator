@@ -38,7 +38,8 @@ namespace Dapper_Layers_Generator.Console.Helpers
                             Position = attr.Position,
                             Type = curProp.PropertyType,
                             ColumnModeOnly = attr.OnlyInColumnMode,
-                            Group = attr.Group
+                            Group = attr.Group,
+                            IsColumnListChoice = attr.IsColumnListChoice
                         });
                     }
                 }

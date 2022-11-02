@@ -40,9 +40,9 @@ Continue like this (y) or select tables(n):"))
 
             AnsiConsole.Write(tableUI);
 
-            var ask = AnsiConsole.Ask<string>("You already selected the above tables, to clear and reselect press (c), or press (a) to select all, to keep press (k)");
+            var ask = AnsiConsole.Ask<string>("You already selected the above tables, to revert and reselect press (r), or press (a) to select all, to keep press (k)");
 
-            if(ask == "c")
+            if(ask == "r")
             {
                 settings.RunGeneratorForSelectedTables = BuildSelectionTable(settings, tables);
                 await SelectionSaved();

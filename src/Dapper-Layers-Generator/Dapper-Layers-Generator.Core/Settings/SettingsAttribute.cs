@@ -14,6 +14,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         public string ChildOf { get; set; } = string.Empty;
         public bool OnlyInColumnMode { get; set; } = false;
         public string Group { get; set; } = string.Empty;
+        public bool IsColumnListChoice { get; set; } = false;
 
     }
 }

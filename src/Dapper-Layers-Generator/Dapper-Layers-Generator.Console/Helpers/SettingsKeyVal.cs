@@ -16,5 +16,6 @@ namespace Dapper_Layers_Generator.Console.Helpers
         internal int Position { get; set; }
         internal bool ColumnModeOnly { get; set; }
         internal string Group { get; set; } = string.Empty;
+        public bool IsColumnListChoice { get; set; } = false;
     }
 }

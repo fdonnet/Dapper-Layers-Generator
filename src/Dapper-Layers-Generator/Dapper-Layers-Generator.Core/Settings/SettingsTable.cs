@@ -8,22 +8,22 @@ namespace Dapper_Layers_Generator.Core.Settings
 {
     public class SettingsTable
     {
-        [SettingsAttribute(Message = "Ignored column names for POCO and all operations (separator ,): ", Position = 1)]
+        [SettingsAttribute(Message = "Ignored column names for POCO and all operations (separator ,): ", Position = 1, IsColumnListChoice = true)]
         public string IgnoredColumnNames { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "Ignored column names for Get operation (separator ,): ", Position = 2)]
+        [SettingsAttribute(Message = "Ignored column names for Get operation (separator ,): ", Position = 2, IsColumnListChoice = true)]
         public string IgnoredColumnNamesForGet { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "Ignored column names for Add operation (separator ,): ", Position = 3)]
+        [SettingsAttribute(Message = "Ignored column names for Add operation (separator ,): ", Position = 3, IsColumnListChoice = true)]
         public string IgnoredColumnNamesForAdd { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "Ignored column names for Update operation (separator ,): ", Position = 4)]
+        [SettingsAttribute(Message = "Ignored column names for Update operation (separator ,): ", Position = 4, IsColumnListChoice = true)]
         public string IgnoredColumnNamesForUpdate { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "Ignored column names for Delete operation (separator ,): ", Position = 5)]
+        [SettingsAttribute(Message = "Ignored column names for Delete operation (separator ,): ", Position = 5, IsColumnListChoice = true)]
         public string IgnoredColumnNamesForDelete { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "JSON ignore decoration for column names  (separator ,): ", Position = 6)]
+        [SettingsAttribute(Message = "JSON ignore decoration for column names  (separator ,): ", Position = 6, IsColumnListChoice = true)]
         public string JsonIgnoreDecoration { get; set; } = string.Empty;
 
         [SettingsAttribute(Message = "Enable get all function generator: ", Position = 7, Group = "Generator")]
