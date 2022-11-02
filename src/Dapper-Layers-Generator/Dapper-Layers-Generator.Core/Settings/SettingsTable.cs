@@ -8,34 +8,49 @@ namespace Dapper_Layers_Generator.Core.Settings
 {
     public class SettingsTable
     {
-        [SettingsAttribute(Message = "Ignored column names (separator ,): ", Position = 1)]
+        [SettingsAttribute(Message = "Ignored column names for POCO and all operations (separator ,): ", Position = 1)]
         public string IgnoredColumnNames { get; set; } = string.Empty;
 
-        [SettingsAttribute(Message = "Enable get all function generator: ", Position = 2, Group = "Generator")]
+        [SettingsAttribute(Message = "Ignored column names for Get operation (separator ,): ", Position = 2)]
+        public string IgnoredColumnNamesForGet { get; set; } = string.Empty;
+
+        [SettingsAttribute(Message = "Ignored column names for Add operation (separator ,): ", Position = 3)]
+        public string IgnoredColumnNamesForAdd { get; set; } = string.Empty;
+
+        [SettingsAttribute(Message = "Ignored column names for Update operation (separator ,): ", Position = 4)]
+        public string IgnoredColumnNamesForUpdate { get; set; } = string.Empty;
+
+        [SettingsAttribute(Message = "Ignored column names for Delete operation (separator ,): ", Position = 5)]
+        public string IgnoredColumnNamesForDelete { get; set; } = string.Empty;
+
+        [SettingsAttribute(Message = "JSON ignore decoration for column names  (separator ,): ", Position = 6)]
+        public string JsonIgnoreDecoration { get; set; } = string.Empty;
+
+        [SettingsAttribute(Message = "Enable get all function generator: ", Position = 7, Group = "Generator")]
         public bool GetAllGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable get by primary key function generator: ", Position = 3, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable get by primary key function generator: ", Position = 8, Group = "Generator")]
         public bool GetByPkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable get by primary keys list function generator: ", Position = 4, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable get by primary keys list function generator: ", Position = 9, Group = "Generator")]
         public bool GetByPkListGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 5, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 10, Group = "Generator")]
         public bool GetByUkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add function generator: ", Position = 6, Group ="Generator" )]
+        [SettingsAttribute(Message = "Enable add function generator: ", Position = 11, Group ="Generator" )]
         public bool AddGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update function generator: ", Position = 7, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update function generator: ", Position = 12, Group = "Generator")]
         public bool UpdateGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 8, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 13, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable add bulk function generator: ", Position = 9, Group = "Generator")]
+        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable add bulk function generator: ", Position = 14, Group = "Generator")]
         public bool AddBulkGenerator { get; set; } = false;
 
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 10, Group = "Generator")]
+        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 15, Group = "Generator")]
         public bool UpdateBulkGenerator { get; set; } = false;
 
         //Global table settings 
