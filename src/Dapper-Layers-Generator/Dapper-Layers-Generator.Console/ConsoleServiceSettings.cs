@@ -135,10 +135,10 @@ internal partial class ConsoleService
         //Change settings values
         if (dicTable.ContainsKey(intValue))
         {
-            if(advancedMode && dicTable[intValue].IsColumnListChoice)
+            if (advancedMode && dicTable[intValue].IsColumnListChoice)
             {
                 var possibleColumns = _dataService.SchemaDefinitions?.FirstOrDefault(s => s.Name == _generatorService.GlobalGeneratorSettings.SelectedSchema)
-                                        ?.Tables?.Where(t => t.Name == tableName).SingleOrDefault()?.Columns?.OrderBy(c => c.Position).Select(c=>c.Name);
+                                        ?.Tables?.Where(t => t.Name == tableName).SingleOrDefault()?.Columns?.OrderBy(c => c.Position).Select(c => c.Name);
 
                 if (possibleColumns != null)
                 {
@@ -160,7 +160,7 @@ internal partial class ConsoleService
                 {
                     ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
                 }
-                
+
             }
             else
                 ChangeValue<SettingsTable>(dicTable[intValue], tableSettings);
@@ -359,7 +359,11 @@ or (q) to return to table advanced settings");
     {
         string newValue = setValue.Type == typeof(bool)
             ? AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False"
-                : AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
+                : AnsiConsole.Ask<string>("type (c) to clear"  + Environment.NewLine + "or change "  
+                    + setValue.Label.Split(") ")[1]);
+
+        if (setValue.Type == typeof(string) && newValue == "c")
+            newValue = string.Empty;
 
         _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
     }

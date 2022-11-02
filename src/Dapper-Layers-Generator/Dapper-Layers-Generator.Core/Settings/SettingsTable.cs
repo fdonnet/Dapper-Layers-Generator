@@ -38,19 +38,22 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 10, Group = "Generator")]
         public bool GetByUkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add function generator: ", Position = 11, Group ="Generator" )]
+        [SettingsAttribute(Message = "Enable check if exist by unique key function generator: ", Position = 11, Group = "Generator")]
+        public bool ExistsByUk { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable add function generator: ", Position = 12, Group ="Generator" )]
         public bool AddGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update function generator: ", Position = 12, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update function generator: ", Position = 13, Group = "Generator")]
         public bool UpdateGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 13, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 14, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable add bulk function generator: ", Position = 14, Group = "Generator")]
+        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable add bulk function generator: ", Position = 15, Group = "Generator")]
         public bool AddBulkGenerator { get; set; } = false;
 
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 15, Group = "Generator")]
+        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 16, Group = "Generator")]
         public bool UpdateBulkGenerator { get; set; } = false;
 
         //Global table settings 
