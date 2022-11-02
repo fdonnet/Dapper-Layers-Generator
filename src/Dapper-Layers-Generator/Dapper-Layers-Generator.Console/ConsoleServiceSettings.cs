@@ -1,6 +1,7 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Core.Settings;
+using Dapper_Layers_Generator.Data.POCO;
 using MySqlX.XDevAPI.Relational;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using Spectre.Console;
@@ -28,7 +29,7 @@ internal partial class ConsoleService
         //Init settings div
         var dic = UISettingsHelper.SettingsDic(globalSettings);
 
-        InitTable(dic,"Config values");
+        InitTable(dic, "Config values");
 
         var intValue = await ManageUserInputForGlobalSettingsAsync();
 
@@ -46,7 +47,7 @@ internal partial class ConsoleService
             }
             else
             {
-               ///(Need to be string type prop or boom) =with children props
+                ///(Need to be string type prop or boom) =with children props
                 if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath")
                 {
                     var newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
@@ -97,7 +98,7 @@ internal partial class ConsoleService
         }
 
         var dicTable = UISettingsHelper.SettingsDic(tableSettings);
-        InitTable(dicTable,"Table settings");
+        InitTable(dicTable, "Table settings");
 
         AnsiConsole.WriteLine(string.Empty);
 
@@ -109,9 +110,23 @@ internal partial class ConsoleService
         var dicColumns = UISettingsHelper.SettingsDic(colSettings);
         InitTable(dicColumns, "Columns settings");
 
-        
-        var intValue = advancedMode 
-            ? await ManageUserInputForAdvancedSettingsAsync(tableSettings,tableName) 
+        //If sub specific config
+        AnsiConsole.WriteLine(string.Empty);
+        if (advancedMode)
+        {
+            AnsiConsole.WriteLine("List of columns with a specific config");
+            AnsiConsole.WriteLine(String.Join(",", advancedSettings!.ColumnSettings.Select(c => c.Key)));
+        }
+        else
+        {
+            AnsiConsole.WriteLine("List of tables with a specific config");
+            AnsiConsole.WriteLine(String.Join(",", _generatorService.GlobalGeneratorSettings!.TableSettings.Select(c => c.Key)));
+        }
+        AnsiConsole.WriteLine(string.Empty);
+
+        //Get the value
+        var intValue = advancedMode
+            ? await ManageUserInputForAdvancedSettingsAsync(tableSettings, tableName)
             : await ManageUserInputForTableSettingsAsync();
 
 
@@ -128,8 +143,31 @@ internal partial class ConsoleService
             }
         }
 
-        
-        await ShowTableSettingsAsync(advancedMode,tableSettings,tableName);
+        await ShowTableSettingsAsync(advancedMode, tableSettings, tableName);
+    }
+
+    internal async Task ShowColumnSettingsAsync(SettingsColumn settingsColumn, string tableName, string columnName)
+    {
+        InitSettingsUI($"Column {tableName}.{columnName} settings");
+
+        AnsiConsole.WriteLine(string.Empty);
+        AnsiConsole.MarkupInterpolated($"TABLE NAME: [red]{tableName}[/] -- COLUMN NAME: [red]{columnName}[/]");
+        AnsiConsole.WriteLine(string.Empty);
+
+        var dicCol = UISettingsHelper.SettingsDic(settingsColumn);
+
+        InitTable(dicCol, "Config values", true);
+
+        var intValue = await ManageUserInputForAdvancedColSettingsAsync(settingsColumn, tableName, columnName);
+
+        //Change settings values
+        if (dicCol.ContainsKey(intValue))
+        {
+            ChangeValue<SettingsColumn>(dicCol[intValue], settingsColumn);
+        }
+
+        await ShowColumnSettingsAsync(settingsColumn, tableName, columnName);
+
     }
 
     private static void InitSettingsUI(string settingsType)
@@ -158,18 +196,18 @@ internal partial class ConsoleService
         // Add some rows
         foreach (var entry in dic)
         {
-            if(section != entry.Value.Group)
+            if (section != entry.Value.Group)
             {
                 tableUI.AddRow(string.Empty);
                 tableUI.AddRow("---------" + entry.Value.Group + "-----------");
                 section = entry.Value.Group;
             }
 
-            if(ColumnMode)
+            if (ColumnMode)
                 tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
             else
             {
-                if(!entry.Value.ColumnModeOnly)
+                if (!entry.Value.ColumnModeOnly)
                     tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
             }
         }
@@ -226,9 +264,9 @@ or (q) to return to main menu");
             await ShowMainMenuAsync();
 
         if (value == "c")
-            await ShowAdvancedColumnsAsync(advancedSettings,tableName);
+            await ShowAdvancedColumnsAsync(advancedSettings, tableName);
 
-        if(value == "r")
+        if (value == "r")
         {
             try
             {
@@ -236,7 +274,7 @@ or (q) to return to main menu");
                 AnsiConsole.WriteLine("Table config reverted to global");
                 await ReturnToMainMenuAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 AnsiConsole.WriteException(ex);
                 AnsiConsole.WriteLine("Error to go back to global config");
@@ -245,7 +283,44 @@ or (q) to return to main menu");
         }
 
         if (!int.TryParse(value, out int intValue))
-            await ShowTableSettingsAsync(true,advancedSettings,tableName);
+            await ShowTableSettingsAsync(true, advancedSettings, tableName);
+
+        return intValue;
+    }
+
+    private async Task<int> ManageUserInputForAdvancedColSettingsAsync(SettingsColumn colAdvancedSettings, string tableName, string columnName)
+    {
+        //Manage user inputs
+        AnsiConsole.WriteLine(string.Empty);
+
+        var value = AnsiConsole.Ask<string>(@"
+!! Press the settings number you want to edit
+or (r) to revert this column to table column normal settings and go back to tabel advanced settings
+or (q) to return to table advanced settings");
+
+        if (value == "q")
+            await ShowTableSettingsAsync(true, _generatorService.GlobalGeneratorSettings.TableSettings[tableName], tableName);
+
+        if (value == "r")
+        {
+            try
+            {
+                _generatorService.GlobalGeneratorSettings.TableSettings[tableName].ColumnSettings.Remove(columnName);
+                AnsiConsole.WriteLine("Column config reverted to table normal settings");
+                AnsiConsole.WriteLine("Press any key to return to advanced table config");
+                Console.ReadKey();
+                await ShowTableSettingsAsync(true, _generatorService.GlobalGeneratorSettings.TableSettings[tableName], tableName);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.WriteException(ex);
+                AnsiConsole.WriteLine("Error to go back to global config");
+                await ReturnToMainMenuAsync();
+            }
+        }
+
+        if (!int.TryParse(value, out int intValue))
+            await ShowColumnSettingsAsync(colAdvancedSettings, tableName, columnName);
 
         return intValue;
     }

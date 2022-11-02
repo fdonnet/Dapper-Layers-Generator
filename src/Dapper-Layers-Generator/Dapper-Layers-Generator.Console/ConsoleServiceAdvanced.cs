@@ -81,7 +81,8 @@ internal partial class ConsoleService
         //Get if global or advanced settings
         if (!advancedSettings.ColumnSettings.TryGetValue(selectedColumnName, out SettingsColumn? curAdvSettings))
         {
-            if (AnsiConsole.Confirm("For the moment, this column uses the table normal settings, do you want to go with advanced/specific settings"))
+            if (AnsiConsole.Confirm(@"For the moment, this column uses the table column normal settings,
+do you want to go with advanced/specific settings"))
             {
                 advancedSettings.ColumnSettings.Add(selectedColumnName, CopyGlobalColumnSettings(advancedSettings));
                 curAdvSettings = advancedSettings.ColumnSettings[selectedColumnName];
@@ -92,7 +93,7 @@ internal partial class ConsoleService
             }
         }
 
-        //await (true, curAdvSettings, selectedTableName);
+        await ShowColumnSettingsAsync(curAdvSettings!, tableName, selectedColumnName);
 
     }
 
