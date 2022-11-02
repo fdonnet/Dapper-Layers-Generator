@@ -13,15 +13,13 @@ namespace Dapper_Layers_Generator.Core
     {
         public IList<ISchema>? SchemaDefinitions { get; private set; }
 
-        private IReaderDapperContext _context;
-        private IConfiguration _config;
+        private readonly IReaderDapperContext _context;
         private IEnumerable<ITable>? _tables;
         private IEnumerable<IColumn>? _columns;
         private IEnumerable<IKey>? _keys;
 
-        public ReaderDBDefinitionService(IConfiguration config, IReaderDapperContext context)
+        public ReaderDBDefinitionService(IReaderDapperContext context)
         {
-            _config = config;
             _context = context; 
         }
 

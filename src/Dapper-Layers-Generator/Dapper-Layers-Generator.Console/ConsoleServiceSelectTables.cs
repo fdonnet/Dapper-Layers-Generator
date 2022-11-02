@@ -65,7 +65,7 @@ Continue like this (y) or select tables(n):"))
         }
     }
 
-    private List<string> BuildSelectionTable(SettingsGlobal settings, IList<ITable> tables)
+    private static List<string> BuildSelectionTable(SettingsGlobal settings, IList<ITable> tables)
     {
         if (tables != null)
         {

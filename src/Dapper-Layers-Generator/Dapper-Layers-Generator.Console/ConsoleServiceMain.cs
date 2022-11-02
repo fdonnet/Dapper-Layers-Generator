@@ -16,7 +16,7 @@ internal partial class ConsoleService
     private readonly GeneratorService _generatorService = null!;
     private readonly JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
     private readonly IConfiguration _config;
-    
+
     public ConsoleService(ReaderDBDefinitionService dataService, GeneratorService generatorService, IConfiguration config)
     {
         _dataService = dataService;
@@ -78,8 +78,8 @@ internal partial class ConsoleService
         new SelectionPrompt<string>()
             .AddChoices(new[] {
                     "Re-print DB definition (JSON)",
-                    "Select tables generation",
                     "Edit main settings",
+                    "Select tables generation",
                     "Edit global table settings",
                     "Advanced settings",
                     "Load config from file",
@@ -92,11 +92,11 @@ internal partial class ConsoleService
             case "Re-print DB definition (JSON)":
                 await PrintDbDefinitionsAsync();
                 break;
-            case "Select tables generation":
-                await ShowSelectTablesAsync();
-                break;
             case "Edit main settings":
                 await ShowGlobalSettingsAsync();
+                break;
+            case "Select tables generation":
+                await ShowSelectTablesAsync();
                 break;
             case "Edit global table settings":
                 await ShowTableSettingsAsync();
