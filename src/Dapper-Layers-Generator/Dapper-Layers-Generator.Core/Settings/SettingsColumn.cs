@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Settings
 {
+    //Position counter begin after Settings Table (don't forget to update)
     public class SettingsColumn
     {
+        [SettingsAttribute(Message = "Enable Requiered decorator for not null fields: ", Position = 2)]
         public bool StandardRequiredDecorator { get; set; } = true;
+        [SettingsAttribute(Message = "Enable StringLength decorator for string: ", Position = 3)]
         public bool StandardStringLengthDecorator { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable JSON ignore decorator: ", Position = 4, OnlyInAdvancedColumnMode =true)]
         public bool StandardJsonIgnoreDecorator { get; set; } = false;
+        [SettingsAttribute(Message = "Fully qualified (full namespace) type: ", Position = 5, OnlyInAdvancedColumnMode =true)]
         public string FieldNameCustomType { get; set; } = string.Empty;
+        [SettingsAttribute(Message = "Fully qualified (full namespace) custom decorator: ", Position = 6, OnlyInAdvancedColumnMode =true)]
         public string? FieldNameCustomDecorators { get; set; } = string.Empty;
     }
 }

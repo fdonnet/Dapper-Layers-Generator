@@ -9,7 +9,8 @@ namespace Dapper_Layers_Generator.Core.Settings
     public class SettingsTable
     {
         //Can ignore certain columns names (separated by ,)
-        public List<string> IgnoredColumnNames { get; set; } = new List<string>();
+        [SettingsAttribute(Message = "Ignored column names in all tables (separator ,): ", Position = 1)]
+        public string IgnoredColumnNames { get; set; } = string.Empty;
 
         //Global table settings 
         public SettingsColumn ColumnGlobalSettings { get; set; } = new SettingsColumn();

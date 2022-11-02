@@ -10,6 +10,7 @@ string _dbProvider = string.Empty;
 ServiceProvider? _builder = null;
 
 IConfiguration? _config = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
         .AddUserSecrets<Program>()
         .AddEnvironmentVariables()
         .Build();
@@ -117,7 +118,7 @@ void BuildServices()
 
     if (_builder == null)
     {
-        AnsiConsole.WriteLine(@$"Provider not supported or services problem, app will shut down (10sec) ...");
+        AnsiConsole.WriteLine("Provider not supported or services problem, app will shut down (10sec) ...");
         Thread.Sleep(10000);
         Environment.Exit(0);
     }

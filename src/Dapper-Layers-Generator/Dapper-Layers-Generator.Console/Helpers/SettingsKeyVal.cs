@@ -14,5 +14,6 @@ namespace Dapper_Layers_Generator.Console.Helpers
         internal string ChildOf { get; set; } = string.Empty;
         internal Type Type { get; set; } = typeof(string);
         internal int Position { get; set; }
+        internal bool AdvancedColumnMode { get; set; }
     }
 }

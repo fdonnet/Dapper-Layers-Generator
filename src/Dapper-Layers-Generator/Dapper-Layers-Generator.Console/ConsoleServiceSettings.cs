@@ -2,6 +2,7 @@
 using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Core.Settings;
 using MySqlX.XDevAPI.Relational;
+using Org.BouncyCastle.Asn1.X509.Qualified;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ using System.Threading.Tasks;
 
 internal partial class ConsoleService
 {
-    internal async Task ShowSettingsAsync()
+    internal async Task ShowGlobalSettingsAsync()
     {
-        InitSettingsUI();
+        InitSettingsUI("Main configuration");
 
         var globalSettings = _generatorService.GlobalGeneratorSettings;
 
@@ -26,59 +27,100 @@ internal partial class ConsoleService
         //Init settings div
         var dic = UISettingsHelper.SettingsDic(globalSettings);
 
-        int intValue = await InitTableAndWaitUserChoice(dic);
+        InitTable(dic,"Config values");
+
+        var intValue = await ManageUserInputForGlobalSettingsAsync();
 
         //Change settings values
         if (dic.ContainsKey(intValue))
         {
-            string newValue = string.Empty;
+            //Schema 
             if (dic[intValue].PropertyName == "SelectedSchema")
             {
                 AnsiConsole.WriteLine("");
-                newValue = AnsiConsole.Prompt(
+                var newValue = AnsiConsole.Prompt(
                          new SelectionPrompt<string>()
                              .Title("Choose at least one schema to be generated: ")
                              .AddChoices(_config["DB:Schemas"].Split(",")));
             }
             else
             {
-                newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
-
-                ///(Need to be string type prop or boom)
-                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath") 
+               ///(Need to be string type prop or boom) =with children props
+                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath")
                 {
+                    var newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
                     if (AnsiConsole.Confirm("Do you want to try to update child namespaces"))
                     {
                         var tmpDic = dic.Where(d => d.Value.ChildOf == dic[intValue].PropertyName);
-                        foreach(var item in tmpDic)
+                        foreach (var item in tmpDic)
                         {
                             var oldChildValue = item.Value.Settings;
                             if (oldChildValue.ToString()!.Contains(dic[intValue].Settings.ToString()!))
                             {
                                 var newChildValue = oldChildValue.ToString()!.Replace(dic[intValue].Settings.ToString()!, newValue);
-                                globalSettings = UISettingsHelper.SetGlobalSettingsStringValue(globalSettings, item.Value.PropertyName, newChildValue);
+                                globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, item.Value.PropertyName, newChildValue);
                             }
                         }
                     }
                 }
+                else // normal case
+                {
+                    ChangeValue<SettingsGlobal>(dic[intValue], globalSettings);
+                }
             }
-
-            globalSettings = UISettingsHelper.SetGlobalSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
         }
 
-        await ShowSettingsAsync();
+        await ShowGlobalSettingsAsync();
     }
 
-    private static void InitSettingsUI()
+    internal async Task ShowGlobalTableSettingsAsync()
+    {
+        InitSettingsUI("Tables and columns global settings");
+
+        //Global tab settings
+        var tableGlobalsettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings;
+        var dicTable = UISettingsHelper.SettingsDic(tableGlobalsettings);
+        InitTable(dicTable,"Table settings");
+
+        //Global col settings
+        var colGlobalSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings.ColumnGlobalSettings;
+        var dicColumns = UISettingsHelper.SettingsDic(colGlobalSettings);
+        InitTable(dicColumns, "Columns settings");
+
+        
+        var intValue = await ManageUserInputForTableSettingsAsync();
+
+        //Change settings values
+        if (dicTable.ContainsKey(intValue))
+        {
+            ChangeValue<SettingsTable>(dicTable[intValue], tableGlobalsettings);
+        }
+        else
+        {
+            if (dicColumns.ContainsKey(intValue))
+            {
+                ChangeValue<SettingsColumn>(dicColumns[intValue], colGlobalSettings);
+            }
+        }
+
+        await ShowGlobalTableSettingsAsync();
+    }
+
+    private static void InitSettingsUI(string settingsType)
     {
         AnsiConsole.Clear();
-        string extract = string.Empty;
-        AnsiConsole.WriteLine("Choose the value you want to change:");
+        var title = new Rule("SETTINGS");
+        var subTitle = new Rule(settingsType);
+
+        AnsiConsole.Write(title);
+        AnsiConsole.Write(subTitle);
+        AnsiConsole.WriteLine(string.Empty);
     }
 
-    private async Task<int> InitTableAndWaitUserChoice(Dictionary<int,SettingsKeyVal>dic)
+    private static void InitTable(Dictionary<int, SettingsKeyVal> dic, string title, bool advancedColumnMode = false)
     {
         var tableUI = new Spectre.Console.Table();
+        tableUI.Title = new TableTitle($"[green]{title}[/]");
 
         tableUI.AddColumn("Settings");
         tableUI.AddColumn("Value");
@@ -86,23 +128,65 @@ internal partial class ConsoleService
         // Add some rows
         foreach (var entry in dic)
         {
-            tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
+            if(advancedColumnMode)
+                tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
+            else
+            {
+                if(!entry.Value.AdvancedColumnMode)
+                    tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
+            }
         }
 
         AnsiConsole.Write(tableUI);
 
+    }
+
+    private async Task<int> ManageUserInputForGlobalSettingsAsync()
+    {
         //Manage user inputs
+        AnsiConsole.WriteLine(string.Empty);
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
 
         if (value == "q")
             await ShowMainMenuAsync();
 
-        int intValue;
 
-        if (!int.TryParse(value, out intValue))
-            await ShowSettingsAsync();
+        if (!int.TryParse(value, out int intValue))
+            await ShowGlobalSettingsAsync();
 
         return intValue;
+    }
+
+    private async Task<int> ManageUserInputForTableSettingsAsync()
+    {
+        //Manage user inputs
+        AnsiConsole.WriteLine(string.Empty);
+        var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
+
+        if (value == "q")
+            await ShowMainMenuAsync();
+
+
+        if (!int.TryParse(value, out int intValue))
+            await ShowGlobalTableSettingsAsync();
+
+        return intValue;
+    }
+
+    private void ChangeValue<T>(SettingsKeyVal setValue, object settings)
+    {
+        string newValue = string.Empty;
+
+        if(setValue.Type == typeof(bool))
+        {
+            newValue = AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False";
+        }
+        else
+        {
+            newValue = AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
+        }
+
+        _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
     }
 
 

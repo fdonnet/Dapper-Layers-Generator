@@ -15,7 +15,7 @@ namespace Dapper_Layers_Generator.Console.Helpers
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        internal static Dictionary<int, SettingsKeyVal> SettingsDic(SettingsGlobal settings)
+        internal static Dictionary<int, SettingsKeyVal> SettingsDic(object settings)
         {
             var dic = new Dictionary<int, SettingsKeyVal>();
 
@@ -36,7 +36,8 @@ namespace Dapper_Layers_Generator.Console.Helpers
                             PropertyName = curProp.Name,
                             ChildOf = attr.ChildOf,
                             Position = attr.Position,
-                            Type = curProp.GetType()
+                            Type = curProp.PropertyType,
+                            AdvancedColumnMode = attr.OnlyInAdvancedColumnMode
                         });
                     }
                 }
@@ -45,7 +46,7 @@ namespace Dapper_Layers_Generator.Console.Helpers
             return dic;
         }
 
-       internal static SettingsGlobal SetGlobalSettingsStringValue(SettingsGlobal settings, string propertyName, string newValue)
+       internal static object SetSettingsStringValue(object settings, string propertyName, string newValue)
         {
             PropertyInfo propertyInfo = settings.GetType().GetProperty(propertyName)!;
             propertyInfo.SetValue(settings, Convert.ChangeType(newValue, propertyInfo.PropertyType), null);
