@@ -6,6 +6,7 @@ using Org.BouncyCastle.Asn1.X509.Qualified;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -73,24 +74,46 @@ internal partial class ConsoleService
         await ShowGlobalSettingsAsync();
     }
 
-    internal async Task ShowTableSettingsAsync()
+    internal async Task ShowTableSettingsAsync(bool advancedMode = false, SettingsTable? advancedSettings = null, string tableName = "")
     {
-        InitSettingsUI("Tables and columns global settings");
+        InitSettingsUI("Tables and columns " + (advancedMode ? "advanced" : "global") + " settings");
+
+        if (advancedMode && (advancedSettings == null || tableName == string.Empty))
+        {
+            AnsiConsole.WriteLine("Cannot use the program this way...");
+            await ReturnToMainMenuAsync();
+        }
 
         //Global tab settings
-        var tableSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings;
+        var tableSettings = advancedMode
+            ? advancedSettings!
+            : _generatorService.GlobalGeneratorSettings.TableGlobalSettings;
+
+        if (advancedMode)
+        {
+            AnsiConsole.WriteLine(string.Empty);
+            AnsiConsole.MarkupInterpolated($"TABLE NAME: [red]{tableName}[/]");
+            AnsiConsole.WriteLine(string.Empty);
+        }
+
         var dicTable = UISettingsHelper.SettingsDic(tableSettings);
         InitTable(dicTable,"Table settings");
 
         AnsiConsole.WriteLine(string.Empty);
 
         //Global col settings
-        var colSettings = _generatorService.GlobalGeneratorSettings.TableGlobalSettings.ColumnGlobalSettings;
+        var colSettings = advancedMode
+            ? advancedSettings!.ColumnGlobalSettings
+            : _generatorService.GlobalGeneratorSettings.TableGlobalSettings.ColumnGlobalSettings;
+
         var dicColumns = UISettingsHelper.SettingsDic(colSettings);
         InitTable(dicColumns, "Columns settings");
 
         
-        var intValue = await ManageUserInputForTableSettingsAsync();
+        var intValue = advancedMode 
+            ? await ManageUserInputForAdvancedSettingsAsync(tableSettings,tableName) 
+            : await ManageUserInputForTableSettingsAsync();
+
 
         //Change settings values
         if (dicTable.ContainsKey(intValue))
@@ -105,7 +128,8 @@ internal partial class ConsoleService
             }
         }
 
-        await ShowTableSettingsAsync();
+        
+        await ShowTableSettingsAsync(advancedMode,tableSettings,tableName);
     }
 
     private static void InitSettingsUI(string settingsType)
@@ -119,10 +143,12 @@ internal partial class ConsoleService
         AnsiConsole.WriteLine(string.Empty);
     }
 
-    private static void InitTable(Dictionary<int, SettingsKeyVal> dic, string title, bool advancedColumnMode = false)
+    private static void InitTable(Dictionary<int, SettingsKeyVal> dic, string title, bool ColumnMode = false)
     {
-        var tableUI = new Spectre.Console.Table();
-        tableUI.Title = new TableTitle($"[green]{title}[/]");
+        var tableUI = new Spectre.Console.Table
+        {
+            Title = new TableTitle($"[green]{title}[/]")
+        };
 
         tableUI.AddColumn("Settings");
         tableUI.AddColumn("Value");
@@ -139,11 +165,11 @@ internal partial class ConsoleService
                 section = entry.Value.Group;
             }
 
-            if(advancedColumnMode)
+            if(ColumnMode)
                 tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
             else
             {
-                if(!entry.Value.AdvancedColumnMode)
+                if(!entry.Value.ColumnModeOnly)
                     tableUI.AddRow(entry.Value.Label, entry.Value.Settings.ToString()!);
             }
         }
@@ -172,6 +198,7 @@ internal partial class ConsoleService
     {
         //Manage user inputs
         AnsiConsole.WriteLine(string.Empty);
+
         var value = AnsiConsole.Ask<string>("Press the settings number you want to edit or (q) to return to main menu: ");
 
         if (value == "q")
@@ -184,18 +211,50 @@ internal partial class ConsoleService
         return intValue;
     }
 
-    private void ChangeValue<T>(SettingsKeyVal setValue, object settings)
+    private async Task<int> ManageUserInputForAdvancedSettingsAsync(SettingsTable advancedSettings, string tableName)
     {
-        string newValue = string.Empty;
+        //Manage user inputs
+        AnsiConsole.WriteLine(string.Empty);
 
-        if(setValue.Type == typeof(bool))
+        var value = AnsiConsole.Ask<string>(@"
+!! Press the settings number you want to edit
+or (c) to go down deeper in column mode (settings at column lvl)
+or (r) to revert this table to global normal settings and go back main menu
+or (q) to return to main menu");
+
+        if (value == "q")
+            await ShowMainMenuAsync();
+
+        if (value == "c")
+            await ShowAdvancedColumnsAsync(advancedSettings,tableName);
+
+        if(value == "r")
         {
-            newValue = AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False";
+            try
+            {
+                _generatorService.GlobalGeneratorSettings.TableSettings.Remove(tableName);
+                AnsiConsole.WriteLine("Table config reverted to global");
+                await ReturnToMainMenuAsync();
+            }
+            catch(Exception ex)
+            {
+                AnsiConsole.WriteException(ex);
+                AnsiConsole.WriteLine("Error to go back to global config");
+                await ReturnToMainMenuAsync();
+            }
         }
-        else
-        {
-            newValue = AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
-        }
+
+        if (!int.TryParse(value, out int intValue))
+            await ShowTableSettingsAsync(true,advancedSettings,tableName);
+
+        return intValue;
+    }
+
+    private static void ChangeValue<T>(SettingsKeyVal setValue, object settings)
+    {
+        string newValue = setValue.Type == typeof(bool)
+            ? AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False"
+            : AnsiConsole.Ask<string>(setValue.Label.Split(") ")[1]);
 
         _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
     }

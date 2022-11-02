@@ -34,13 +34,13 @@ namespace Dapper_Layers_Generator.Core.Settings
         public string TargetProjectPath { get; set; } = @"c:\temp\MyTestProject\";
 
         [SettingsAttribute(Message = "---  Target folder for POCO files: ", Position = 8, ChildOf = "TargetProjectPath")]
-        public string TargetFolderForPOCO { get; set; } = @"c:\temp\MyTestProject\POCO\";
+        public string TargetFolderForPOCO { get; set; } = @"c:\temp\MyTestProject\POCO\Generated\";
 
         [SettingsAttribute(Message = "---  Target folder for repo files: ", Position = 9, ChildOf = "TargetProjectPath")]
-        public string TargetFolderForRepo { get; set; } = @"c:\temp\MyTestProject\Repo\";
+        public string TargetFolderForRepo { get; set; } = @"c:\temp\MyTestProject\Repo\Generated\";
 
         [SettingsAttribute(Message = "--- Target folder for DB context file: ", Position = 10, ChildOf = "TargetProjectPath")]
-        public string TargetFolderForDBContext { get; set; } = @"c:\temp\MyTestProject\DbContext\";
+        public string TargetFolderForDBContext { get; set; } = @"c:\temp\MyTestProject\DbContext\Generated\";
 
         [SettingsAttribute(Message = "Connection string name for configuration injection (ex Default): ", Position = 11)]
         public string ConnectionStringName { get; set; } = "Default";

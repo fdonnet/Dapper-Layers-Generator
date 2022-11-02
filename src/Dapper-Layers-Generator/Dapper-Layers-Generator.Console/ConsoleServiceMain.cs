@@ -70,9 +70,12 @@ internal partial class ConsoleService
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
 
+        var title = new Rule("MAIN MENU");
+        title.Centered();
+        AnsiConsole.Write(title);
+
         var menu = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
-            .Title("[green]MENU[/]")
             .AddChoices(new[] {
                     "Re-print DB definition (JSON)",
                     "Select tables generation",
@@ -99,7 +102,7 @@ internal partial class ConsoleService
                 await ShowTableSettingsAsync();
                 break;
             case "Advanced settings":
-                await ShowTableSettingsAsync();
+                await ShowAdvancedAsync();
                 break;
             case "Load config from file":
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");

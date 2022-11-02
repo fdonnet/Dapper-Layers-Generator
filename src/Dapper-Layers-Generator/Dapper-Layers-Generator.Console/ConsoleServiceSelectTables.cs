@@ -17,7 +17,9 @@ internal partial class ConsoleService
 
         if (settings.RunGeneratorForAllTables)
         {
-            if (!AnsiConsole.Confirm("For the moment, all tables are selected for generation, continue like this (y) or select tables(n):"))
+            if (!AnsiConsole.Confirm(@$"
+For the moment, all tables are selected for generation (schema: [green]{settings.SelectedSchema}[/]).
+Continue like this (y) or select tables(n):"))
             {
                 settings.RunGeneratorForSelectedTables = BuildSelectionTable(settings, tables);
                 await SelectionSaved();

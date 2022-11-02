@@ -12,7 +12,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         public string Message { get; set; } = string.Empty;
         public int Position { get; set; }
         public string ChildOf { get; set; } = string.Empty;
-        public bool OnlyInAdvancedColumnMode { get; set; } = false;
+        public bool OnlyInColumnMode { get; set; } = false;
         public string Group { get; set; } = string.Empty;
 
     }
