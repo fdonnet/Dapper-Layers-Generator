@@ -8,7 +8,7 @@ namespace Dapper_Layers_Generator.Core.Settings
 {
     public class SettingsTable
     {
-        [SettingsAttribute(Message = "Ignored column names in all tables (separator ,): ", Position = 1)]
+        [SettingsAttribute(Message = "Ignored column names (separator ,): ", Position = 1)]
         public string IgnoredColumnNames { get; set; } = string.Empty;
 
         [SettingsAttribute(Message = "Enable get all function generator: ", Position = 2, Group = "Generator")]

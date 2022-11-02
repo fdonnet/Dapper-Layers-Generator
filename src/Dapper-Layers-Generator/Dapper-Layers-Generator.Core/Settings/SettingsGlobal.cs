@@ -47,6 +47,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Db context class name: ", Position = 12)]
         public string DbContextClassName { get; set; } = "DbContext";
 
+        //Will be set based on db convention (mariadb = true, postgresql = true, mssql=false etc)
         [SettingsAttribute(Message = "Enable PascalCase transform for all table & column names: ", Position = 13)]
         public bool UsePascalTransform { get; set; } = true;
 
