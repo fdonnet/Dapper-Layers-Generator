@@ -11,7 +11,8 @@ namespace Dapper_Layers_Generator.Core.Generators
     public interface IGeneratorsProvider
     {
         T GetGenerator<T>();
-        IEnumerable<IGenerator> GetSelectedGeneratorsForRepo(string tableName);
+        T GetGenerator<T>(string tableName);
+        IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName);
     }
     public class GeneratorsProvider : IGeneratorsProvider
     {
@@ -24,9 +25,9 @@ namespace Dapper_Layers_Generator.Core.Generators
             _settings = settings;
         }
 
-        public IEnumerable<IGenerator> GetSelectedGeneratorsForRepo(string tableName)
+        public IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName)
         {
-            var generators = new List<IGenerator>();
+            var generators = new List<IGeneratorFromTable>();
 
             SettingsTable curSettings = _settings.TableSettings.TryGetValue(tableName, out var tabSettings) 
                 ? tabSettings 
@@ -34,7 +35,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             if(curSettings.AddGenerator)
             {
-                generators.Add((IGenerator)_serviceProvider.GetService(typeof(IGeneratorRepoAdd))!);
+                generators.Add((IGeneratorFromTable)GetGenerator<IGeneratorRepoAdd>(tableName));
             }
 
             return generators;
@@ -43,6 +44,14 @@ namespace Dapper_Layers_Generator.Core.Generators
         public T GetGenerator<T>()
         {
             return (T)_serviceProvider.GetService(typeof(T))!;
+        }
+
+        public T GetGenerator<T>(string tableName)
+        {
+            var generator =  (IGeneratorFromTable)_serviceProvider.GetService(typeof(T))!;
+            generator.SetTable(tableName);
+
+            return (T)generator;
         }
 
     }

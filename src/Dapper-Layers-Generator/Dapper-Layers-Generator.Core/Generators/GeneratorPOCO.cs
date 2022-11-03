@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorPOCO
+    public interface IGeneratorPOCO : IGenerator, IGeneratorFromTable
     {
 
     }
@@ -29,16 +29,25 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             string output =
 $@" 
-namespace TEST {{
-/// =================================================================
-/// Author: {_settings.AuthorName}
-/// Description: Poco class for the table {Table.Name} 
-/// =================================================================";
+{WritePocoHeader()}";
 
             return output;
 
 
         }
+
+        private string WritePocoHeader()
+        {
+            return $@" 
+namespace {_settings.TargetNamespaceForPOCO} 
+{{
+/// =================================================================
+/// Author: {_settings.AuthorName}
+/// Description: Poco class for the table {Table.Name} 
+/// =================================================================";
+        }
+
+
 
     }
 }

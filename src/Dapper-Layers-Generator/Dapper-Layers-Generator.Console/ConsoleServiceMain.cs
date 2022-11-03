@@ -78,6 +78,7 @@ internal partial class ConsoleService
         new SelectionPrompt<string>()
             .AddChoices(new[] {
                     "Re-print DB definition (JSON)",
+                    "TEST",
                     "Edit main settings",
                     "Select tables generation",
                     "Edit global table settings",
@@ -91,6 +92,12 @@ internal partial class ConsoleService
         {
             case "Re-print DB definition (JSON)":
                 await PrintDbDefinitionsAsync();
+                break;
+            case "TEST":
+                var test = _generatorService.TestWrite("clients");
+                AnsiConsole.WriteLine(test);
+
+                await ReturnToMainMenuAsync();
                 break;
             case "Edit main settings":
                 await ShowGlobalSettingsAsync();

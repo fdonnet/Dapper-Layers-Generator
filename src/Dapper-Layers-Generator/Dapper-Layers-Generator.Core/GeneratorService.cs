@@ -14,6 +14,7 @@ namespace Dapper_Layers_Generator.Core
     public interface IGeneratorService
     {
         SettingsGlobal GlobalGeneratorSettings { get; set; }
+        string TestWrite(string tableName);
     }
 
     public class GeneratorService : IGeneratorService
@@ -25,6 +26,13 @@ namespace Dapper_Layers_Generator.Core
         {
             GlobalGeneratorSettings = settingsGlobal;
             _generatorsProvider = generatorsProvider;
+        }
+
+        public string TestWrite(string tableName)
+        {
+            var generator = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
+
+            return generator.Generate();
         }
 
 

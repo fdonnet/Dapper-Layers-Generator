@@ -9,9 +9,15 @@ using System.Xml.Linq;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public abstract class GeneratorFromTable : Generator
+    public interface IGeneratorFromTable
     {
-        public ITable? Table { get; private set; }
+        void SetTable(string tableName);
+    }
+
+    public abstract class GeneratorFromTable : Generator, IGeneratorFromTable
+    {
+        //used by factory only can force null not set in constructor
+        public ITable Table { get; private set; } = null!;
 
         public GeneratorFromTable(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data) : base(settingsGlobal, data)
         {
@@ -19,10 +25,12 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
         public void SetTable(string tableName)
         {
-            Table = _currentSchema.Tables?.Where(t => t.Name == tableName).SingleOrDefault();
+            var table = _currentSchema.Tables?.Where(t => t.Name == tableName).SingleOrDefault();
 
-            if (Table == null)
+            if (table == null)
                 throw new NullReferenceException("Table not found in the DB repository");
+
+            Table = table;
         }
 
         public override abstract string Generate();
