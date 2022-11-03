@@ -1,4 +1,5 @@
-﻿using Dapper_Layers_Generator.Core.Settings;
+﻿using Dapper_Layers_Generator.Core.Converters;
+using Dapper_Layers_Generator.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,9 @@ namespace Dapper_Layers_Generator.Core.Generators
     {
         public GeneratorRepoAdd(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
-            ,StringTransformationService stringTransformationService) 
-                : base(settingsGlobal, data, stringTransformationService)
+            , StringTransformationService stringTransformationService
+            , IDataTypeConverter dataConverter) 
+                : base(settingsGlobal, data, stringTransformationService,dataConverter)
         {
 
         }

@@ -19,6 +19,6 @@ namespace Dapper_Layers_Generator.Core.Settings
         public string FieldNameCustomType { get; set; } = string.Empty;
 
         [SettingsAttribute(Message = "Fully qualified (full namespace) custom decorator: ", Position = 20, OnlyInColumnMode = true)]
-        public string? FieldNameCustomDecorators { get; set; } = string.Empty;
+        public string? FieldNameCustomDecorator { get; set; } = string.Empty;
     }
 }

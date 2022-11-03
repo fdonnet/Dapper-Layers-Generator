@@ -15,52 +15,27 @@ namespace Dapper_Layers_Generator.Core.Converters
     {
         public string GetDotNetDataType(string sqlDataTypeName, bool nullable = false)
         {
-            if (sqlDataTypeName == null) throw new ArgumentNullException(nameof(sqlDataTypeName));
-            switch (sqlDataTypeName.ToLower())
+            return sqlDataTypeName == null
+                ? throw new ArgumentNullException(nameof(sqlDataTypeName))
+                : sqlDataTypeName.ToLower() switch
             {
-                case "bigint":
-                    return "long" + (nullable ? "?" : "");
-                case "binary":
-                case "image":
-                case "varbinary":
-                    return "byte[]";
-                case "bit":
-                    return "bool" + (nullable ? "?" : "");
-                case "char":
-                    return "char" + (nullable ? "?" : "");
-                case "datetime":
-                case "smalldatetime":
-                    return "System.DateTime" + (nullable ? "?" : "");
-                case "decimal":
-                case "money":
-                case "numeric":
-                    return "decimal" + (nullable ? "?" : "");
-                case "float":
-                    return "double" + (nullable ? "?" : "");
-                case "int":
-                    return "int" + (nullable ? "?" : "");
-                case "nchar":
-                case "nvarchar":
-                case "text":
-                case "varchar":
-                case "xml":
-                    return "string";
-                case "real":
-                    return "single" + (nullable ? "?" : "");
-                case "smallint":
-                    return "short" + (nullable ? "?" : "");
-                case "tinyint":
-                    return "byte" + (nullable ? "?" : "");
-                case "uniqueidentifier":
-                    return "System.Guid" + (nullable ? "?" : "");
-                case "date":
-                    return "System.DateTime" + (nullable ? "?" : "");
-                case "rowversion":
-                    return "byte[]";
-
-                default:
-                    return "object";
-            }
+                "bigint" => "long" + (nullable ? "?" : ""),
+                "binary" or "image" or "varbinary" => "byte[]",
+                "bit" => "bool" + (nullable ? "?" : ""),
+                "char" => "char" + (nullable ? "?" : ""),
+                "datetime" or "smalldatetime" => "System.DateTime" + (nullable ? "?" : ""),
+                "decimal" or "money" or "numeric" => "decimal" + (nullable ? "?" : ""),
+                "float" => "double" + (nullable ? "?" : ""),
+                "int" => "int" + (nullable ? "?" : ""),
+                "nchar" or "nvarchar" or "text" or "varchar" or "xml" => "string",
+                "real" => "single" + (nullable ? "?" : ""),
+                "smallint" => "short" + (nullable ? "?" : ""),
+                "tinyint" => "byte" + (nullable ? "?" : ""),
+                "uniqueidentifier" => "System.Guid" + (nullable ? "?" : ""),
+                "date" => "System.DateTime" + (nullable ? "?" : ""),
+                "rowversion" => "byte[]",
+                _ => "object",
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Dapper_Layers_Generator.Core.Settings;
+﻿using Dapper_Layers_Generator.Core.Converters;
+using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
 using System;
 using System.Collections.Generic;
@@ -20,13 +21,15 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected ITable Table { get; private set; } = null!;
         protected string ClassName { get; private set; } = null!;
         protected SettingsTable TableSettings { get; private set; } = null!;
+        protected IDataTypeConverter DataConverter { get; private set; } = null!;
 
         public GeneratorFromTable(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
-            , StringTransformationService stringTransformationService) 
+            , StringTransformationService stringTransformationService
+            , IDataTypeConverter dataConverter) 
                 : base(settingsGlobal, data, stringTransformationService)
         {
-
+            DataConverter = dataConverter;
         }
 
         public override abstract string Generate();
