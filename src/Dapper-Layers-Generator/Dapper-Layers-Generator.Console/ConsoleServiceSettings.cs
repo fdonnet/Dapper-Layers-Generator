@@ -36,21 +36,21 @@ internal partial class ConsoleService
         //Change settings values
         if (dic.ContainsKey(intValue))
         {
-            //Schema 
-            if (dic[intValue].PropertyName == "SelectedSchema")
+            var newValue = string.Empty;
+
+            switch (dic[intValue].PropertyName)
             {
-                AnsiConsole.WriteLine("");
-                var newValue = AnsiConsole.Prompt(
-                         new SelectionPrompt<string>()
-                             .Title("Choose at least one schema to be generated: ")
-                             .AddChoices(_config["DB:Schemas"].Split(",")));
-            }
-            else
-            {
-                ///(Need to be string type prop or boom) =with children props
-                if (dic[intValue].PropertyName == "TargetProjectNamespace" || dic[intValue].PropertyName == "TargetProjectPath")
-                {
-                    var newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
+                case "SelectedSchema":
+                    AnsiConsole.WriteLine("");
+                    newValue = AnsiConsole.Prompt(
+                             new SelectionPrompt<string>()
+                                 .Title("Choose at least one schema to be generated: ")
+                                 .AddChoices(_config["DB:Schemas"].Split(",")));
+                    globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
+                    break;
+                case "TargetProjectNamespace":
+                case "TargetProjectPath":
+                    newValue = AnsiConsole.Ask<string>(dic[intValue].Label.Split(") ")[1]);
                     if (AnsiConsole.Confirm("Do you want to try to update child namespaces"))
                     {
                         var tmpDic = dic.Where(d => d.Value.ChildOf == dic[intValue].PropertyName);
@@ -64,11 +64,22 @@ internal partial class ConsoleService
                             }
                         }
                     }
-                }
-                else // normal case
-                {
+                    globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
+                    break;
+                case "IndentStringInGeneratedCode":
+                    newValue = AnsiConsole.Prompt(
+                            new SelectionPrompt<string>()
+                                .Title("What's your favorite indent way")
+                                .AddChoices(new[] {
+                                    "space", "double space", "tab",
+                                }));
+
+                    globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
+                    break;
+                default:
                     ChangeValue<SettingsGlobal>(dic[intValue], globalSettings);
-                }
+                    break;
+
             }
         }
 
@@ -359,8 +370,8 @@ or (q) to return to table advanced settings");
     {
         string newValue = setValue.Type == typeof(bool)
             ? AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False"
-                : AnsiConsole.Ask<string>("type (c) to clear"  + Environment.NewLine + "or change "  
-                    + setValue.Label.Split(") ")[1]);
+                : AnsiConsole.Ask<string>("type (c) to clear" + Environment.NewLine + "or change "
+                    + setValue.Label);
 
         if (setValue.Type == typeof(string) && newValue == "c")
             newValue = string.Empty;

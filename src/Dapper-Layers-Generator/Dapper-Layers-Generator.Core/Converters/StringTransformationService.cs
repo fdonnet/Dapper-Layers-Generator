@@ -6,15 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dapper_Layers_Generator.Core
+namespace Dapper_Layers_Generator.Core.Converters
 {
     public class StringTransformationService
     {
         private readonly bool _isPascalCaseEnable = false;
         private readonly bool _isSingularizeEnable = false;
+        private readonly string _indentStringInGeneratedCode;
 
         public StringTransformationService(SettingsGlobal settingsGlobal)
         {
+            _indentStringInGeneratedCode = settingsGlobal.IndentStringInGeneratedCode;
             _isPascalCaseEnable = settingsGlobal.UsePascalTransform;
             _isSingularizeEnable = settingsGlobal.UseSingularizeTransform;
         }
@@ -50,25 +52,40 @@ namespace Dapper_Layers_Generator.Core
 
         public string? Singularize(string? theString)
         {
-            return theString == null 
-                ? theString 
-                : _isSingularizeEnable 
-                    ? Humanizer.InflectorExtensions.Singularize(theString) 
+            return theString == null
+                ? theString
+                : _isSingularizeEnable
+                    ? Humanizer.InflectorExtensions.Singularize(theString)
                     : theString;
         }
 
         public string? SingularizeAndPascalCase(string? theString)
         {
-            return theString == null 
-                ? null 
-                : theString == null 
-                    ? theString 
+            return theString == null
+                ? null
+                : theString == null
+                    ? theString
                     : PascalCase(Singularize(theString));
         }
 
         public string? ApplyConfigTransform(string? theString)
         {
             return SingularizeAndPascalCase(theString);
+        }
+
+        public string IndentString()
+        {
+            switch (_indentStringInGeneratedCode)
+            {
+                case "double space":
+                    return "  ";
+                case "space":
+                    return " ";
+                case "tab":
+                    return "\t";
+                default:
+                    return "  ";
+            }
         }
 
 

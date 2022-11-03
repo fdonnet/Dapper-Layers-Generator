@@ -1,6 +1,7 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Core.Converters;
+using Dapper_Layers_Generator.Core.Converters.MySql;
 using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
