@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySqlX.XDevAPI.Relational;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -51,6 +52,10 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Enable PascalCase transform for all table & column names: ", Position = 13)]
         public bool UsePascalTransform { get; set; } = true;
 
+        //Will be set based on db convention (need to be tested)
+        [SettingsAttribute(Message = "Enable Singularize transform for all table names: ", Position = 14)]
+        public bool UseSingularizeTransform { get; set; } = true;
+
         //Tables selection to be generated (all or list of table names)
         public bool RunGeneratorForAllTables { get; set; } = true;
         public List<string> RunGeneratorForSelectedTables { get; set; } = new List<string>();
@@ -73,6 +78,18 @@ namespace Dapper_Layers_Generator.Core.Settings
             using FileStream openStream = File.OpenRead(configPath);
 
             return openStream == null ? null : await JsonSerializer.DeserializeAsync<SettingsGlobal>(openStream);
+        }
+
+        public SettingsTable GetTableSettings(string tableName)
+        {
+            if (TableSettings.TryGetValue(tableName, out var tabSettings))
+            {
+                return tabSettings;
+            }
+            else
+            {
+                return TableGlobalSettings;
+            }
         }
 
     }

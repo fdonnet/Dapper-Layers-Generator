@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySqlX.XDevAPI.Relational;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "Enable check if exist by unique key function generator: ", Position = 11, Group = "Generator")]
         public bool ExistsByUk { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add function generator: ", Position = 12, Group ="Generator" )]
+        [SettingsAttribute(Message = "Enable add function generator: ", Position = 12, Group = "Generator")]
         public bool AddGenerator { get; set; } = true;
 
         [SettingsAttribute(Message = "Enable update function generator: ", Position = 13, Group = "Generator")]
@@ -61,5 +62,16 @@ namespace Dapper_Layers_Generator.Core.Settings
 
         //Override table global seetings
         public Dictionary<string, SettingsColumn> ColumnSettings { get; set; } = new Dictionary<string, SettingsColumn>();
+
+        public SettingsColumn GetColumnSettings(string colName)
+        {
+            if (ColumnSettings.TryGetValue(colName, out var colSettings))
+            {
+                return colSettings;
+            }
+            else
+                return ColumnGlobalSettings;
+        }
+
     }
 }

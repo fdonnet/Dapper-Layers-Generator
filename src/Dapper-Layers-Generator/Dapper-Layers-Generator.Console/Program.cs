@@ -1,5 +1,6 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
+using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
@@ -137,6 +138,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
 
         //Avalaible Generators
         services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
+        services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
 
     }
 
@@ -149,6 +151,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
         //Always running services
         services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
         services.AddSingleton<SettingsGlobal>();
+        services.AddSingleton<StringTransformationService>();
         services.AddSingleton<IGeneratorService, GeneratorService>();
         services.AddSingleton<ConsoleService>();
 

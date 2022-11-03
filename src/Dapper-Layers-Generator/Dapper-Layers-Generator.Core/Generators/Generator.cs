@@ -17,10 +17,11 @@ namespace Dapper_Layers_Generator.Core.Generators
     {
         protected readonly SettingsGlobal _settings;
         protected readonly ISchema _currentSchema;
+        protected readonly StringTransformationService _stringTransform;
 
         private readonly IReaderDBDefinitionService _data;
 
-        public Generator(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data)
+        public Generator(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data, StringTransformationService stringTransformationService)
         {
             _settings = settingsGlobal;
             _data = data;
@@ -30,6 +31,8 @@ namespace Dapper_Layers_Generator.Core.Generators
                 throw new NullReferenceException("Selected DB schema cannot be null in the config when you want to use a generator");
 
             _currentSchema = schema;
+
+            _stringTransform = stringTransformationService;
         }
 
         public abstract string Generate();

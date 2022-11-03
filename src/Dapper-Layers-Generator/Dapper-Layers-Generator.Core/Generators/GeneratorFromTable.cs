@@ -17,12 +17,20 @@ namespace Dapper_Layers_Generator.Core.Generators
     public abstract class GeneratorFromTable : Generator, IGeneratorFromTable
     {
         //used by factory only can force null not set in constructor
-        public ITable Table { get; private set; } = null!;
+        protected ITable Table { get; private set; } = null!;
+        protected string ClassName { get; private set; } = null!;
+        protected SettingsTable TableSettings { get; private set; } = null!;
 
-        public GeneratorFromTable(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data) : base(settingsGlobal, data)
+        public GeneratorFromTable(SettingsGlobal settingsGlobal
+            , IReaderDBDefinitionService data
+            , StringTransformationService stringTransformationService) 
+                : base(settingsGlobal, data, stringTransformationService)
         {
 
         }
+
+        public override abstract string Generate();
+
         public void SetTable(string tableName)
         {
             var table = _currentSchema.Tables?.Where(t => t.Name == tableName).SingleOrDefault();
@@ -31,9 +39,9 @@ namespace Dapper_Layers_Generator.Core.Generators
                 throw new NullReferenceException("Table not found in the DB repository");
 
             Table = table;
+            ClassName = _stringTransform.ApplyConfigTransform(Table.Name)!;
+            TableSettings = _settings.GetTableSettings(Table.Name);
         }
-
-        public override abstract string Generate();
 
     }
 }

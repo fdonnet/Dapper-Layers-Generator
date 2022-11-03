@@ -13,7 +13,10 @@ namespace Dapper_Layers_Generator.Core.Generators
     }
     public class GeneratorRepoAdd : GeneratorFromTable, IGeneratorRepoAdd
     {
-        public GeneratorRepoAdd(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data) : base(settingsGlobal, data)
+        public GeneratorRepoAdd(SettingsGlobal settingsGlobal
+            , IReaderDBDefinitionService data
+            ,StringTransformationService stringTransformationService) 
+                : base(settingsGlobal, data, stringTransformationService)
         {
 
         }
