@@ -88,7 +88,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                 Table = c.table_name,
                 Name = c.column_name,
                 Position = (int)c.ordinal_position,
-                IsNullable = c.is_nullable == "Yes" ? true : false,
+                IsNullable = c.is_nullable == "YES" ? true : false,
                 DataType = c.data_type,
                 Length = (int?)c.character_maximum_length ?? 0,
                 Precision = (int?)c.numeric_precision ?? 0,

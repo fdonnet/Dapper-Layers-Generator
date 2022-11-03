@@ -94,7 +94,7 @@ internal partial class ConsoleService
                 await PrintDbDefinitionsAsync();
                 break;
             case "TEST":
-                var test = _generatorService.TestWrite("failures");
+                var test = _generatorService.TestWrite("clients");
                 AnsiConsole.WriteLine(test);
 
                 await ReturnToMainMenuAsync();

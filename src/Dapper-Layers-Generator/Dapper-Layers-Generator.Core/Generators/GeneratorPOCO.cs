@@ -58,7 +58,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
     public class {ClassName}
     {{
-        {WritePocoMemberFields()}
+{WritePocoMemberFields()}
     }}
 }}";
 
@@ -84,13 +84,8 @@ namespace {_settings.TargetNamespaceForPOCO}
 
                 var decorators = WriteMemberDecorators(colSettings, memberType, col);
 
-
-                return$@"
-{decorators}public {memberType} {memberName} {{ get; set; }}"
-                    + (!col.IsNullable 
-                        ? " = null!;" 
-                        : string.Empty)
-                    + Environment.NewLine;
+                return 
+$"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.IsNullable ? " = null!;" : string.Empty) + Environment.NewLine;
 
             }));
 
@@ -142,7 +137,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             {
                 if (settings.StandardRequiredDecorator)
                 {
-                    decorator = $"[System.ComponentModel.DataAnnotations.Required]";
+                    decorator = "[System.ComponentModel.DataAnnotations.Required]";
                 }
             }
             return decorator;
@@ -155,7 +150,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
             if (colFound)
             {
-                decorator += $"[JsonIgnore]";
+                decorator += "[JsonIgnore]";
             }
 
             return decorator;
@@ -177,7 +172,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             if (decorators.Length > curLength)
             {
                 decorators.Append(Environment.NewLine);
-                decorators.Append("        ");
+                decorators.Append("     ");
                 curLength = decorators.Length;
             }
         }
