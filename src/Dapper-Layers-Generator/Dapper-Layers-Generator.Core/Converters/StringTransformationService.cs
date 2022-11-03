@@ -10,17 +10,57 @@ namespace Dapper_Layers_Generator.Core.Converters
 {
     public class StringTransformationService
     {
-        private readonly bool _isPascalCaseEnable = false;
-        private readonly bool _isSingularizeEnable = false;
-        private readonly string _indentStringInGeneratedCode;
+        private readonly SettingsGlobal _settingsGlobal;
+
+        public string IndentString
+        {
+            get
+            {
+                switch (_settingsGlobal.IndentStringInGeneratedCode)
+                {
+                    case "double space":
+                        return "  ";
+                    case "space":
+                        return " ";
+                    case "quadruple space":
+                        return "    ";
+                    case "tab":
+                        return "\t";
+                    default:
+                        return "  ";
+                }
+            }
+        }
+
+        private bool _isPascalCaseEnable
+        {
+            get
+            {
+                return _settingsGlobal.UsePascalTransform;
+            }
+        }
+
+        private string _indentStringInGeneratedCode
+        {
+            get
+            {
+                return _settingsGlobal.IndentStringInGeneratedCode;
+            }
+        }
+
+        private bool _isSingularizeEnable
+        {
+            get
+            {
+                return _settingsGlobal.UseSingularizeTransform;
+            }
+        }
 
         public StringTransformationService(SettingsGlobal settingsGlobal)
         {
-            _indentStringInGeneratedCode = settingsGlobal.IndentStringInGeneratedCode;
-            _isPascalCaseEnable = settingsGlobal.UsePascalTransform;
-            _isSingularizeEnable = settingsGlobal.UseSingularizeTransform;
+            _settingsGlobal = settingsGlobal;
         }
-
+ 
         public string? PascalCase(string? theString)
         {
             // If there are 0 or 1 characters, just return the string.
@@ -72,22 +112,6 @@ namespace Dapper_Layers_Generator.Core.Converters
         {
             return SingularizeAndPascalCase(theString);
         }
-
-        public string IndentString()
-        {
-            switch (_indentStringInGeneratedCode)
-            {
-                case "double space":
-                    return "  ";
-                case "space":
-                    return " ";
-                case "tab":
-                    return "\t";
-                default:
-                    return "  ";
-            }
-        }
-
 
     }
 }

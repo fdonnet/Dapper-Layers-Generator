@@ -57,7 +57,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         public bool UseSingularizeTransform { get; set; } = true;
 
         [SettingsAttribute(Message = "What's your indent way for generated code: ", Position = 15)]
-        public string IndentStringInGeneratedCode { get; set; } = "double space";
+        public string IndentStringInGeneratedCode { get; set; } = "tab";
 
         //Tables selection to be generated (all or list of table names)
         public bool RunGeneratorForAllTables { get; set; } = true;

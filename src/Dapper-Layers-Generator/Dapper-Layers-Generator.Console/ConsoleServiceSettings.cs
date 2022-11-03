@@ -71,7 +71,7 @@ internal partial class ConsoleService
                             new SelectionPrompt<string>()
                                 .Title("What's your favorite indent way")
                                 .AddChoices(new[] {
-                                    "space", "double space", "tab",
+                                    "space", "double space","quadruple space", "tab", 
                                 }));
 
                     globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);

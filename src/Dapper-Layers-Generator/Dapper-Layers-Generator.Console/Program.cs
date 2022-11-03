@@ -152,7 +152,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
         //Always running services
         services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
         services.AddSingleton<SettingsGlobal>();
-        services.AddSingleton<StringTransformationService>();
+        services.AddScoped<StringTransformationService>();
         services.AddSingleton<IGeneratorService, GeneratorService>();
         services.AddSingleton<ConsoleService>();
 
