@@ -11,6 +11,7 @@ namespace Dapper_Layers_Generator.Core
 {
     public interface IReaderDBDefinitionService
     {
+        IList<ISchema>? SchemaDefinitions { get; }
         Task ReadAllDBDefinitionsStepAsync();
     }
 

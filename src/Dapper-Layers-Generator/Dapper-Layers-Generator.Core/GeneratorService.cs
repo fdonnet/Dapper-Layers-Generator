@@ -23,7 +23,5 @@ namespace Dapper_Layers_Generator.Core
         {
             GlobalGeneratorSettings = settingsGlobal;
         }
-
-
     }
 }

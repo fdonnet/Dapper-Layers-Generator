@@ -1,10 +1,13 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
+using Dapper_Layers_Generator.Core.Generators;
+using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.Data.Types;
 using Spectre.Console;
 
 string _dbProvider = string.Empty;
@@ -131,18 +134,33 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     if (dbProvider == "mysql")
     {
         services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
+
+        //Avalaible Generators
+        services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
+
     }
 
     //If accepted dbProvider
     if (dbProvider == "mysql")
     {
+         //Available Generators not dependent on DB provider
+        services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
+
+        //Always running services
         services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
         services.AddSingleton<SettingsGlobal>();
         services.AddSingleton<IGeneratorService, GeneratorService>();
         services.AddSingleton<ConsoleService>();
+
+        //Generators factory
+        services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
+
         return services.BuildServiceProvider();
     }
+
 
     return null;
 
 }
+
+
