@@ -20,19 +20,19 @@ namespace Dapper_Layers_Generator.Core.Converters
                 : sqlDataTypeName.ToLower() switch
             {
                 "bigint" => "long" + (nullable ? "?" : ""),
-                "binary" or "image" or "varbinary" => "byte[]",
+                "binary" or "image" or "varbinary" => "byte[]" + (nullable ? "?" : ""),
                 "bit" => "bool" + (nullable ? "?" : ""),
                 "char" => "char" + (nullable ? "?" : ""),
-                "datetime" or "smalldatetime" => "System.DateTime" + (nullable ? "?" : ""),
+                "datetime" or "smalldatetime" => "DateTime" + (nullable ? "?" : ""),
                 "decimal" or "money" or "numeric" => "decimal" + (nullable ? "?" : ""),
                 "float" => "double" + (nullable ? "?" : ""),
                 "int" => "int" + (nullable ? "?" : ""),
-                "nchar" or "nvarchar" or "text" or "varchar" or "xml" => "string",
+                "nchar" or "nvarchar" or "text" or "varchar" or "xml" => "string" + (nullable ? "?" : ""),
                 "real" => "single" + (nullable ? "?" : ""),
                 "smallint" => "short" + (nullable ? "?" : ""),
                 "tinyint" => "byte" + (nullable ? "?" : ""),
                 "uniqueidentifier" => "System.Guid" + (nullable ? "?" : ""),
-                "date" => "System.DateTime" + (nullable ? "?" : ""),
+                "date" => "DateTime" + (nullable ? "?" : ""),
                 "rowversion" => "byte[]",
                 _ => "object",
             };

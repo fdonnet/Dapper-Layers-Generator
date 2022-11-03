@@ -40,28 +40,38 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         private string WritePocoHeaderComment()
         {
-            return $@" 
+            return $@"
+#nullable disable warnings
 namespace {_settings.TargetNamespaceForPOCO} 
 {{
-/// =================================================================
-/// Author: {_settings.AuthorName}
-/// Poco: {ClassName}
-/// Description: Poco class for the table {Table.Name}
-/// Generated: {DateTime.Now}
-/// =================================================================";
+  /// =================================================================
+  /// Author: {_settings.AuthorName}
+  /// Poco: {ClassName}
+  /// Description: Poco class for the table {Table.Name}
+  /// Generated: {DateTime.Now}
+  /// =================================================================";
         }
 
         private string WritePocoClass()
         {
-            return $@" 
-{WritePocoHeaderComment()}
+            var builder = new StringBuilder();
+            
+            builder.Append(WritePocoHeaderComment());
+            
+            builder.Append(Environment.NewLine);
+            builder.Append($"  public class {ClassName}");
+            builder.Append(Environment.NewLine);
+            builder.Append("  {");
+            builder.Append(Environment.NewLine);
 
-    public class {ClassName}
-    {{
-{WritePocoMemberFields()}
-    }}
-}}";
+            builder.Append(WritePocoMemberFields());
 
+            builder.Append("  }");
+            builder.Append(Environment.NewLine);
+            builder.Append("}");
+
+            return builder.ToString();
+            
         }
 
         private string WritePocoMemberFields()
@@ -73,7 +83,7 @@ namespace {_settings.TargetNamespaceForPOCO}
                           ? Table.Columns
                           : Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name));
 
-            var members = String.Join(Environment.NewLine + "       ", columns.Select(col =>
+            var members = String.Join(Environment.NewLine, columns.Select(col =>
             {
                 var memberName = _stringTransform.PascalCase(col.Name);
                 var colSettings = TableSettings.GetColumnSettings(col.Name);
@@ -84,8 +94,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
                 var decorators = WriteMemberDecorators(colSettings, memberType, col);
 
-                return 
-$"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.IsNullable ? " = null!;" : string.Empty) + Environment.NewLine;
+                return  $"{decorators}    public {memberType} {memberName} {{ get; set; }}" + Environment.NewLine;
 
             }));
 
@@ -122,7 +131,7 @@ $"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.Is
                 {
                     if (col.Length > 0)
                     {
-                        decorator = $"[System.ComponentModel.DataAnnotations.StringLength({col.Length})]";
+                        decorator = $"    [System.ComponentModel.DataAnnotations.StringLength({col.Length})]";
                     }
                 }
             }
@@ -137,7 +146,7 @@ $"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.Is
             {
                 if (settings.StandardRequiredDecorator)
                 {
-                    decorator = "[System.ComponentModel.DataAnnotations.Required]";
+                    decorator = "    [System.ComponentModel.DataAnnotations.Required]";
                 }
             }
             return decorator;
@@ -150,7 +159,7 @@ $"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.Is
 
             if (colFound)
             {
-                decorator += "[JsonIgnore]";
+                decorator = "    [JsonIgnore]";
             }
 
             return decorator;
@@ -161,7 +170,7 @@ $"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.Is
             var decorator = string.Empty;
             if (!string.IsNullOrEmpty(settings.FieldNameCustomDecorator))
             {
-                decorator = settings.FieldNameCustomDecorator;
+                decorator = "    " + settings.FieldNameCustomDecorator;
             }
 
             return decorator;
@@ -172,7 +181,6 @@ $"      {decorators}public {memberType} {memberName} {{ get; set; }}" + (!col.Is
             if (decorators.Length > curLength)
             {
                 decorators.Append(Environment.NewLine);
-                decorators.Append("     ");
                 curLength = decorators.Length;
             }
         }
