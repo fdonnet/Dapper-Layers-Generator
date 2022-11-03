@@ -9,7 +9,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
     public class MySqlGeneratorRepoAdd : GeneratorRepoAdd, IGeneratorRepoAdd
     {
-        public MySqlGeneratorRepoAdd(SettingsGlobal settingsGlobal) : base(settingsGlobal)
+        public MySqlGeneratorRepoAdd(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data) : base(settingsGlobal, data)
         {
 
         }

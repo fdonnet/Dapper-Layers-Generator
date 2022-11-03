@@ -11,14 +11,14 @@ namespace Dapper_Layers_Generator.Core.Generators
     {
 
     }
-    public class GeneratorRepoAdd : Generator, IGeneratorRepoAdd
+    public class GeneratorRepoAdd : GeneratorFromTable, IGeneratorRepoAdd
     {
-        public GeneratorRepoAdd(SettingsGlobal settingsGlobal) : base(settingsGlobal)
+        public GeneratorRepoAdd(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data) : base(settingsGlobal, data)
         {
 
         }
 
-        public override async Task<string> Generate()
+        public override string Generate()
         {
             return "TEST";
         }

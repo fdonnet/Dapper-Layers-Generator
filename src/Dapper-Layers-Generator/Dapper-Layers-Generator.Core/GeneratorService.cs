@@ -1,4 +1,5 @@
-﻿using Dapper_Layers_Generator.Core.Settings;
+﻿using Dapper_Layers_Generator.Core.Generators;
+using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
 using Dapper_Layers_Generator.Data.Reader;
 using Microsoft.Extensions.Configuration;
@@ -17,11 +18,15 @@ namespace Dapper_Layers_Generator.Core
 
     public class GeneratorService : IGeneratorService
     {
-        public SettingsGlobal GlobalGeneratorSettings { get; set; } 
+        public SettingsGlobal GlobalGeneratorSettings { get; set; }
+        private readonly IGeneratorsProvider _generatorsProvider;
 
-        public GeneratorService(SettingsGlobal settingsGlobal)
+        public GeneratorService(SettingsGlobal settingsGlobal, IGeneratorsProvider generatorsProvider)
         {
             GlobalGeneratorSettings = settingsGlobal;
+            _generatorsProvider = generatorsProvider;
         }
+
+
     }
 }

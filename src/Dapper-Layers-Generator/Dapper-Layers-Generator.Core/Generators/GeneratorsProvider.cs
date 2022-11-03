@@ -10,7 +10,8 @@ namespace Dapper_Layers_Generator.Core.Generators
 {
     public interface IGeneratorsProvider
     {
-        IEnumerable<IGenerator> GetGeneratorsForRepo(string tableName);
+        T GetGenerator<T>();
+        IEnumerable<IGenerator> GetSelectedGeneratorsForRepo(string tableName);
     }
     public class GeneratorsProvider : IGeneratorsProvider
     {
@@ -23,29 +24,25 @@ namespace Dapper_Layers_Generator.Core.Generators
             _settings = settings;
         }
 
-        public IEnumerable<IGenerator> GetGeneratorsForRepo(string tableName)
+        public IEnumerable<IGenerator> GetSelectedGeneratorsForRepo(string tableName)
         {
             var generators = new List<IGenerator>();
 
-            var service = _serviceProvider.GetService(typeof(IGeneratorRepoAdd));
-            generators.Add((IGenerator)service!);
+            SettingsTable curSettings = _settings.TableSettings.TryGetValue(tableName, out var tabSettings) 
+                ? tabSettings 
+                : _settings.TableGlobalSettings;
+
+            if(curSettings.AddGenerator)
+            {
+                generators.Add((IGenerator)_serviceProvider.GetService(typeof(IGeneratorRepoAdd))!);
+            }
 
             return generators;
         }
 
-        public IGeneratorPOCO GetGeneratorForContext()
+        public T GetGenerator<T>()
         {
-            var generator = (IGeneratorPOCO)_serviceProvider.GetService(typeof(IGeneratorPOCO))!;
-            
-            return generator;
-
-        }
-
-        public IGeneratorPOCO GetGeneratorForPOCO()
-        {
-            var generator = (IGeneratorPOCO)_serviceProvider.GetService(typeof(IGeneratorPOCO))!;
-
-            return generator;
+            return (T)_serviceProvider.GetService(typeof(T))!;
         }
 
     }
