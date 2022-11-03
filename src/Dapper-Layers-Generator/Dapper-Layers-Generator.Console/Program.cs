@@ -1,5 +1,6 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
 using Dapper_Layers_Generator.Core;
+using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
@@ -135,8 +136,9 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     //If accepted dbProvider
     if (dbProvider == "mysql")
     {
-        services.AddSingleton<ReaderDBDefinitionService>();
-        services.AddSingleton<GeneratorService>();
+        services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
+        services.AddSingleton<SettingsGlobal>();
+        services.AddSingleton<IGeneratorService, GeneratorService>();
         services.AddSingleton<ConsoleService>();
         return services.BuildServiceProvider();
     }

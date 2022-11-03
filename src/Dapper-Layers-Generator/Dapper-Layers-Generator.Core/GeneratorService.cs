@@ -10,13 +10,18 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core
 {
-    public class GeneratorService
+    public interface IGeneratorService
     {
-        public SettingsGlobal GlobalGeneratorSettings { get; set; }
+        SettingsGlobal GlobalGeneratorSettings { get; set; }
+    }
 
-        public GeneratorService()
+    public class GeneratorService : IGeneratorService
+    {
+        public SettingsGlobal GlobalGeneratorSettings { get; set; } 
+
+        public GeneratorService(SettingsGlobal settingsGlobal)
         {
-            GlobalGeneratorSettings = new SettingsGlobal();
+            GlobalGeneratorSettings = settingsGlobal;
         }
 
 

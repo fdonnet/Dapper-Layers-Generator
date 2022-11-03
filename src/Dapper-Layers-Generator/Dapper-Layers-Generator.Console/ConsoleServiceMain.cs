@@ -12,12 +12,12 @@ using Dapper_Layers_Generator.Console.Helpers;
 
 internal partial class ConsoleService
 {
-    private readonly ReaderDBDefinitionService _dataService = null!;
-    private readonly GeneratorService _generatorService = null!;
+    private readonly IReaderDBDefinitionService _dataService = null!;
+    private readonly IGeneratorService _generatorService = null!;
     private readonly JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
     private readonly IConfiguration _config;
 
-    public ConsoleService(ReaderDBDefinitionService dataService, GeneratorService generatorService, IConfiguration config)
+    public ConsoleService(IReaderDBDefinitionService dataService, IGeneratorService generatorService, IConfiguration config)
     {
         _dataService = dataService;
         _generatorService = generatorService;

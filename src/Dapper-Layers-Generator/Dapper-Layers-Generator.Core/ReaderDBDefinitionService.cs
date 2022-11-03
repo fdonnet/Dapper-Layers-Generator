@@ -9,7 +9,12 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core
 {
-    public class ReaderDBDefinitionService
+    public interface IReaderDBDefinitionService
+    {
+        Task ReadAllDBDefinitionsStepAsync();
+    }
+
+    public class ReaderDBDefinitionService : IReaderDBDefinitionService
     {
         public IList<ISchema>? SchemaDefinitions { get; private set; }
 
