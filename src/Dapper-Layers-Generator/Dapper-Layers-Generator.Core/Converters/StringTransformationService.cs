@@ -61,7 +61,12 @@ namespace Dapper_Layers_Generator.Core.Converters
             _settingsGlobal = settingsGlobal;
         }
  
-        public string? PascalCase(string? theString)
+        /// <summary>
+        /// Old method for ref
+        /// </summary>
+        /// <param name="theString"></param>
+        /// <returns></returns>
+        public string? PascalCaseOld(string? theString)
         {
             // If there are 0 or 1 characters, just return the string.
             if (theString == null) return theString;
@@ -90,13 +95,33 @@ namespace Dapper_Layers_Generator.Core.Converters
                 return theString;
         }
 
-        public string? Singularize(string? theString)
+        public string? PascalCase(string? theString)
         {
             return theString == null
                 ? theString
-                : _isSingularizeEnable
-                    ? Humanizer.InflectorExtensions.Singularize(theString)
+                : _isPascalCaseEnable
+                    ? Humanizer.InflectorExtensions.Pascalize(theString)
                     : theString;
+        }
+
+        public string? Singularize(string? theString)
+        {
+            if (theString == null)
+                return null;
+
+            if(_isSingularizeEnable)
+            {
+                var theStringSplit = theString.Split('_');
+                var resultString = string.Empty;
+
+                foreach(var str in theStringSplit)
+                {
+                    resultString += Humanizer.InflectorExtensions.Singularize(str) + '_';
+                }
+                return resultString[..^1];
+                
+            }
+            return theString;
         }
 
         public string? SingularizeAndPascalCase(string? theString)

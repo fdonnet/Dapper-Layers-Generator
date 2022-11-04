@@ -11,7 +11,7 @@ using System.Xml.Linq;
 namespace Dapper_Layers_Generator.Core.Generators
 {
     public interface IGeneratorFromTable
-    {
+    {   string ClassName { get; }
         void SetTable(string tableName);
     }
 
@@ -19,7 +19,7 @@ namespace Dapper_Layers_Generator.Core.Generators
     {
         //used by factory only can force null not set in constructor
         protected ITable Table { get; private set; } = null!;
-        protected string ClassName { get; private set; } = null!;
+        public string ClassName { get; private set; } = null!;
         protected SettingsTable TableSettings { get; private set; } = null!;
         protected IDataTypeConverter DataConverter { get; private set; } = null!;
 

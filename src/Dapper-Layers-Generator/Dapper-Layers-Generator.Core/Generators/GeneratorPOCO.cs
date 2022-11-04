@@ -45,10 +45,12 @@ namespace Dapper_Layers_Generator.Core.Generators
 namespace {_settings.TargetNamespaceForPOCO} 
 {{
 {_stringTransform.IndentString}/// =================================================================
+{_stringTransform.IndentString}/// <summary>
+{_stringTransform.IndentString}/// Poco class for the table {Table.Name}
 {_stringTransform.IndentString}/// Author: {_settings.AuthorName}
 {_stringTransform.IndentString}/// Poco: {ClassName}
-{_stringTransform.IndentString}/// Description: Poco class for the table {Table.Name}
 {_stringTransform.IndentString}/// Generated: {DateTime.Now}
+{_stringTransform.IndentString}/// </summary>
 {_stringTransform.IndentString}/// =================================================================";
 
         }
