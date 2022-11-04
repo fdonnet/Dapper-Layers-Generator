@@ -20,7 +20,6 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected readonly SettingsGlobal _settings;
         protected readonly ISchema _currentSchema;
         protected readonly StringTransformationService _stringTransform;
-
         private readonly IReaderDBDefinitionService _data;
 
         public Generator(SettingsGlobal settingsGlobal

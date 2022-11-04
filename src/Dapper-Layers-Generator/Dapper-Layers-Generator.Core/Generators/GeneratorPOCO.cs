@@ -40,36 +40,38 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         private string WritePocoHeaderComment()
         {
+            var tab = _stringTransform.IndentString;
             return $@"#nullable disable warnings
 namespace {_settings.TargetNamespaceForPOCO} 
 {{
-{_stringTransform.IndentString}/// =================================================================
-{_stringTransform.IndentString}/// <summary>
-{_stringTransform.IndentString}/// Poco class for the table {Table.Name}
-{_stringTransform.IndentString}/// Author: {_settings.AuthorName}
-{_stringTransform.IndentString}/// Poco: {ClassName}
-{_stringTransform.IndentString}/// Generated: {DateTime.Now}
-{_stringTransform.IndentString}/// WARNING: Never change this file manually (re-generate it)
-{_stringTransform.IndentString}/// </summary>
-{_stringTransform.IndentString}/// =================================================================";
+{tab}/// =================================================================
+{tab}/// <summary>
+{tab}/// Poco class for the table {Table.Name}
+{tab}/// Author: {_settings.AuthorName}
+{tab}/// Poco: {ClassName}
+{tab}/// Generated: {DateTime.Now}
+{tab}/// WARNING: Never change this file manually (re-generate it)
+{tab}/// </summary>
+{tab}/// =================================================================";
 
         }
 
         private string WritePocoClass()
         {
+            var tab = _stringTransform.IndentString;
             var builder = new StringBuilder();
             
-            builder.Append(WritePocoHeaderComment());
+            builder.Append(@WritePocoHeaderComment());
             
             builder.Append(Environment.NewLine);
-            builder.Append($"{_stringTransform.IndentString}public class {ClassName}");
+            builder.Append($"{tab}public class {ClassName}");
             builder.Append(Environment.NewLine);
-            builder.Append($"{_stringTransform.IndentString}{{");
+            builder.Append($"{tab}{{");
             builder.Append(Environment.NewLine);
 
             builder.Append(WritePocoMemberFields());
 
-            builder.Append($"{_stringTransform.IndentString}}}");
+            builder.Append($"{tab}}}");
             builder.Append(Environment.NewLine);
             builder.Append("}");
 
@@ -79,6 +81,8 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WritePocoMemberFields()
         {
+            var tab = _stringTransform.IndentString;
+
             if (Table.Columns == null)
                 return "";
 
@@ -97,7 +101,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
                 var decorators = WriteMemberDecorators(colSettings, memberType, col);
 
-                return  $"{decorators}{_stringTransform.IndentString}{_stringTransform.IndentString}public {memberType} {memberName} {{ get; set; }}"
+                return  $"{decorators}{tab}{tab}public {memberType} {memberName} {{ get; set; }}"
                     + Environment.NewLine;
 
             }));
@@ -127,6 +131,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, IColumn col)
         {
+            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
 
             if (memberType == "string")
@@ -135,7 +140,7 @@ namespace {_settings.TargetNamespaceForPOCO}
                 {
                     if (col.Length > 0)
                     {
-                        decorator = $"{_stringTransform.IndentString}{_stringTransform.IndentString}[System.ComponentModel.DataAnnotations.StringLength({col.Length})]";
+                        decorator = $"{tab}{tab}[System.ComponentModel.DataAnnotations.StringLength({col.Length})]";
                     }
                 }
             }
@@ -144,13 +149,14 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberRequieredDecorator(SettingsColumn settings, IColumn col)
         {
+            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
 
             if (!col.IsNullable && !col.IsAutoIncrement)
             {
                 if (settings.StandardRequiredDecorator)
                 {
-                    decorator = $"{_stringTransform.IndentString}{_stringTransform.IndentString}[System.ComponentModel.DataAnnotations.Required]";
+                    decorator = $"{tab}{tab}[System.ComponentModel.DataAnnotations.Required]";
                 }
             }
             return decorator;
@@ -158,12 +164,13 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberJsonIgnoreDecorator(IColumn col)
         {
+            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
             var colFound = TableSettings.JsonIgnoreDecoration.Split(',').Any(c => c == col.Name);
 
             if (colFound)
             {
-                decorator = $"{_stringTransform.IndentString}{_stringTransform.IndentString}[JsonIgnore]";
+                decorator = $"{tab}{tab}[JsonIgnore]";
             }
 
             return decorator;

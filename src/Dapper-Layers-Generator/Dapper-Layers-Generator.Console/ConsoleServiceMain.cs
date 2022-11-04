@@ -35,6 +35,8 @@ internal partial class ConsoleService
         try
         {
             AnsiConsole.Clear();
+            //TMP CODING
+            await _settings.LoadFromFile(@"c:\temp\config.json");
 
             await AnsiConsole.Status()
                  .StartAsync(
@@ -72,9 +74,6 @@ internal partial class ConsoleService
 
     internal async Task ShowMainMenuAsync()
     {
-        //TMP CODING
-        await _settings.LoadFromFile(@"c:\temp\config.json");
-
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
 
@@ -134,7 +133,7 @@ internal partial class ConsoleService
 
                 await ReturnToMainMenuAsync();
                 break;
-            case "Re-print DB definition (JSON)":
+            case "Print DB definitions (JSON)":
                 await PrintDbDefinitionsAsync();
                 break;
             case "Load config from file":

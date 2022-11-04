@@ -16,23 +16,18 @@ namespace Dapper_Layers_Generator.Core.Converters
         {
             get
             {
-                switch (_settingsGlobal.IndentStringInGeneratedCode)
+                return _settingsGlobal.IndentStringInGeneratedCode switch
                 {
-                    case "double space":
-                        return "  ";
-                    case "space":
-                        return " ";
-                    case "quadruple space":
-                        return "    ";
-                    case "tab":
-                        return "\t";
-                    default:
-                        return "  ";
-                }
+                    "double space" => "  ",
+                    "space" => " ",
+                    "quadruple space" => "    ",
+                    "tab" => "\t",
+                    _ => "  ",
+                };
             }
         }
 
-        private bool _isPascalCaseEnable
+        private bool IsPascalCaseEnable
         {
             get
             {
@@ -40,15 +35,7 @@ namespace Dapper_Layers_Generator.Core.Converters
             }
         }
 
-        private string _indentStringInGeneratedCode
-        {
-            get
-            {
-                return _settingsGlobal.IndentStringInGeneratedCode;
-            }
-        }
-
-        private bool _isSingularizeEnable
+        private bool IsSingularizeEnable
         {
             get
             {
@@ -71,7 +58,7 @@ namespace Dapper_Layers_Generator.Core.Converters
             // If there are 0 or 1 characters, just return the string.
             if (theString == null) return theString;
 
-            if (_isPascalCaseEnable)
+            if (IsPascalCaseEnable)
             {
                 if (theString.Length < 2) return theString.ToUpper();
 
@@ -99,7 +86,7 @@ namespace Dapper_Layers_Generator.Core.Converters
         {
             return theString == null
                 ? theString
-                : _isPascalCaseEnable
+                : IsPascalCaseEnable
                     ? Humanizer.InflectorExtensions.Pascalize(theString)
                     : theString;
         }
@@ -109,7 +96,7 @@ namespace Dapper_Layers_Generator.Core.Converters
             if (theString == null)
                 return null;
 
-            if(_isSingularizeEnable)
+            if(IsSingularizeEnable)
             {
                 var theStringSplit = theString.Split('_');
                 var resultString = string.Empty;
@@ -136,6 +123,15 @@ namespace Dapper_Layers_Generator.Core.Converters
         public string? ApplyConfigTransform(string? theString)
         {
             return SingularizeAndPascalCase(theString);
+        }
+
+#pragma warning disable CA1822 // Mark members as static
+        public string? FirstCharToLower(string? theString)
+#pragma warning restore CA1822 // Mark members as static
+        {
+            return String.IsNullOrEmpty(theString) || Char.IsLower(theString, 0)
+                ? theString
+                : Char.ToLowerInvariant(theString[0]) + theString[1..];
         }
 
     }
