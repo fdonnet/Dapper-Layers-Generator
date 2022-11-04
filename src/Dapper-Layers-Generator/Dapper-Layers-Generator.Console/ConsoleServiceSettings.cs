@@ -158,6 +158,7 @@ internal partial class ConsoleService
                         new MultiSelectionPrompt<string>()
                             .Title("Select the columns you want for this specific config")
                             .PageSize(15)
+                            .Required(false)
                             .MoreChoicesText("[grey](Move up and down to reveal more tables)[/]")
                             .InstructionsText(
                                 "[grey](Press [blue]<space>[/] to toggle a table, " +
