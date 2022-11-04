@@ -40,8 +40,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         private string WritePocoHeaderComment()
         {
-            return $@"
-#nullable disable warnings
+            return $@"#nullable disable warnings
 namespace {_settings.TargetNamespaceForPOCO} 
 {{
 {_stringTransform.IndentString}/// =================================================================
@@ -50,6 +49,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 {_stringTransform.IndentString}/// Author: {_settings.AuthorName}
 {_stringTransform.IndentString}/// Poco: {ClassName}
 {_stringTransform.IndentString}/// Generated: {DateTime.Now}
+{_stringTransform.IndentString}/// WARNING: Never change this file manually (re-generate it)
 {_stringTransform.IndentString}/// </summary>
 {_stringTransform.IndentString}/// =================================================================";
 

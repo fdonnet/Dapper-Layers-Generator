@@ -116,6 +116,7 @@ void BuildServices()
     {
         _builder = ServicesConfig(_dbProvider, _services);
         AnsiConsole.MarkupLine("DbProvider loading: SUCCESS !");
+        _builder!.GetRequiredService<SettingsGlobal>().DbProvider = _dbProvider;
     }
     catch (Exception ex)
     {

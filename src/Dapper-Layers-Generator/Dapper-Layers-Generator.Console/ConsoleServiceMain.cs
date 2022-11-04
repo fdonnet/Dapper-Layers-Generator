@@ -67,6 +67,8 @@ internal partial class ConsoleService
 
     internal async Task ShowMainMenuAsync()
     {
+        //TMP CODING
+        _generatorService.GlobalGeneratorSettings = await SettingsGlobal.LoadFromFile(@"c:\temp\config.json") ?? new SettingsGlobal();
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
 
@@ -82,7 +84,7 @@ internal partial class ConsoleService
                     "Select tables generation",
                     "Edit global table settings",
                     "Advanced settings",
-                    "GENERATE!",
+                    "!!!! GENERATE !!!!",
                     "Load config from file",
                     "Save config to file",
                     "Quit, don't forget to save your config !!!",
@@ -105,8 +107,24 @@ internal partial class ConsoleService
             case "Advanced settings":
                 await ShowAdvancedAsync();
                 break;
-            case "GENERATE!":
-                await _generatorService.GenerateAsync();
+            case "!!!! GENERATE !!!!":
+                AnsiConsole.Clear();
+                await AnsiConsole.Status()
+                    .Spinner(Spinner.Known.Star)
+                    .SpinnerStyle(Style.Parse("green bold"))
+                    .StartAsync("Generation begins...",  async ctx =>
+                    {
+                        var progress = new Progress<string>(text =>
+                        {
+                            if(text.Contains("SUCCESS"))
+                                AnsiConsole.MarkupLine($"[green]{text}[/]");
+                            else
+                                AnsiConsole.MarkupLine(text);
+                        });
+
+                        await _generatorService.GenerateAsync(progress);
+
+                    });
 
                 await ReturnToMainMenuAsync();
                 break;

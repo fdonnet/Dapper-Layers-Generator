@@ -15,7 +15,7 @@ namespace Dapper_Layers_Generator.Core
     public interface IGeneratorService
     {
         SettingsGlobal GlobalGeneratorSettings { get; set; }
-        Task GenerateAsync(IProgress<(double current, double total)>? progress = null);
+        Task GenerateAsync(IProgress<string> progress);
     }
 
     public class GeneratorService : IGeneratorService
@@ -31,7 +31,7 @@ namespace Dapper_Layers_Generator.Core
             _dataService = dataService;
         }
 
-        public async Task GenerateAsync(IProgress<(double current, double total)>? progress = null)
+        public async Task GenerateAsync(IProgress<string> progress)
         {
             var selectedTableNames = new List<string>();
             if(GlobalGeneratorSettings.RunGeneratorForAllTables)
@@ -50,12 +50,14 @@ namespace Dapper_Layers_Generator.Core
             }
 
             List<Task> tasks = new();
+            progress.Report("---- POCO Generator BEGINS ----" + Environment.NewLine);
             foreach(var tableName in selectedTableNames)
             {
                 //POCO
                 var generator = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
                 var output = generator.Generate();
-                tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generator.ClassName}.cs", output));
+                tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generator.ClassName}.cs"
+                        , output, "PocoGenerator", progress));
             }
 
             Task taskMain = Task.WhenAll(tasks);
@@ -63,9 +65,10 @@ namespace Dapper_Layers_Generator.Core
 
         }
 
-        private static async Task WriteFileAsync(string fileFullPath, string content)
+        private static async Task WriteFileAsync(string fileFullPath, string content, string WriterType
+            , IProgress<string> progress)
         {
-
+            progress.Report($"{WriterType}: is writing {fileFullPath} ...");
             byte[] buffer = Encoding.UTF8.GetBytes(content);
             int offset = 0;
             const int Buffer_Size = 5 * 1024 * 1024; // 5 MB;
@@ -73,6 +76,7 @@ namespace Dapper_Layers_Generator.Core
             FileMode.Create, FileAccess.Write,
             FileShare.None, bufferSize: Buffer_Size, useAsync: true);
             await fileStream.WriteAsync(buffer.AsMemory(offset, buffer.Length));
+            progress.Report($"{WriterType}: {fileFullPath} SUCCESS ...");
         }
     }
 }
