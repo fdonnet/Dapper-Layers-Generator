@@ -140,8 +140,10 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
 
     //Available Generators not dependent on DB provider
     services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
+    services.AddScoped<IGeneratorContext, GeneratorContext>();
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
+    services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
 
     //MySql
     if (dbProvider == "mysql")
@@ -152,13 +154,6 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
         services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
 
     }
-
-    //Generators factory
-    services.AddScoped<IGeneratorsProvider>(x =>
-    {
-        return new GeneratorsProvider(_builder!, _builder!.GetRequiredService<SettingsGlobal>());
-    });
-
 
     //If accepted DB providers
     if (dbProvider == "mysql")
