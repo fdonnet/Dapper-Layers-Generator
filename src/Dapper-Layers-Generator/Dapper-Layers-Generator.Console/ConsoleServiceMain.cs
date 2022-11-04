@@ -47,11 +47,11 @@ internal partial class ConsoleService
                           });
 
             AnsiConsole.WriteLine("DB definitions loaded.");
-            if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
-            {
-                await PrintDbDefinitionsAsync();
-            }
-            else
+            //if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
+            //{
+            //    await PrintDbDefinitionsAsync();
+            //}
+            //else
                 await ShowMainMenuAsync();
 
         }
@@ -85,14 +85,14 @@ internal partial class ConsoleService
         new SelectionPrompt<string>()
             .PageSize(15)
             .AddChoices(new[] {
-                    "Edit main settings",
-                    "Select tables generation",
-                    "Edit global table settings",
+                    "Select tables",
+                    "Main settings",
+                    "General settings",
                     "Advanced settings",
                     string.Empty,
                     "!!!! GENERATE !!!!",
                     string.Empty,
-                    "Print DB definitions (JSON)",
+                    "Show DB definitions (JSON)",
                     "Load config from file",
                     "Save config to file",
                     "Quit, don't forget to save your config !!!",
@@ -100,13 +100,13 @@ internal partial class ConsoleService
 
         switch (menu)
         {
-            case "Edit main settings":
-                await ShowGlobalSettingsAsync();
-                break;
-            case "Select tables generation":
+            case "Select tables":
                 await ShowSelectTablesAsync();
                 break;
-            case "Edit global table settings":
+            case "Main settings":
+                await ShowGlobalSettingsAsync();
+                break;
+            case "General settings":
                 await ShowTableSettingsAsync();
                 break;
             case "Advanced settings":
@@ -133,7 +133,7 @@ internal partial class ConsoleService
 
                 await ReturnToMainMenuAsync();
                 break;
-            case "Print DB definitions (JSON)":
+            case "Show DB definitions (JSON)":
                 await PrintDbDefinitionsAsync();
                 break;
             case "Load config from file":
