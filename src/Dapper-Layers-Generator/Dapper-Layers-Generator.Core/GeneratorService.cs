@@ -22,21 +22,23 @@ namespace Dapper_Layers_Generator.Core
     {
         public SettingsGlobal GlobalGeneratorSettings { get; set; }
         private readonly IReaderDBDefinitionService _dataService;
+        private readonly IGeneratorsProvider _generatorsProvider;
 
         public GeneratorService(SettingsGlobal settingsGlobal, IGeneratorsProvider generatorsProvider, IReaderDBDefinitionService dataService)
         {
             GlobalGeneratorSettings = settingsGlobal;
             _dataService = dataService;
+            _generatorsProvider = generatorsProvider;
         }
 
         public async Task GenerateAsync(IProgress<string> progress)
         {
             //Call to main generator to get selected tables for 
-            var selectedTableNames = GetGenerator<IGeneratorContext>().GetSelectedTableNames();
+            var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContext>().GetSelectedTableNames();
 
             //Context
             progress.Report("---- Context Generator BEGINS ----");
-            var generatorContext = GetGenerator<IGeneratorContext>();
+            var generatorContext = _generatorsProvider.GetGenerator<IGeneratorContext>();
             var outpoutContext = generatorContext.Generate();
             var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}{GlobalGeneratorSettings.DbContextClassName}.cs"
                         , outpoutContext, "ContextGenerator", progress);
@@ -48,7 +50,7 @@ namespace Dapper_Layers_Generator.Core
             foreach(var tableName in selectedTableNames)
             {
                 //POCO
-                var generatorPoco = GetGenerator<IGeneratorPOCO>(tableName);
+                var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
                 var outputPoco = generatorPoco.Generate();
                 tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generatorPoco.ClassName}.cs"
                         , outputPoco, "PocoGenerator", progress));

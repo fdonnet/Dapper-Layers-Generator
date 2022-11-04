@@ -16,13 +16,18 @@ internal partial class ConsoleService
     private readonly IGeneratorService _generatorService = null!;
     private readonly JsonSerializerOptions _jsonOption = new() { WriteIndented = true };
     private readonly IConfiguration _config;
+    private readonly SettingsGlobal _settings;
 
-    public ConsoleService(IReaderDBDefinitionService dataService, IGeneratorService generatorService, IConfiguration config)
+    public ConsoleService(IReaderDBDefinitionService dataService
+        , IGeneratorService generatorService
+        , IConfiguration config
+        , SettingsGlobal settingsGlobal)
     {
         _dataService = dataService;
         _generatorService = generatorService;
         _config = config;
         _generatorService.GlobalGeneratorSettings.SelectedSchema = _config["DB:Schemas"].Split(",")[0];
+        _settings = settingsGlobal;
     }
 
     internal async Task InitAndLoadDbDefinitionsAsync()
@@ -68,7 +73,8 @@ internal partial class ConsoleService
     internal async Task ShowMainMenuAsync()
     {
         //TMP CODING
-        _generatorService.GlobalGeneratorSettings = await SettingsGlobal.LoadFromFile(@"c:\temp\config.json") ?? new SettingsGlobal();
+        await _settings.LoadFromFile(@"c:\temp\config.json");
+
         AnsiConsole.Clear();
         ProgramHelper.MainTitle();
 
@@ -135,7 +141,8 @@ internal partial class ConsoleService
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");
                 try
                 {
-                    _generatorService.GlobalGeneratorSettings = await SettingsGlobal.LoadFromFile(pathLoad) ?? new SettingsGlobal();
+                    await _settings.LoadFromFile(pathLoad);
+
                     AnsiConsole.WriteLine("File loaded !");
                     await ReturnToMainMenuAsync();
                 }

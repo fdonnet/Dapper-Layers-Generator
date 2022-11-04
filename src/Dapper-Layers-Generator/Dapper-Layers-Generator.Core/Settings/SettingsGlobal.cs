@@ -78,11 +78,35 @@ namespace Dapper_Layers_Generator.Core.Settings
             await createStream.DisposeAsync();
         }
 
-        public static async Task<SettingsGlobal?> LoadFromFile(string configPath)
+        public async Task LoadFromFile(string configPath)
         {
             using FileStream openStream = File.OpenRead(configPath);
 
-            return openStream == null ? null : await JsonSerializer.DeserializeAsync<SettingsGlobal>(openStream);
+            var mySettings = openStream == null ? null : await JsonSerializer.DeserializeAsync<SettingsGlobal>(openStream);
+
+            if (mySettings != null)
+            {
+                AuthorName = mySettings.AuthorName;
+                SelectedSchema = mySettings.SelectedSchema;
+                TargetProjectNamespace = mySettings.TargetProjectNamespace;
+                TargetNamespaceForRepo = mySettings.TargetNamespaceForRepo; 
+                TargetNamespaceForPOCO = mySettings.TargetNamespaceForPOCO;
+                TargetNamespaceForDbContext = mySettings.TargetNamespaceForDbContext;
+                TargetFolderForDBContext = mySettings.TargetFolderForDBContext;
+                TargetFolderForPOCO = mySettings.TargetFolderForPOCO;
+                TargetFolderForRepo = mySettings.TargetFolderForRepo;
+                TargetProjectPath = mySettings.TargetProjectPath;
+                ConnectionStringName = mySettings.ConnectionStringName;
+                DbContextClassName = mySettings.DbContextClassName;
+                UsePascalTransform = mySettings.UsePascalTransform;
+                UseSingularizeTransform = mySettings.UseSingularizeTransform;
+                IndentStringInGeneratedCode = mySettings.IndentStringInGeneratedCode;
+                DbProvider = mySettings.DbProvider;
+                RunGeneratorForAllTables = mySettings.RunGeneratorForAllTables;
+                RunGeneratorForSelectedTables = mySettings.RunGeneratorForSelectedTables;
+                TableGlobalSettings = mySettings.TableGlobalSettings;
+                TableSettings = mySettings.TableSettings;
+            }
         }
 
         public SettingsTable GetTableSettings(string tableName)

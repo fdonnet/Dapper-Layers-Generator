@@ -133,36 +133,38 @@ void BuildServices()
 
 ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
 {
+    //Always running services
+    services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
+    services.AddSingleton<SettingsGlobal>();
+    services.AddSingleton<ConsoleService>();
+
+    //Available Generators not dependent on DB provider
+    services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
+    services.AddScoped<StringTransformationService>();
+    services.AddScoped<IGeneratorService, GeneratorService>();
+
     //MySql
     if (dbProvider == "mysql")
     {
         services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
-
         //Avalaible Generators
         services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
         services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
 
     }
 
-    //If accepted dbProvider
+    //Generators factory
+    services.AddScoped<IGeneratorsProvider>(x =>
+    {
+        return new GeneratorsProvider(_builder!, _builder!.GetRequiredService<SettingsGlobal>());
+    });
+
+
+    //If accepted DB providers
     if (dbProvider == "mysql")
     {
-         //Available Generators not dependent on DB provider
-        services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
-
-        //Always running services
-        services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
-        services.AddSingleton<SettingsGlobal>();
-        services.AddScoped<StringTransformationService>();
-        services.AddSingleton<IGeneratorService, GeneratorService>();
-        services.AddSingleton<ConsoleService>();
-
-        //Generators factory
-        services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
-
         return services.BuildServiceProvider();
     }
-
 
     return null;
 
