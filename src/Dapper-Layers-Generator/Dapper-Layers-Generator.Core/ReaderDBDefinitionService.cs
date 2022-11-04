@@ -35,7 +35,7 @@ namespace Dapper_Layers_Generator.Core
             SchemaDefinitions = (await _context.DatabaseDefinitionsRepo.GetAllSchemasAsync()).ToList();
             _tables = await _context.DatabaseDefinitionsRepo.GetAllTablesAsync();
             _columns = await _context.DatabaseDefinitionsRepo.GetAllColumnsAsync();
-            _keys = await _context.DatabaseDefinitionsRepo.GetAllPrimaryAndUniqueKeys();
+            _keys = await _context.DatabaseDefinitionsRepo.GetAllPrimaryAndUniqueKeysAsync();
 
             LinkDbDefinitions();
         }

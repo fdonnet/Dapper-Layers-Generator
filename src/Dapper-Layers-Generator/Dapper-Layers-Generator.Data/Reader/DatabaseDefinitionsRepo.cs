@@ -12,7 +12,7 @@ namespace Dapper_Layers_Generator.Data.Reader
         Task<IEnumerable<ISchema>> GetAllSchemasAsync();
         Task<IEnumerable<ITable>> GetAllTablesAsync();
         Task<IEnumerable<IColumn>> GetAllColumnsAsync(); //---- included auto-increment true or false (will see with other DBs if we need a separate method)
-        Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeys();
+        Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeysAsync();
     }
 
     public class DatabaseDefinitionsRepoBase

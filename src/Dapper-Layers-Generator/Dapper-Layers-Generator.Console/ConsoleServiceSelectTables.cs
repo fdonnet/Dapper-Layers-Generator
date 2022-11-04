@@ -22,7 +22,7 @@ For the moment, all tables are selected for generation (schema: [green]{settings
 Continue like this (y) or select tables(n):"))
             {
                 settings.RunGeneratorForSelectedTables = BuildSelectionTable(settings, tables);
-                await SelectionSaved();
+                await SelectionSavedAsync();
             }
             else
                 await ReturnToMainMenuAsync();
@@ -45,7 +45,7 @@ Continue like this (y) or select tables(n):"))
             if(ask == "r")
             {
                 settings.RunGeneratorForSelectedTables = BuildSelectionTable(settings, tables);
-                await SelectionSaved();
+                await SelectionSavedAsync();
             }
             else
             {
@@ -53,7 +53,7 @@ Continue like this (y) or select tables(n):"))
                 {
                     settings.RunGeneratorForSelectedTables = new List<string>();
                     settings.RunGeneratorForAllTables = true;
-                    await SelectionSaved();
+                    await SelectionSavedAsync();
                 }
                 else
                 {
@@ -87,7 +87,7 @@ Continue like this (y) or select tables(n):"))
         return new List<string>();
     }
 
-    private async Task SelectionSaved()
+    private async Task SelectionSavedAsync()
     {
         AnsiConsole.Clear();
         AnsiConsole.WriteLine("Tables selection saved !");

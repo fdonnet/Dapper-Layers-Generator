@@ -49,7 +49,6 @@ namespace Dapper_Layers_Generator.Core
             progress.Report(Environment.NewLine + "---- POCO Generator BEGINS ----");
             foreach(var tableName in selectedTableNames)
             {
-                //POCO
                 var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
                 var outputPoco = generatorPoco.Generate();
                 tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generatorPoco.ClassName}.cs"

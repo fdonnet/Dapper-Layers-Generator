@@ -99,7 +99,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             return columns;
         }
 
-        public async Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeys()
+        public async Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeysAsync()
         {
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
