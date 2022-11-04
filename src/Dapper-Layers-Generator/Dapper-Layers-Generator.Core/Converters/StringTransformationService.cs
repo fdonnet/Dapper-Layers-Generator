@@ -62,7 +62,7 @@ namespace Dapper_Layers_Generator.Core.Converters
         }
  
         /// <summary>
-        /// Old method for ref
+        /// Old method for reference
         /// </summary>
         /// <param name="theString"></param>
         /// <returns></returns>

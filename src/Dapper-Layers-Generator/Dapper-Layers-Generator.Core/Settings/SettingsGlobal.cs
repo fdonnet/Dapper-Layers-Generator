@@ -87,15 +87,7 @@ namespace Dapper_Layers_Generator.Core.Settings
 
         public SettingsTable GetTableSettings(string tableName)
         {
-            if (TableSettings.TryGetValue(tableName, out var tabSettings))
-            {
-                return tabSettings;
-            }
-            else
-            {
-                return TableGlobalSettings;
-            }
+            return TableSettings.TryGetValue(tableName, out var tabSettings) ? tabSettings : TableGlobalSettings;
         }
-
     }
 }

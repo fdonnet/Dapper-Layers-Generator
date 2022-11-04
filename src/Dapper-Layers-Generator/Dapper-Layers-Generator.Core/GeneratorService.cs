@@ -21,48 +21,44 @@ namespace Dapper_Layers_Generator.Core
     public class GeneratorService : IGeneratorService
     {
         public SettingsGlobal GlobalGeneratorSettings { get; set; }
-        private readonly IGeneratorsProvider _generatorsProvider;
         private readonly IReaderDBDefinitionService _dataService;
 
         public GeneratorService(SettingsGlobal settingsGlobal, IGeneratorsProvider generatorsProvider, IReaderDBDefinitionService dataService)
         {
             GlobalGeneratorSettings = settingsGlobal;
-            _generatorsProvider = generatorsProvider;
             _dataService = dataService;
         }
 
         public async Task GenerateAsync(IProgress<string> progress)
         {
-            var selectedTableNames = new List<string>();
-            if(GlobalGeneratorSettings.RunGeneratorForAllTables)
-            {
-                selectedTableNames = _dataService.SchemaDefinitions?.Where(s => s.Name == GlobalGeneratorSettings.SelectedSchema)
-                                                                .SingleOrDefault()?.Tables?.ToList().Select(t => t.Name).ToList();
+            //Call to main generator to get selected tables for 
+            var selectedTableNames = GetGenerator<IGeneratorContext>().GetSelectedTableNames();
 
-                if(selectedTableNames == null || selectedTableNames.Count == 0)
-                {
-                    throw new NullReferenceException("No db defintions found to generate anything...");
-                }
-            }
-            else
-            {
-                selectedTableNames = GlobalGeneratorSettings.RunGeneratorForSelectedTables;
-            }
+            //Context
+            progress.Report("---- Context Generator BEGINS ----");
+            var generatorContext = GetGenerator<IGeneratorContext>();
+            var outpoutContext = generatorContext.Generate();
+            var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}{GlobalGeneratorSettings.DbContextClassName}.cs"
+                        , outpoutContext, "ContextGenerator", progress);
 
+
+            //POCO
             List<Task> tasks = new();
-            progress.Report("---- POCO Generator BEGINS ----" + Environment.NewLine);
+            progress.Report(Environment.NewLine + "---- POCO Generator BEGINS ----");
             foreach(var tableName in selectedTableNames)
             {
                 //POCO
-                var generator = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
-                var output = generator.Generate();
-                tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generator.ClassName}.cs"
-                        , output, "PocoGenerator", progress));
+                var generatorPoco = GetGenerator<IGeneratorPOCO>(tableName);
+                var outputPoco = generatorPoco.Generate();
+                tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generatorPoco.ClassName}.cs"
+                        , outputPoco, "PocoGenerator", progress));
             }
 
-            Task taskMain = Task.WhenAll(tasks);
-            await taskMain;
+            Task taskPoco= Task.WhenAll(tasks);
 
+
+            Task allTask = Task.WhenAll(contextTask,taskPoco);
+            await allTask;
         }
 
         private static async Task WriteFileAsync(string fileFullPath, string content, string WriterType

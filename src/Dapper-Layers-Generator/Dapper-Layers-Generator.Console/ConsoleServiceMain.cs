@@ -78,13 +78,16 @@ internal partial class ConsoleService
 
         var menu = AnsiConsole.Prompt(
         new SelectionPrompt<string>()
+            .PageSize(15)
             .AddChoices(new[] {
-                    "Re-print DB definition (JSON)",
                     "Edit main settings",
                     "Select tables generation",
                     "Edit global table settings",
                     "Advanced settings",
+                    string.Empty,
                     "!!!! GENERATE !!!!",
+                    string.Empty,
+                    "Print DB definitions (JSON)",
                     "Load config from file",
                     "Save config to file",
                     "Quit, don't forget to save your config !!!",
@@ -92,9 +95,6 @@ internal partial class ConsoleService
 
         switch (menu)
         {
-            case "Re-print DB definition (JSON)":
-                await PrintDbDefinitionsAsync();
-                break;
             case "Edit main settings":
                 await ShowGlobalSettingsAsync();
                 break;
@@ -127,6 +127,9 @@ internal partial class ConsoleService
                     });
 
                 await ReturnToMainMenuAsync();
+                break;
+            case "Re-print DB definition (JSON)":
+                await PrintDbDefinitionsAsync();
                 break;
             case "Load config from file":
                 var pathLoad = AnsiConsole.Ask<string>(@"Specify the complete filepath you want to load:");

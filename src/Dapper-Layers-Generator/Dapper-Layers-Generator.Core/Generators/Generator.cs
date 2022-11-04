@@ -11,7 +11,8 @@ namespace Dapper_Layers_Generator.Core.Generators
 {
     public interface IGenerator
     {
-       string Generate();
+        string Generate();
+        List<string> GetSelectedTableNames();
     }
 
     public abstract class Generator : IGenerator
@@ -22,7 +23,9 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         private readonly IReaderDBDefinitionService _data;
 
-        public Generator(SettingsGlobal settingsGlobal, IReaderDBDefinitionService data, StringTransformationService stringTransformationService)
+        public Generator(SettingsGlobal settingsGlobal
+            , IReaderDBDefinitionService data
+            , StringTransformationService stringTransformationService)
         {
             _settings = settingsGlobal;
             _data = data;
@@ -34,6 +37,26 @@ namespace Dapper_Layers_Generator.Core.Generators
             _currentSchema = schema;
 
             _stringTransform = stringTransformationService;
+        }
+
+        public List<string> GetSelectedTableNames()
+        {
+            var selectedTableNames = new List<string>();
+            if (_settings.RunGeneratorForAllTables)
+            {
+                selectedTableNames = _data.SchemaDefinitions?.Where(s => s.Name == _settings.SelectedSchema)
+                                                                .SingleOrDefault()?.Tables?.ToList().Select(t => t.Name).ToList();
+
+                if (selectedTableNames == null || selectedTableNames.Count == 0)
+                {
+                    throw new NullReferenceException("No db defintions found to generate anything...");
+                }
+            }
+            else
+            {
+                selectedTableNames = _settings.RunGeneratorForSelectedTables;
+            }
+            return selectedTableNames;
         }
 
         public abstract string Generate();
