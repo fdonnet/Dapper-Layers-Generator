@@ -1,15 +1,8 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
-using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Relational;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -18,9 +11,15 @@ namespace Dapper_Layers_Generator.Core.Generators
 
     }
 
-    public class GeneratorContext: Generator, IGeneratorContext
+    public abstract class GeneratorContext: Generator, IGeneratorContext
     {
         private IEnumerable<ITable>? _selectedTables;
+        protected abstract string UsingDbProviderSpecific { get; init; }
+        protected abstract string ConnectionStringInject { get; init; }
+        protected abstract string ConnectionStringSimple { get; init; }
+        protected abstract string DapperDefaultMapStrat { get; init; }
+        protected abstract string DapperCommandTimeOut { get; init; }
+
         public GeneratorContext(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService) 
@@ -68,12 +67,11 @@ namespace {_settings.TargetNamespaceForDbContext}
 
         private string WriteUsingStatements()
         {
-            var dbProviderSpecific = _settings.DbProvider == "mysql" ? "using MySql.Data.MySqlClient;" : string.Empty;
-
             string output =$@"using System;
 using {_settings.TargetNamespaceForRepo};
 using System.Data;
-{dbProviderSpecific}
+using System.Data.Common;
+{UsingDbProviderSpecific}
 using Dapper;
 using Microsoft.Extensions.Configuration;
 
@@ -163,14 +161,6 @@ using Microsoft.Extensions.Configuration;
         private string WriteFullClassContent()
         {
             var tab = _stringTransform.IndentString;
-            var conString = string.Empty;
-            var conStringSimple = string.Empty;
-            if (_settings.DbProvider == "mysql")
-            {
-                conString = $@"_cn = new MySqlConnection(_config.GetConnectionString(""{_settings.ConnectionStringName}""));";
-                conStringSimple = "_cn = new MySqlConnection(connectionString);";
-            }
-                
 
             return $@"
 
@@ -236,9 +226,9 @@ using Microsoft.Extensions.Configuration;
 {tab}{tab}public {_settings.DbContextClassName}(IConfiguration config)
 {tab}{tab}{{
 {tab}{tab}{tab}_config = config;
-{tab}{tab}{tab}DefaultTypeMap.MatchNamesWithUnderscores = true;
-{tab}{tab}{tab}SqlMapper.Settings.CommandTimeout = 60000;
-{tab}{tab}{tab}{conString}
+{tab}{tab}{tab}{DapperDefaultMapStrat}
+{tab}{tab}{tab}{DapperCommandTimeOut}
+{tab}{tab}{tab}{ConnectionStringInject}
 {tab}{tab}}}
 {tab}{tab}
 {tab}{tab}/// <summary>
@@ -247,9 +237,9 @@ using Microsoft.Extensions.Configuration;
 {tab}{tab}/// </summary>
 {tab}{tab}public {_settings.DbContextClassName}(string connectionString)
 {tab}{tab}{{
-{tab}{tab}{tab}DefaultTypeMap.MatchNamesWithUnderscores = true;
-{tab}{tab}{tab}SqlMapper.Settings.CommandTimeout = 60000;
-{tab}{tab}{tab}{conStringSimple}
+{tab}{tab}{tab}{DapperDefaultMapStrat}
+{tab}{tab}{tab}{DapperCommandTimeOut}
+{tab}{tab}{tab}{ConnectionStringSimple}
 {tab}{tab}}}
 {tab}{tab}
 {tab}{tab}/// <summary>

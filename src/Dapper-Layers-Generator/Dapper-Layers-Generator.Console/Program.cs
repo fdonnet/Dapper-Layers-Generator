@@ -138,9 +138,8 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddSingleton<SettingsGlobal>();
     services.AddSingleton<ConsoleService>();
 
-    //Available Generators not dependent on DB provider
+    //Available Generators or services not dependent on DB provider
     services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
-    services.AddScoped<IGeneratorContext, GeneratorContext>();
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
     services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
@@ -149,20 +148,13 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     if (dbProvider == "mysql")
     {
         services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
-        //Avalaible Generators
         services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
         services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
-
+        services.AddScoped<IGeneratorContext, MySqlGeneratorContext>();
     }
 
     //If accepted DB providers
-    if (dbProvider == "mysql")
-    {
-        return services.BuildServiceProvider();
-    }
-
-    return null;
-
+    return dbProvider == "mysql" ? services.BuildServiceProvider() : null;
 }
 
 
