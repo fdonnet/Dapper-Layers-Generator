@@ -380,13 +380,18 @@ or (q) to return to table advanced settings");
     {
         string newValue = setValue.Type == typeof(bool)
             ? AnsiConsole.Confirm(setValue.Label.Split(") ")[1]) ? "True" : "False"
-                : AnsiConsole.Ask<string>("type (c) to clear" + Environment.NewLine + "or change "
-                    + setValue.Label);
+                : AnsiConsole.Ask<string>("type (c) to clear" 
+                                          + Environment.NewLine + 
+                                          "type (k) to keep " +
+                                          Environment.NewLine +
+                                          "or change ==>"
+                    + setValue.Label[2..]);
 
         if (setValue.Type == typeof(string) && newValue == "c")
             newValue = string.Empty;
-
-        _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
+        
+        if (newValue != "k")
+            _ = (T)UISettingsHelper.SetSettingsStringValue(settings, setValue.PropertyName, newValue);
     }
 
 

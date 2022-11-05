@@ -34,7 +34,7 @@ namespace Dapper_Layers_Generator.Core
 
         public async Task GenerateAsync(IProgress<string> progress)
         {
-            //Call to main generator to get selected tables for 
+            //Call to main generator to get selected tables from 
             var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>().GetSelectedTableNames();
 
             //Context
