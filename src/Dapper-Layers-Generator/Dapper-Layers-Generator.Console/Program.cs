@@ -106,7 +106,7 @@ void ProviderChoice()
         .Title("Choose your dbprovider:")
         .PageSize(10)
         .AddChoices(new[] {
-            "mysql",
+            "MySql",
         }));
 }
 
@@ -146,7 +146,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorContextBase, GeneratorContextBase>();
 
     //MySql
-    if (dbProvider == "mysql")
+    if (dbProvider == "MySql")
     {
         services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
         services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
@@ -155,7 +155,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     }
 
     //If accepted DB providers
-    return dbProvider == "mysql" ? services.BuildServiceProvider() : null;
+    return dbProvider == "MySql" ? services.BuildServiceProvider() : null;
 }
 
 

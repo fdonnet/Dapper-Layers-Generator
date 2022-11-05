@@ -59,7 +59,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         [SettingsAttribute(Message = "What's your indent way for generated code: ", Position = 15)]
         public string IndentStringInGeneratedCode { get; set; } = "tab";
 
-        public string DbProvider { get; set; } = "mysql";
+        public string DbProvider { get; set; } = "MySql";
 
         //Tables selection to be generated (all or list of table names)
         public bool RunGeneratorForAllTables { get; set; } = true;
