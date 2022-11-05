@@ -143,6 +143,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
     services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
+    services.AddScoped<IGeneratorContextBase, GeneratorContextBase>();
 
     //MySql
     if (dbProvider == "mysql")

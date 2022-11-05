@@ -34,15 +34,26 @@ namespace Dapper_Layers_Generator.Core
         public async Task GenerateAsync(IProgress<string> progress)
         {
             //Call to main generator to get selected tables for 
-            var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContext>().GetSelectedTableNames();
+            var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>().GetSelectedTableNames();
 
             //Context
+            //Base abstract context gen
             progress.Report("---- Context Generator BEGINS ----");
+            var generatorContextBase = _generatorsProvider.GetGenerator<IGeneratorContextBase>();
+            var outpoutContextBase = generatorContextBase.Generate();
+            var contextBaseTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
+                        $"{GlobalGeneratorSettings.DbContextClassName}Base.cs"
+                        , outpoutContextBase, "ContextGeneratorBase", progress);
+
+            //Real context db specific generation
             var generatorContext = _generatorsProvider.GetGenerator<IGeneratorContext>();
             var outpoutContext = generatorContext.Generate();
-            var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}{GlobalGeneratorSettings.DbContextClassName}.cs"
-                        , outpoutContext, "ContextGenerator", progress);
+            var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
+                            $"{GlobalGeneratorSettings.DbContextClassName}{GlobalGeneratorSettings.DbProvider}.cs"
+                            , outpoutContext, "ContextGenerator", progress);
 
+
+            Task contextTasks = Task.WhenAll(contextBaseTask, contextTask);
 
             //POCO
             List<Task> tasks = new();
@@ -58,7 +69,7 @@ namespace Dapper_Layers_Generator.Core
             Task taskPoco= Task.WhenAll(tasks);
 
 
-            Task allTask = Task.WhenAll(contextTask,taskPoco);
+            Task allTask = Task.WhenAll(contextTasks, taskPoco);
             await allTask;
         }
 

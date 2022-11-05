@@ -6,19 +6,14 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorContext : IGenerator
+    public interface IGeneratorContextBase : IGenerator
     {
 
     }
 
-    public abstract class GeneratorContextBase: Generator, IGeneratorContext
+    public class GeneratorContextBase: Generator, IGeneratorContextBase
     {
-        private IEnumerable<ITable>? _selectedTables;
-        protected abstract string UsingDbProviderSpecific { get; init; }
-        protected abstract string ConnectionStringInject { get; init; }
-        protected abstract string ConnectionStringSimple { get; init; }
-        protected abstract string DapperDefaultMapStrat { get; init; }
-        protected abstract string DapperCommandTimeOut { get; init; }
+        protected IEnumerable<ITable>? _selectedTables;
 
         public GeneratorContextBase(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
@@ -54,6 +49,8 @@ namespace Dapper_Layers_Generator.Core.Generators
             return $@"{@WriteUsingStatements()}
 // =================================================================
 // DBContext implements all repo management + a small context factory
+//           this file contains interfaces declaration and abstract
+//           base classes for factory and DB context
 // Author: {_settings.AuthorName}
 // Context name: {_settings.DbContextClassName}
 // Generated: {DateTime.Now}
@@ -67,12 +64,7 @@ namespace {_settings.TargetNamespaceForDbContext}
 
         private string WriteUsingStatements()
         {
-            string output =$@"using System;
-using {_settings.TargetNamespaceForRepo};
-using System.Data;
-using System.Data.Common;
-{UsingDbProviderSpecific}
-using Dapper;
+            string output =$@"using System.Data;
 using Microsoft.Extensions.Configuration;
 
 ";
@@ -144,14 +136,7 @@ using Microsoft.Extensions.Configuration;
                 var repoProtectedFieldName = $"_{_stringTransform.FirstCharToLower(repoClassName)}";
 
                 return $@"{tab}{tab}protected {interfaceName} {repoProtectedFieldName};
-{tab}{tab}public {interfaceName} {repoClassName} {{
-{tab}{tab}{tab}get {{
-{tab}{tab}{tab}{tab}if ({repoProtectedFieldName} == null) 
-{tab}{tab}{tab}{tab}{tab}{repoProtectedFieldName} = new {repoClassName}(this);
-{tab}{tab}{tab}{tab}return {repoProtectedFieldName};
-{tab}{tab}{tab}}}
-{tab}{tab}}}
-";
+{tab}{tab}public abstract {interfaceName} {repoClassName} {{ get; }}";
             }));
 
             return membersDeclaration;
@@ -175,11 +160,11 @@ using Microsoft.Extensions.Configuration;
 {tab}/// Used when the DBcontext itself is not suffisent to manage its lifecycle 
 {tab}/// Very simple implementation
 {tab}/// </summary>
-{tab}public abstract class {_settings.DbContextClassName}Factory : {("I" + _settings.DbContextClassName)}Factory
+{tab}public abstract class {_settings.DbContextClassName}FactoryBase : {("I" + _settings.DbContextClassName)}Factory
 {tab}{{
 {tab}{tab}protected readonly IConfiguration _config;
 {tab}{tab}
-{tab}{tab}public DbContextFactory(IConfiguration config)
+{tab}{tab}public DbContextFactoryBase(IConfiguration config)
 {tab}{tab}{{
 {tab}{tab}{tab}_config = config;
 {tab}{tab}}}
@@ -187,10 +172,12 @@ using Microsoft.Extensions.Configuration;
 {tab}{tab}public abstract {("I" + _settings.DbContextClassName)} Create();
 {tab}}}
 {tab}
-{tab}public abstract class {_settings.DbContextClassName} : {("I" + _settings.DbContextClassName)}
+{tab}/// <summary>
+{tab}/// Abstract DBContext base 
+{tab}/// </summary>
+{tab}public abstract class {_settings.DbContextClassName}Base : {("I" + _settings.DbContextClassName)}
 {tab}{{
 {tab}{tab}protected readonly IConfiguration _config;
-{tab}{tab}
 {tab}{tab}public abstract IDbConnection Connection {{get;init;}}
 {tab}{tab}
 {tab}{tab}protected IDbTransaction? _trans = null;
@@ -201,10 +188,11 @@ using Microsoft.Extensions.Configuration;
 {tab}{tab}private bool _disposed = false;
 {tab}{tab}
 {@WriteClassRepoMembers()}
+{tab}
 {tab}{tab}/// <summary>
 {tab}{tab}/// Main constructor, inject standard config
 {tab}{tab}/// </summary>
-{tab}{tab}public {_settings.DbContextClassName}(IConfiguration config)
+{tab}{tab}public {_settings.DbContextClassName}Base(IConfiguration config)
 {tab}{tab}{{
 {tab}{tab}{tab}_config = config;
 {tab}{tab}}}
