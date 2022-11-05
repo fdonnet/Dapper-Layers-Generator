@@ -40,6 +40,15 @@ internal partial class ConsoleService
 
             switch (dic[intValue].PropertyName)
             {
+                case "TargetDbProviderForGeneration":
+                    AnsiConsole.WriteLine("");
+                    newValue = String.Join(',',AnsiConsole.Prompt(
+                             new MultiSelectionPrompt<string>()
+                                 .Title("Choose at least one schema to be generated: ")
+                                 .AddChoices(new[] {"MySql"})));
+
+                    globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
+                    break;
                 case "SelectedSchema":
                     AnsiConsole.WriteLine("");
                     newValue = AnsiConsole.Prompt(

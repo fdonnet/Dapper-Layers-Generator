@@ -10,10 +10,11 @@ using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.Types;
+using Org.BouncyCastle.Security;
 using Spectre.Console;
 
-string _dbProvider = string.Empty;
 ServiceProvider? _builder = null;
+string _dbProviderToReadDBDef = string.Empty;
 
 IConfiguration? _config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -27,9 +28,6 @@ IServiceCollection _services = new ServiceCollection()
 
 //Welcome and load/check config
 WelcomeMsg();
-
-//Choose dbprovider 
-ProviderChoice();
 
 //Build services to run the app
 BuildServices();
@@ -46,6 +44,7 @@ void WelcomeMsg()
 {
     string schemas = string.Empty;
     bool isOk = false;
+    List<string> acceptedProvider = new() { "MySql" };
 
     ProgramHelper.MainTitle();
 
@@ -58,7 +57,7 @@ void WelcomeMsg()
                 {
                     if (string.IsNullOrEmpty(_config.GetConnectionString("Default")))
                     {
-                        AnsiConsole.MarkupLine("Cannot read your ConnectionStrings:Default connection string ...");
+                        AnsiConsole.MarkupLine("[red]Cannot read your ConnectionStrings:Default connection string ...[/]");
                     }
                     else
                     {
@@ -67,19 +66,29 @@ void WelcomeMsg()
 
                         if (string.IsNullOrEmpty(schemas))
                         {
-                            AnsiConsole.MarkupLine("Cannot read your DB:Schemas config string ...");
+                            AnsiConsole.MarkupLine("[red]Cannot read your DB:Schemas config...[/]");
                         }
                         else
                         {
-                            var info =
+                            _dbProviderToReadDBDef = _config["DB:Provider"];
+                            if (String.IsNullOrEmpty(_dbProviderToReadDBDef) || !acceptedProvider.Contains(_dbProviderToReadDBDef))
+                            {
+                                AnsiConsole.MarkupLine($"[red]Cannot read your DB:provider config..., " +
+                                    $"or not accepted provider to read DB definitions (possible values: {String.Join(',',acceptedProvider)})[/]");
+                            }
+                            else
+                            {
+                                var info =
 $@"
 Connection string loading: SUCCESS !
 Schemas specified:  {schemas}
 ";
-                            var panel = new Panel(info);
-                            AnsiConsole.Write(panel);
+                                var panel = new Panel(info);
+                                AnsiConsole.Write(panel);
 
-                            isOk = true;
+                                isOk = true;
+                            }
+                            
                         }
                     }
                 }
@@ -99,24 +108,13 @@ Schemas specified:  {schemas}
     }
 }
 
-void ProviderChoice()
-{
-    _dbProvider = AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-        .Title("Choose your dbprovider:")
-        .PageSize(10)
-        .AddChoices(new[] {
-            "MySql",
-        }));
-}
-
 void BuildServices()
 {
     try
     {
-        _builder = ServicesConfig(_dbProvider, _services);
+        _builder = ServicesConfig(_dbProviderToReadDBDef, _services);
         AnsiConsole.MarkupLine("DbProvider loading: SUCCESS !");
-        _builder!.GetRequiredService<SettingsGlobal>().DbProvider = _dbProvider;
+        _builder!.GetRequiredService<SettingsGlobal>().TargetDbProviderForGeneration = _dbProviderToReadDBDef;
     }
     catch (Exception ex)
     {
@@ -138,23 +136,28 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddSingleton<SettingsGlobal>();
     services.AddSingleton<ConsoleService>();
 
-    //Available Generators or services not dependent on DB provider
+    //Available Generators or services
     services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
-    services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
     services.AddScoped<IGeneratorContextBase, GeneratorContextBase>();
 
-    //MySql
+    //Will manage generator based on user config
+    services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
+
+    //MySql specific (db provider for source generation)
+    //You will be able to generate the code for several db types... 
+    services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
+    services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
+    services.AddScoped<IMySqlGeneratorContext, MySqlGeneratorContext>();
+
+    //Service that depend on the dbprovider (in config to read db defintions)
     if (dbProvider == "MySql")
     {
         services.AddTransient<IReaderDapperContext, MysqlReaderDapperContext>();
-        services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
-        services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
-        services.AddScoped<IGeneratorContext, MySqlGeneratorContext>();
     }
 
-    //If accepted DB providers
+    //If accepted DB providers (for the moment only mysqlto read data def)
     return dbProvider == "MySql" ? services.BuildServiceProvider() : null;
 }
 

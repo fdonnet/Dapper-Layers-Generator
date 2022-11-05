@@ -1,4 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Generators;
+using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
 using Dapper_Layers_Generator.Data.Reader;
@@ -46,14 +47,24 @@ namespace Dapper_Layers_Generator.Core
                         , outpoutContextBase, "ContextGeneratorBase", progress);
 
             //Real context db specific generation
-            var generatorContext = _generatorsProvider.GetGenerator<IGeneratorContext>();
-            var outpoutContext = generatorContext.Generate();
-            var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
-                            $"{GlobalGeneratorSettings.DbContextClassName}{GlobalGeneratorSettings.DbProvider}.cs"
-                            , outpoutContext, "ContextGenerator", progress);
-
-
-            Task contextTasks = Task.WhenAll(contextBaseTask, contextTask);
+            List<Task> tasksContextDB = new();
+            foreach (var dbType in GlobalGeneratorSettings.TargetDbProviderForGeneration.Split(','))
+            {
+                string outputContext = string.Empty;
+                if (dbType == "MySql")
+                {
+                    var generatorContext = _generatorsProvider.GetGenerator<IMySqlGeneratorContext>();
+                    outputContext = generatorContext.Generate();
+                }
+                
+                var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
+                                $"{GlobalGeneratorSettings.DbContextClassName}{dbType}.cs"
+                                , outputContext, "ContextGenerator", progress);
+                
+                tasksContextDB.Add(contextTask);
+            }
+            Task dbContextSpecific = Task.WhenAll(tasksContextDB);
+            Task contextTasks = Task.WhenAll(contextBaseTask, dbContextSpecific);
 
             //POCO
             List<Task> tasks = new();

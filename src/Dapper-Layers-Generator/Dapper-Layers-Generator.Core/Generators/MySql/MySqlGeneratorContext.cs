@@ -8,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
-    public class MySqlGeneratorContext : GeneratorContext, IGeneratorContextBase
+    public interface IMySqlGeneratorContext : IGenerator
+    {
+
+    }
+    public class MySqlGeneratorContext : GeneratorContext, IMySqlGeneratorContext
     {
         protected override string UsingDbProviderSpecific { get; init; }
         protected override string DbProviderString { get; init; }
