@@ -85,7 +85,7 @@ Schemas specified:  {schemas}
 ";
                                 var panel = new Panel(info);
                                 AnsiConsole.Write(panel);
-
+                                Thread.Sleep(1000);
                                 isOk = true;
                             }
                             
@@ -135,15 +135,16 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddSingleton<IReaderDBDefinitionService, ReaderDBDefinitionService>();
     services.AddSingleton<SettingsGlobal>();
     services.AddSingleton<ConsoleService>();
+    services.AddSingleton<IGeneratorsProvider, GeneratorsProvider>();
 
-    //Available Generators or services
+    
+    //Available Generators or services (to be really scoped,
+    //following generators will be call by Generator service and
+    // Generator will request a IServiceScope.... to manage life cycle. 
     services.AddScoped<IGeneratorPOCO, GeneratorPOCO>();
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
     services.AddScoped<IGeneratorContextBase, GeneratorContextBase>();
-
-    //Will manage generator based on user config
-    services.AddScoped<IGeneratorsProvider, GeneratorsProvider>();
 
     //MySql specific (db provider for source generation)
     //You will be able to generate the code for several db types... 

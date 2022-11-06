@@ -307,14 +307,14 @@ internal partial class ConsoleService
 
         var value = AnsiConsole.Ask<string>(@"
 !! Press the settings number you want to edit
-or (c) to go down deeper in column mode (settings at column lvl)
+or (d) to DIG deeper in column mode (settings at column lvl)
 or (r) to revert this table to global normal settings and go back main menu
 or (q) to return to main menu");
 
         if (value == "q")
             await ShowMainMenuAsync();
 
-        if (value == "c")
+        if (value == "d")
             await ShowAdvancedColumnsAsync(advancedSettings, tableName);
 
         if (value == "r")

@@ -1,6 +1,7 @@
 ﻿using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
+using Microsoft.Extensions.DependencyInjection;
 using Dapper_Layers_Generator.Data.POCO;
 using Dapper_Layers_Generator.Data.Reader;
 using Microsoft.Extensions.Configuration;
@@ -24,23 +25,31 @@ namespace Dapper_Layers_Generator.Core
         public SettingsGlobal GlobalGeneratorSettings { get; set; }
         private readonly IReaderDBDefinitionService _dataService;
         private readonly IGeneratorsProvider _generatorsProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public GeneratorService(SettingsGlobal settingsGlobal, IGeneratorsProvider generatorsProvider, IReaderDBDefinitionService dataService)
+        public GeneratorService(SettingsGlobal settingsGlobal
+            , IGeneratorsProvider generatorsProvider
+            , IReaderDBDefinitionService dataService
+            , IServiceProvider serviceProvider)
         {
             GlobalGeneratorSettings = settingsGlobal;
             _dataService = dataService;
             _generatorsProvider = generatorsProvider;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task GenerateAsync(IProgress<string> progress)
         {
+            //To be really SCOPED
+            using var scope = _serviceProvider.CreateScope();
+            
             //Call to main generator to get selected tables from 
-            var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>().GetSelectedTableNames();
+            var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>(scope).GetSelectedTableNames();
 
             //Context
             //Base abstract context gen
             progress.Report("---- Context Generator BEGINS ----");
-            var generatorContextBase = _generatorsProvider.GetGenerator<IGeneratorContextBase>();
+            var generatorContextBase = _generatorsProvider.GetGenerator<IGeneratorContextBase>(scope);
             var outpoutContextBase = generatorContextBase.Generate();
             var contextBaseTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
                         $"{GlobalGeneratorSettings.DbContextClassName}Base.cs"
@@ -53,7 +62,7 @@ namespace Dapper_Layers_Generator.Core
                 string outputContext = string.Empty;
                 if (dbType == "MySql")
                 {
-                    var generatorContext = _generatorsProvider.GetGenerator<IMySqlGeneratorContext>();
+                    var generatorContext = _generatorsProvider.GetGenerator<IMySqlGeneratorContext>(scope);
                     outputContext = generatorContext.Generate();
                 }
                 
@@ -71,7 +80,7 @@ namespace Dapper_Layers_Generator.Core
             progress.Report(Environment.NewLine + "---- POCO Generator BEGINS ----");
             foreach(var tableName in selectedTableNames)
             {
-                var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName);
+                var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName,scope);
                 var outputPoco = generatorPoco.Generate();
                 tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generatorPoco.ClassName}.cs"
                         , outputPoco, "PocoGenerator", progress));

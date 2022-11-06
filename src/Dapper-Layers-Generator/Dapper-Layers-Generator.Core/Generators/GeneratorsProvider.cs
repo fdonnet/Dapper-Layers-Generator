@@ -1,4 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Settings;
+using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
@@ -10,22 +11,20 @@ namespace Dapper_Layers_Generator.Core.Generators
 {
     public interface IGeneratorsProvider
     {
-        T GetGenerator<T>();
-        T GetGenerator<T>(string tableName);
-        IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName);
+        T GetGenerator<T>(IServiceScope scope);
+        T GetGenerator<T>(string tableName, IServiceScope scope);
+        IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName, IServiceScope scope);
     }
     public class GeneratorsProvider : IGeneratorsProvider
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly SettingsGlobal _settings;
 
-        public GeneratorsProvider(IServiceProvider serviceProvider, SettingsGlobal settings)
+        public GeneratorsProvider(SettingsGlobal settings)
         {
-            _serviceProvider = serviceProvider;
             _settings = settings;
         }
 
-        public IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName)
+        public IEnumerable<IGeneratorFromTable> GetSelectedGeneratorsForRepo(string tableName, IServiceScope scope)
         {
             var generators = new List<IGeneratorFromTable>();
 
@@ -35,20 +34,21 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             if(curSettings.AddGenerator)
             {
-                generators.Add((IGeneratorFromTable)GetGenerator<IGeneratorRepoAdd>(tableName));
+                generators.Add((IGeneratorFromTable)GetGenerator<IGeneratorRepoAdd>(tableName,scope));
             }
 
             return generators;
         }
 
-        public T GetGenerator<T>()
+       //Get a real scoped generator
+        public T GetGenerator<T>(IServiceScope scope)
         {
-            return (T)_serviceProvider.GetService(typeof(T))!;
+            return (T)scope.ServiceProvider.GetService(typeof(T))!;
         }
 
-        public T GetGenerator<T>(string tableName)
+        public T GetGenerator<T>(string tableName, IServiceScope scope)
         {
-            var generator =  (IGeneratorFromTable)_serviceProvider.GetService(typeof(T))!;
+            var generator = (IGeneratorFromTable)scope.ServiceProvider.GetService(typeof(T))!;
             generator.SetTable(tableName);
 
             return (T)generator;

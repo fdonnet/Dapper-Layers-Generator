@@ -10,7 +10,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
     public interface IMySqlGeneratorContext : IGenerator
     {
-
     }
     public class MySqlGeneratorContext : GeneratorContext, IMySqlGeneratorContext
     {

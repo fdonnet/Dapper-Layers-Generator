@@ -47,12 +47,8 @@ internal partial class ConsoleService
                           });
 
             AnsiConsole.WriteLine("DB definitions loaded.");
-            //if (AnsiConsole.Confirm("Do you want to print all definitions ?", false))
-            //{
-            //    await PrintDbDefinitionsAsync();
-            //}
-            //else
-                await ShowMainMenuAsync();
+            Thread.Sleep(1000);
+            await ShowMainMenuAsync();
 
         }
         catch (Exception ex)
@@ -114,14 +110,16 @@ internal partial class ConsoleService
                 break;
             case "!!!! GENERATE !!!!":
                 AnsiConsole.Clear();
-                await AnsiConsole.Status()
+                try
+                {
+                    await AnsiConsole.Status()
                     .Spinner(Spinner.Known.Star)
                     .SpinnerStyle(Style.Parse("green bold"))
-                    .StartAsync("Generation begins...",  async ctx =>
+                    .StartAsync("Generation begins...", async ctx =>
                     {
                         var progress = new Progress<string>(text =>
                         {
-                            if(text.Contains("SUCCESS"))
+                            if (text.Contains("SUCCESS"))
                                 AnsiConsole.MarkupLine($"[green]{text}[/]");
                             else
                                 AnsiConsole.MarkupLine(text);
@@ -130,7 +128,11 @@ internal partial class ConsoleService
                         await _generatorService.GenerateAsync(progress);
 
                     });
-
+                }
+                catch (Exception ex)
+                {
+                    AnsiConsole.WriteException(ex);
+                }
                 await ReturnToMainMenuAsync();
                 break;
             case "Show DB definitions (JSON)":
