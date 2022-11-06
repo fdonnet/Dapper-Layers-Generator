@@ -1,8 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using Dapper_Layers_Generator.Data.POCO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {

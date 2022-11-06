@@ -2,15 +2,7 @@
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using Dapper_Layers_Generator.Data.POCO;
-using Dapper_Layers_Generator.Data.Reader;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Dapper_Layers_Generator.Core
 {

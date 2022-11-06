@@ -9,8 +9,6 @@ using Dapper_Layers_Generator.Data.Reader;
 using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySql.Data.Types;
-using Org.BouncyCastle.Security;
 using Spectre.Console;
 
 ServiceProvider? _builder = null;

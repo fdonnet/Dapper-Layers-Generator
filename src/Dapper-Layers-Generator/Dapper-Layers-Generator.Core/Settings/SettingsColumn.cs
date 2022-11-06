@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dapper_Layers_Generator.Core.Settings
+﻿namespace Dapper_Layers_Generator.Core.Settings
 {
     //Position counter begin after Settings Table (don't forget to update)
     public class SettingsColumn

@@ -1,12 +1,4 @@
-﻿using MySqlX.XDevAPI.Relational;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Text.Json;
 
 namespace Dapper_Layers_Generator.Core.Settings
 {

@@ -1,11 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 internal partial class ConsoleService
 {
     internal async Task ShowSelectTablesAsync()

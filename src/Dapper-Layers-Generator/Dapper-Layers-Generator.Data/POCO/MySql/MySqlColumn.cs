@@ -1,12 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.X509;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Org.BouncyCastle.Math.EC.ECCurve;
-
-namespace Dapper_Layers_Generator.Data.POCO.MySql
+﻿namespace Dapper_Layers_Generator.Data.POCO.MySql
 {
     public class MySqlColumn : IColumn
     {

@@ -1,17 +1,7 @@
 ﻿using Dapper_Layers_Generator.Console.Helpers;
-using Dapper_Layers_Generator.Core;
 using Dapper_Layers_Generator.Core.Settings;
-using Dapper_Layers_Generator.Data.POCO;
-using MySqlX.XDevAPI.Relational;
-using Org.BouncyCastle.Asn1.X509.Qualified;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
 
 internal partial class ConsoleService
 {

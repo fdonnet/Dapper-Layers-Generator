@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dapper_Layers_Generator.Data.POCO.MySql
+﻿namespace Dapper_Layers_Generator.Data.POCO.MySql
 {
     public class MySqlSchema : ISchema
     {
