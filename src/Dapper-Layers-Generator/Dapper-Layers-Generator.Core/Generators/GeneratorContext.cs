@@ -1,15 +1,11 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using Dapper_Layers_Generator.Data.POCO;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorContext : IGenerator
-    {
-
-    }
-
-    public abstract class GeneratorContext : GeneratorContextBase, IGeneratorContext
+    public abstract class GeneratorContext : GeneratorContextTemplate 
     {
         protected abstract string UsingDbProviderSpecific { get; init; }
         protected abstract string DbProviderString { get; init; }
@@ -26,25 +22,19 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
-
         public override string Generate()
         {
-            if (_currentSchema.Tables == null)
-                throw new NullReferenceException("Cannot generate without at least one table selected");
-            _selectedTables = _currentSchema.Tables.Where(t => GetSelectedTableNames().Contains(t.Name));
-
             var builder = new StringBuilder();
             //Header
             builder.Append(WriteContextHeaderComment());
 
             //Db context class
-            builder.Append(WriteClass());
+            builder.Append(WriteFullClassContent());
 
             return builder.ToString();
-
         }
 
-        private string WriteContextHeaderComment()
+        protected override string WriteContextHeaderComment()
         {
             return $@"{@WriteUsingStatements()}
 // =================================================================
@@ -62,7 +52,7 @@ namespace {_settings.TargetNamespaceForDbContext}
 
         }
 
-        private string WriteUsingStatements()
+        protected override string WriteUsingStatements()
         {
             string output = $@"using {_settings.TargetNamespaceForRepo};
 using System.Data;
@@ -74,13 +64,7 @@ using Microsoft.Extensions.Configuration;
 
             return output;
         }
-
-        private string WriteClass()
-        {
-            return WriteFullClassContent();
-        }
-
-        private string WriteClassRepoMembers()
+        protected override string WriteClassRepoMembers()
         {
             var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
@@ -105,7 +89,7 @@ using Microsoft.Extensions.Configuration;
             return membersDeclaration;
         }
 
-        private string WriteFullClassContent()
+        protected override string WriteFullClassContent()
         {
             var tab = _stringTransform.IndentString;
 
