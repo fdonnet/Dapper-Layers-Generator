@@ -11,7 +11,9 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             , IDataTypeConverter dataConverter) 
                 : base(settingsGlobal, data, stringTransformationService, dataConverter)
         {
-
+            ColAndTableIdentifier = "`";
         }
+
+
     }
 }

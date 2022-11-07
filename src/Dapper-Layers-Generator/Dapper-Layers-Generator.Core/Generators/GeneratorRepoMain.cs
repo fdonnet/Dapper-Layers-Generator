@@ -14,16 +14,15 @@ namespace Dapper_Layers_Generator.Core.Generators
     }
     public class GeneratorRepoMain : GeneratorFromTable, IGeneratorRepoMain
     {
-        protected virtual string UsingDbProviderSpecific { get; init; }
-        protected virtual string DbProviderString { get; init; }
+        protected virtual string UsingDbProviderSpecific { get; init; } = string.Empty;
+        protected virtual string DbProviderString { get; init; } = String.Empty;
 
         public GeneratorRepoMain(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter) : base(settingsGlobal, data, stringTransformationService, dataConverter)
         {
-            UsingDbProviderSpecific = string.Empty;
-            DbProviderString = string.Empty;
+
         }
 
         public override string Generate()
@@ -31,8 +30,10 @@ namespace Dapper_Layers_Generator.Core.Generators
             var output = new StringBuilder();
             output.Append(WriteRepoHeaderAndConstructor());
 
-            if (string.IsNullOrEmpty(UsingDbProviderSpecific))
+            if (string.IsNullOrEmpty(DbProviderString))
                 output.Append(WriteInterface());
+
+            output.Append(WriteClass());
 
             return output.ToString();
         }
@@ -43,11 +44,11 @@ namespace Dapper_Layers_Generator.Core.Generators
                 ? $@"{@WriteUsingStatements()}
 // =================================================================
 // Repo class for table {Table.Name}
-// Base virtual class that can be used with no specific db provider
+// Base abstract class that can be used with no specific db provider
 // You can extend it via other partial files where you know that a 
 // query can run the same on different db providers
 // Author: {_settings.AuthorName}
-// Repo name: {ClassName}Repo
+// Repo name: {ClassName}RepoBase
 // Generated: {DateTime.Now}
 // WARNING: Never change this file manually (re-generate it)
 // =================================================================
@@ -77,10 +78,39 @@ namespace {_settings.TargetNamespaceForRepo}
 using System.Data;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using {_settings.TargetNamespaceForDbContext};
 {UsingDbProviderSpecific}
 
 ";
             return output;
+        }
+
+        private string WriteClass()
+        {
+            var tab = _stringTransform.IndentString;
+
+            if (string.IsNullOrEmpty(DbProviderString))
+                return @$"
+{tab}public abstract partial class {ClassName}RepoBase : I{ClassName}Repo
+{tab}{{
+{tab}{tab}protected I{_settings.DbContextClassName} _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)} = null;
+{tab}{tab}
+{tab}{tab}public {ClassName}RepoBase(I{_settings.DbContextClassName} {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)})
+{tab}{tab}{{
+{tab}{tab}{tab}_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)} = {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)};
+{tab}{tab}}}
+
+";
+            else
+                return @$"
+{tab}public partial class {ClassName}Repo{DbProviderString} : {ClassName}RepoBase, I{ClassName}Repo
+{tab}{{
+{tab}{tab}public {ClassName}Repo{DbProviderString}(I{_settings.DbContextClassName} {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}): base ({_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)})
+{tab}{tab}{{
+{tab}{tab}}}
+
+";
+
         }
 
         /// <summary>

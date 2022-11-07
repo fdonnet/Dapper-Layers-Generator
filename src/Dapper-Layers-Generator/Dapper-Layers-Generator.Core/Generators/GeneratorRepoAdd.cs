@@ -9,6 +9,8 @@ namespace Dapper_Layers_Generator.Core.Generators
     }
     public class GeneratorRepoAdd : GeneratorFromTable, IGeneratorRepoAdd
     {
+        protected virtual string ColAndTableIdentifier { get; init; } = String.Empty;
+
         public GeneratorRepoAdd(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
@@ -20,7 +22,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override string Generate()
         {
-            return "TEST";
+            return "";
         }
     }
 }

@@ -150,6 +150,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
     services.AddScoped<IDataTypeConverter, MySqlDataTypeConverter>();
     services.AddScoped<IMySqlGeneratorContext, MySqlGeneratorContext>();
+    services.AddScoped<IMySqlGeneratorRepoMain, MySqlGeneratorRepoMain>();
 
     //Service that depend on the dbprovider (in config to read db defintions)
     if (dbProvider == "MySql")

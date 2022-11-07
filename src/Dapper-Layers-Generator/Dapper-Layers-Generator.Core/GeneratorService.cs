@@ -3,6 +3,7 @@ using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.ComponentModel.Design.Serialization;
 using System.Data;
 using System.Text;
 
@@ -87,14 +88,47 @@ namespace Dapper_Layers_Generator.Core
 
             List<Task> tasksRepo = new();
             progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
+            
             foreach (var tableName in selectedTableNames)
             {
-                var generatorRepo = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
-                var outputRepo = generatorRepo.Generate();
-                var repoTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForRepo}" +
-                                    $"{generatorRepo.ClassName}Repo.cs"
-                                    , outputRepo, "RepoGenerator", progress);
-                tasksRepo.Add(repoTask);
+
+                   //Main Repo
+                var generatorRepoBaseMain = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
+                //Create subfolder for each repo (can be messy if not if a lotz of db providers)
+                var subDirectoryFullPath=GlobalGeneratorSettings.TargetFolderForRepo
+                    + generatorRepoBaseMain.ClassName
+                    + Path.DirectorySeparatorChar;
+
+                bool existsFolder = Directory.Exists(subDirectoryFullPath);
+                if(!existsFolder)
+                {
+                    Directory.CreateDirectory(subDirectoryFullPath);
+                }
+
+                var outputRepoBaseMain = generatorRepoBaseMain.Generate();
+                var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
+                                    $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
+                                    , outputRepoBaseMain, "RepoGenerator", progress);
+                tasksRepo.Add(repoBaseTaskMain);
+
+                //DbProvider specific
+                foreach (var dbType in GlobalGeneratorSettings.TargetDbProviderForGeneration.Split(','))
+                {
+                    string outputRepoMain = string.Empty;
+                    string className = string.Empty;
+                    if (dbType == "MySql")
+                    {
+                        var generatorRepoMain = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoMain>(tableName,scope);
+                        outputRepoMain = generatorRepoMain.Generate();
+                        className = generatorRepoMain.ClassName;
+                    }
+
+                    var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
+                                $"{className}Repo{dbType}.cs"
+                                , outputRepoMain, "RepoGenerator", progress);
+
+                    tasksRepo.Add(repoTaskMain);
+                }
             }
 
             return Task.WhenAll(tasksRepo);

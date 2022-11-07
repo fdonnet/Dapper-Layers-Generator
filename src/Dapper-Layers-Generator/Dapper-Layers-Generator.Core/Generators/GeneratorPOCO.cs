@@ -67,7 +67,7 @@ namespace {_settings.TargetNamespaceForPOCO}
 
             builder.Append($"{tab}}}");
             builder.Append(Environment.NewLine);
-            builder.Append("}");
+            builder.Append('}');
 
             return builder.ToString();
             
