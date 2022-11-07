@@ -59,6 +59,7 @@ namespace {_settings.TargetNamespaceForDbContext}
         {
             string output =$@"using System.Data;
 using Microsoft.Extensions.Configuration;
+using {_settings.TargetNamespaceForRepo};
 
 ";
 
@@ -98,7 +99,7 @@ using Microsoft.Extensions.Configuration;
             var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
             {
-                var tableName = _stringTransform.ApplyConfigTransform(t.Name);
+                var tableName = _stringTransform.ApplyConfigTransformClass(t.Name);
                 var settings = _settings.GetTableSettings(t.Name);
 
                 var interfaceName = "I" + tableName + "Repo";
@@ -115,14 +116,14 @@ using Microsoft.Extensions.Configuration;
             var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
             {
-                var tableName = _stringTransform.ApplyConfigTransform(t.Name);
+                var tableName = _stringTransform.ApplyConfigTransformClass(t.Name);
                 var settings = _settings.GetTableSettings(t.Name);
 
                 var interfaceName = "I" + tableName + "Repo";
                 var repoClassName = tableName + "Repo";
                 var repoProtectedFieldName = $"_{_stringTransform.FirstCharToLower(repoClassName)}";
 
-                return $@"{tab}{tab}protected {interfaceName} {repoProtectedFieldName};
+                return $@"{tab}{tab}protected {interfaceName}? {repoProtectedFieldName};
 {tab}{tab}public abstract {interfaceName} {repoClassName} {{ get; }}";
             }));
 

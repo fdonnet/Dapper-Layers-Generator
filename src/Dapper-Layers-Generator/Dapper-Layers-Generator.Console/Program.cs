@@ -143,6 +143,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<StringTransformationService>();
     services.AddScoped<IGeneratorService, GeneratorService>();
     services.AddScoped<IGeneratorContextBase, GeneratorContextForBase>();
+    services.AddScoped<IGeneratorRepoMain, GeneratorRepoMain>();
 
     //MySql specific (db provider for source generation)
     //You will be able to generate the code for several db types... 

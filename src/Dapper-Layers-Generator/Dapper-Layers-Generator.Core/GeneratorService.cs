@@ -2,6 +2,8 @@
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Data;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core
@@ -38,6 +40,18 @@ namespace Dapper_Layers_Generator.Core
             //Call to main generator to get selected tables from 
             var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>(scope).GetSelectedTableNames();
 
+            //Tasks
+            Task contextTasks = BuildContextTasks(scope, progress);
+            Task repoTasks = BuildRepoTasks(scope, progress,selectedTableNames);
+            Task pocoTasks = BuildPocoTasks(scope, progress,selectedTableNames);
+
+            Task allTask = Task.WhenAll(contextTasks, repoTasks, pocoTasks);
+
+            await allTask;
+        }
+
+        private Task BuildContextTasks(IServiceScope scope, IProgress<string> progress)
+        {
             //Context
             //Base abstract context gen
             progress.Report("---- Context Generator BEGINS ----");
@@ -57,32 +71,48 @@ namespace Dapper_Layers_Generator.Core
                     var generatorContext = _generatorsProvider.GetGenerator<IMySqlGeneratorContext>(scope);
                     outputContext = generatorContext.Generate();
                 }
-                
+
                 var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
                                 $"{GlobalGeneratorSettings.DbContextClassName}{dbType}.cs"
                                 , outputContext, "ContextGenerator", progress);
-                
+
                 tasksContextDB.Add(contextTask);
             }
             Task dbContextSpecific = Task.WhenAll(tasksContextDB);
-            Task contextTasks = Task.WhenAll(contextBaseTask, dbContextSpecific);
+            return Task.WhenAll(contextBaseTask, dbContextSpecific);
+        }
 
-            //POCO
+        private Task BuildRepoTasks(IServiceScope scope, IProgress<string> progress, List<string> selectedTableNames)
+        {
+
+            List<Task> tasksRepo = new();
+            progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
+            foreach (var tableName in selectedTableNames)
+            {
+                var generatorRepo = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
+                var outputRepo = generatorRepo.Generate();
+                var repoTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForRepo}" +
+                                    $"{generatorRepo.ClassName}Repo.cs"
+                                    , outputRepo, "RepoGenerator", progress);
+                tasksRepo.Add(repoTask);
+            }
+
+            return Task.WhenAll(tasksRepo);
+        }
+
+        private Task BuildPocoTasks(IServiceScope scope, IProgress<string> progress, List<string> selectedTableNames)
+        {
             List<Task> tasks = new();
             progress.Report(Environment.NewLine + "---- POCO Generator BEGINS ----");
-            foreach(var tableName in selectedTableNames)
+            foreach (var tableName in selectedTableNames)
             {
-                var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName,scope);
+                var generatorPoco = _generatorsProvider.GetGenerator<IGeneratorPOCO>(tableName, scope);
                 var outputPoco = generatorPoco.Generate();
                 tasks.Add(WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForPOCO}{generatorPoco.ClassName}.cs"
                         , outputPoco, "PocoGenerator", progress));
             }
 
-            Task taskPoco= Task.WhenAll(tasks);
-
-
-            Task allTask = Task.WhenAll(contextTasks, taskPoco);
-            await allTask;
+            return Task.WhenAll(tasks);
         }
 
         private static async Task WriteFileAsync(string fileFullPath, string content, string WriterType

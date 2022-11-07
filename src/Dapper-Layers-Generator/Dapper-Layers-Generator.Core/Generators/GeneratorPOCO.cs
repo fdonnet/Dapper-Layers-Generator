@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorPOCO : IGenerator, IGeneratorFromTable
+    public interface IGeneratorPOCO : IGeneratorFromTable
     {
 
     }
@@ -88,10 +88,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             {
                 var memberName = _stringTransform.PascalCase(col.Name);
                 var colSettings = TableSettings.GetColumnSettings(col.Name);
-
-                var memberType = colSettings.FieldNameCustomType == String.Empty
-                                    ? DataConverter.GetDotNetDataType(col.DataType, col.IsNullable)
-                                    : colSettings.FieldNameCustomType;
+                var memberType = GetColumnDotNetType(col);
 
                 var decorators = WriteMemberDecorators(colSettings, memberType, col);
 
@@ -128,7 +125,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
 
-            if (memberType == "string")
+            if (memberType == "string" || memberType == "string?")
             {
                 if (settings.StandardStringLengthDecorator)
                 {

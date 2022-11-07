@@ -114,9 +114,14 @@ namespace Dapper_Layers_Generator.Core.Converters
                     : PascalCase(Singularize(theString));
         }
 
-        public string? ApplyConfigTransform(string? theString)
+        public string? ApplyConfigTransformClass(string? theString)
         {
             return SingularizeAndPascalCase(theString);
+        }
+
+        public string? ApplyConfigTransformMember(string? theString)
+        {
+            return _settingsGlobal.UsePascalTransform ? Humanizer.InflectorExtensions.Camelize(theString) : theString;
         }
 
 #pragma warning disable CA1822 // Mark members as static
