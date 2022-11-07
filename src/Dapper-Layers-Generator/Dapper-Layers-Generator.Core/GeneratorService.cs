@@ -99,7 +99,7 @@ namespace Dapper_Layers_Generator.Core
 
                 //Main Repo
                 var generatorRepoBaseMain = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
-                //Create subfolder for each repo (can be messy if not if a lotz of db providers)
+                //Create subfolder for each repo (can be messy if not if a lot of db providers)
                 var subDirectoryFullPath=GlobalGeneratorSettings.TargetFolderForRepo
                     + generatorRepoBaseMain.ClassName
                     + Path.DirectorySeparatorChar;

@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
 
 ServiceProvider? _builder = null;
-string _dbProviderToReadDBDef = string.Empty;
+string? _dbProviderToReadDBDef = string.Empty;
 
 IConfiguration? _config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -40,7 +40,7 @@ await console.InitAndLoadDbDefinitionsAsync();
 //*****************************
 void WelcomeMsg()
 {
-    string schemas = string.Empty;
+    string? schemas = string.Empty;
     bool isOk = false;
     List<string> acceptedProvider = new() { "MySql" };
 
