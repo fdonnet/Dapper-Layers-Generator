@@ -31,7 +31,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override abstract string Generate();
 
-        public void SetTable(string tableName)
+        public virtual void SetTable(string tableName)
         {
             var table = _currentSchema.Tables?.Where(t => t.Name == tableName).SingleOrDefault();
 

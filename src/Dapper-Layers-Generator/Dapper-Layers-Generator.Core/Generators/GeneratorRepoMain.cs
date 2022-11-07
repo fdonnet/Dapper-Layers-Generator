@@ -93,7 +93,7 @@ using {_settings.TargetNamespaceForDbContext};
                 return @$"
 {tab}public abstract partial class {ClassName}RepoBase : I{ClassName}Repo
 {tab}{{
-{tab}{tab}protected I{_settings.DbContextClassName} _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)} = null;
+{tab}{tab}protected readonly I{_settings.DbContextClassName} _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)};
 {tab}{tab}
 {tab}{tab}public {ClassName}RepoBase(I{_settings.DbContextClassName} {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)})
 {tab}{tab}{{

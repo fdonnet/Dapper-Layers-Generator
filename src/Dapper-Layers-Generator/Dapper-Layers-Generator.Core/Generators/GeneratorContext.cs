@@ -79,7 +79,7 @@ using Microsoft.Extensions.Configuration;
                 return $@"{tab}{tab}public override {interfaceName} {repoClassName} 
 {tab}{tab}{{
 {tab}{tab}{tab}get {{
-{tab}{tab}{tab}{tab}{repoProtectedFieldName} ??= new {repoClassName}(this);
+{tab}{tab}{tab}{tab}{repoProtectedFieldName} ??= new {repoClassName}{DbProviderString}(this);
 {tab}{tab}{tab}{tab}return {repoProtectedFieldName};
 {tab}{tab}{tab}}}
 {tab}{tab}}}

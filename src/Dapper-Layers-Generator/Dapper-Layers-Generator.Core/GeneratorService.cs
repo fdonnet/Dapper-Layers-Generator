@@ -1,4 +1,5 @@
-﻿using Dapper_Layers_Generator.Core.Generators;
+﻿using Dapper_Layers_Generator.Core.Converters;
+using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,16 +22,19 @@ namespace Dapper_Layers_Generator.Core
         private readonly IReaderDBDefinitionService _dataService;
         private readonly IGeneratorsProvider _generatorsProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly StringTransformationService _stringTransformation;
 
         public GeneratorService(SettingsGlobal settingsGlobal
             , IGeneratorsProvider generatorsProvider
             , IReaderDBDefinitionService dataService
-            , IServiceProvider serviceProvider)
+            , IServiceProvider serviceProvider
+            , StringTransformationService stringTransformation)
         {
             GlobalGeneratorSettings = settingsGlobal;
             _dataService = dataService;
             _generatorsProvider = generatorsProvider;
             _serviceProvider = serviceProvider;
+            _stringTransformation = stringTransformation;
         }
 
         public async Task GenerateAsync(IProgress<string> progress)
@@ -88,11 +92,12 @@ namespace Dapper_Layers_Generator.Core
 
             List<Task> tasksRepo = new();
             progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
-            
+            var tab = _stringTransformation.IndentString;
+
             foreach (var tableName in selectedTableNames)
             {
 
-                   //Main Repo
+                //Main Repo
                 var generatorRepoBaseMain = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
                 //Create subfolder for each repo (can be messy if not if a lotz of db providers)
                 var subDirectoryFullPath=GlobalGeneratorSettings.TargetFolderForRepo
@@ -106,6 +111,11 @@ namespace Dapper_Layers_Generator.Core
                 }
 
                 var outputRepoBaseMain = generatorRepoBaseMain.Generate();
+                var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoAdd>(tableName, scope);
+                var outputAddBase = generatorAddBase.Generate();
+
+
+                outputRepoBaseMain = outputRepoBaseMain + outputAddBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
@@ -115,13 +125,19 @@ namespace Dapper_Layers_Generator.Core
                 foreach (var dbType in GlobalGeneratorSettings.TargetDbProviderForGeneration.Split(','))
                 {
                     string outputRepoMain = string.Empty;
+                    var outputAddSpec = string.Empty;
                     string className = string.Empty;
                     if (dbType == "MySql")
                     {
                         var generatorRepoMain = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoMain>(tableName,scope);
                         outputRepoMain = generatorRepoMain.Generate();
                         className = generatorRepoMain.ClassName;
+
+                        var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAdd>(tableName, scope);
+                        outputAddSpec = generatorAddSpec.Generate();
                     }
+
+                    outputRepoMain = outputRepoMain + outputAddSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"

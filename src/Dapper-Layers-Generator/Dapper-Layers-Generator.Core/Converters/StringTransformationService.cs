@@ -104,6 +104,12 @@ namespace Dapper_Layers_Generator.Core.Converters
             }
             return theString;
         }
+#pragma warning disable CA1822 // Mark members as static
+        public string? PluralizeToLower(string? theString)
+#pragma warning restore CA1822 // Mark members as static
+        {
+            return theString == null ? null : Humanizer.InflectorExtensions.Pluralize(theString.ToLower());
+        }
 
         public string? SingularizeAndPascalCase(string? theString)
         {

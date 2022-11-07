@@ -152,7 +152,7 @@ using {_settings.TargetNamespaceForRepo};
 {tab}{{
 {tab}{tab}protected readonly IConfiguration _config;
 {tab}{tab}
-{tab}{tab}public DbContextFactoryBase(IConfiguration config)
+{tab}{tab}public {_settings.DbContextClassName}FactoryBase(IConfiguration config)
 {tab}{tab}{{
 {tab}{tab}{tab}_config = config;
 {tab}{tab}}}
