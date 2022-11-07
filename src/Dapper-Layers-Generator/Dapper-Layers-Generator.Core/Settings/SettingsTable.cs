@@ -32,9 +32,6 @@
         [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 10, Group = "Generator")]
         public bool GetByUkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable check if exist by unique key function generator: ", Position = 11, Group = "Generator")]
-        public bool ExistsByUk { get; set; } = true;
-
         [SettingsAttribute(Message = "Enable add function generator: ", Position = 12, Group = "Generator")]
         public bool AddGenerator { get; set; } = true;
 
