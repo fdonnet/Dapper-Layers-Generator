@@ -28,7 +28,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             if(curSettings.AddGenerator)
             {
-                generators.Add((IGeneratorFromTable)GetGenerator<IGeneratorRepoAdd>(tableName,scope));
+                generators.Add((IGeneratorFromTable)GetGenerator<IGeneratorRepoGetAll>(tableName,scope));
             }
 
             return generators;

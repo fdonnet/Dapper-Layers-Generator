@@ -111,7 +111,7 @@ namespace Dapper_Layers_Generator.Core
                 }
 
                 var outputRepoBaseMain = generatorRepoBaseMain.Generate();
-                var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoAdd>(tableName, scope);
+                var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
                 var outputAddBase = generatorAddBase.Generate();
 
 
@@ -133,7 +133,7 @@ namespace Dapper_Layers_Generator.Core
                         outputRepoMain = generatorRepoMain.Generate();
                         className = generatorRepoMain.ClassName;
 
-                        var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAdd>(tableName, scope);
+                        var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
                         outputAddSpec = generatorAddSpec.Generate();
                     }
 

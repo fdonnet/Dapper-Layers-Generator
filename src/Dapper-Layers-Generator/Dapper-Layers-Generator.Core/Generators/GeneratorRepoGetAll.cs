@@ -5,17 +5,17 @@ using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorRepoAdd : IGeneratorFromTable
+    public interface IGeneratorRepoGetAll : IGeneratorFromTable
     {
 
     }
-    public class GeneratorRepoAdd : GeneratorFromTable, IGeneratorRepoAdd
+    public class GeneratorRepoGetAll : GeneratorFromTable, IGeneratorRepoGetAll
     {
         protected virtual string ColAndTableIdentifier { get; init; } = String.Empty;
         protected virtual bool IsBase { get; init; } = true;
         protected IEnumerable<IColumn>? ColumnForGetAll;
 
-        public GeneratorRepoAdd(SettingsGlobal settingsGlobal
+        public GeneratorRepoGetAll(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)

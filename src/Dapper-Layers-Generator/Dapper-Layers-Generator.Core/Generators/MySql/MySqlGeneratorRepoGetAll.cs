@@ -3,13 +3,13 @@ using Dapper_Layers_Generator.Core.Settings;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
-    public interface IMySqlGeneratorRepoAdd : IGeneratorFromTable
+    public interface IMySqlGeneratorRepoGetAll : IGeneratorFromTable
     {
 
     }
-    public class MySqlGeneratorRepoAdd : GeneratorRepoAdd, IMySqlGeneratorRepoAdd
+    public class MySqlGeneratorRepoGetAll : GeneratorRepoGetAll, IMySqlGeneratorRepoGetAll
     {
-        public MySqlGeneratorRepoAdd(SettingsGlobal settingsGlobal
+        public MySqlGeneratorRepoGetAll(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)

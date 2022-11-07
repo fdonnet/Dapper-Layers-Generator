@@ -76,20 +76,26 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex))
             {
-                return string.Join("And", curIndex.OrderBy(c => c.Position).Select(c=> _stringTransform.ApplyConfigTransformClass(c.Name)));
+                return string.Join("And", curIndex.OrderBy(c => c.Position).Select(c=> 
+                    _stringTransform.ApplyConfigTransformClass(c.Name)));
+
             }
             else
-                throw new NullReferenceException($"Cannot find the specified index {indexName} for table {Table.Name}");
+                throw new NullReferenceException(
+                    $"Cannot find the specified index {indexName} for table {Table.Name}");
         }
 
         protected string GetUkMemberNamesStringAndType(string indexName)
         {
             if (ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex))
             {
-                return string.Join(", ", curIndex.OrderBy(c => c.Position).Select(c => $"{GetColumnDotNetType(c)} {_stringTransform.ApplyConfigTransformMember(c.Name)}"));
+                return string.Join(", ", curIndex.OrderBy(c => c.Position).Select(c =>
+                    $"{GetColumnDotNetType(c)} {_stringTransform.ApplyConfigTransformMember(c.Name)}"));
+
             }
             else
-                throw new NullReferenceException($"Cannot find the specified index {indexName} for table {Table.Name}");
+                throw new NullReferenceException(
+                    $"Cannot find the specified index {indexName} for table {Table.Name}");
         }
 
         protected string GetPkMemberNamesStringAndType()
@@ -121,7 +127,9 @@ namespace Dapper_Layers_Generator.Core.Generators
             }
             else
             {
-                output = PkColumns.Select(c => $"IEnumerable<{GetColumnDotNetType(c)}> listOf{_stringTransform.ApplyConfigTransformClass(c.Name)}").First();
+                output = PkColumns.Select(c => $"IEnumerable<{GetColumnDotNetType(c)}> " +
+                    $"listOf{_stringTransform.ApplyConfigTransformClass(c.Name)}").First();
+
             }
             
             return output;
