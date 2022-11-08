@@ -141,8 +141,13 @@ namespace Dapper_Layers_Generator.Core
                 var generatorUpdateBase = _generatorsProvider.GetGenerator<IGeneratorRepoUpdate>(tableName, scope);
                 var outputUpdateBase = generatorUpdateBase.Generate();
 
+                //Delete base
+                outputUpdateBase = !string.IsNullOrEmpty(outputUpdateBase) ? outputUpdateBase + Environment.NewLine : string.Empty;
+                var generatorDeleteBase = _generatorsProvider.GetGenerator<IGeneratorRepoDelete>(tableName, scope);
+                var outputDeleteBase = generatorDeleteBase.Generate();
+
                 outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + outputGetByPkListBase
-                    + outputGetByUkBase + outputAddBase + outputUpdateBase + $"{tab}}}{Environment.NewLine}}}";
+                    + outputGetByUkBase + outputAddBase + outputUpdateBase + outputDeleteBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
@@ -159,6 +164,7 @@ namespace Dapper_Layers_Generator.Core
                     var outputGetByUkSpec = string.Empty;
                     var outputAddSpec = string.Empty;
                     var outputUpdateSpec = string.Empty;
+                    var outputDeleteSpec = string.Empty;
 
                     string className = string.Empty;
                     
@@ -197,10 +203,15 @@ namespace Dapper_Layers_Generator.Core
                         outputAddSpec = !string.IsNullOrEmpty(outputAddSpec) ? outputAddSpec + Environment.NewLine : string.Empty;
                         var generatorUpdateSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoUpdate>(tableName, scope);
                         outputUpdateSpec = generatorUpdateSpec.Generate();
+
+                        //Delete
+                        outputUpdateSpec = !string.IsNullOrEmpty(outputUpdateSpec) ? outputUpdateSpec + Environment.NewLine : string.Empty;
+                        var generatorDeleteSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoDelete>(tableName, scope);
+                        outputDeleteSpec = generatorDeleteSpec.Generate();
                     }
 
                     outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + outputGetByPkListSpec 
-                        + outputGetByUkSpec + outputAddSpec + outputUpdateSpec + $"{tab}}}{Environment.NewLine}}}";
+                        + outputGetByUkSpec + outputAddSpec + outputUpdateSpec + outputDeleteSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"

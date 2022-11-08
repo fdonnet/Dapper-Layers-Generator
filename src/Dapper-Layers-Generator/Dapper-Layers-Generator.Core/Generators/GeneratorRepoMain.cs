@@ -180,7 +180,7 @@ using {_settings.TargetNamespaceForDbContext};
             }
 
             //Delete
-            if (TableSettings.DeleteGenerator)
+            if (TableSettings.DeleteGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 output.Append($"{tab}{tab}Task DeleteAsync({GetPkMemberNamesStringAndType()});");
 

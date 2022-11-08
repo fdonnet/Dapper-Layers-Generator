@@ -60,6 +60,21 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
+        protected virtual string GetDapperDynaParamsForPk()
+        {
+            var output = new StringBuilder();
+            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
+            output.Append(Environment.NewLine);
+
+            var spParams = String.Join(Environment.NewLine, PkColumns.Select(col =>
+            {
+                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(col.Name)});";
+            }));
+
+            output.Append(spParams);
+            return output.ToString();
+        }
+
 
         private string GetColumnListStringForSelect()
         {
