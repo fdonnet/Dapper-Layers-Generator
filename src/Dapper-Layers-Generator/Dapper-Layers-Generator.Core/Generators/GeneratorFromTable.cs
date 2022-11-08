@@ -20,6 +20,11 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected Dictionary<string,List<IColumn>> ColumnNamesByIndexNameDic { get; private set; }
             = new Dictionary<string, List<IColumn>>();
 
+        protected virtual string ColAndTableIdentifier { get; init; } = String.Empty;
+        protected virtual bool IsBase { get; init; } = true;
+
+        protected IEnumerable<IColumn>? ColumnForGetOperations;
+
         public GeneratorFromTable(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
@@ -64,7 +69,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                     }
                 }
             }
+
+            ColumnForGetOperations = Table.Columns != null
+                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForGet.Split(',').Contains(c.Name))
+                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
         }
+
 
         protected string GetPkMemberNamesString()
         {
@@ -74,33 +84,25 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected string GetUkMemberNamesString(string indexName)
         {
-            if (ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex))
-            {
-                return string.Join("And", curIndex.OrderBy(c => c.Position).Select(c=> 
-                    _stringTransform.ApplyConfigTransformClass(c.Name)));
-
-            }
-            else
-                throw new NullReferenceException(
+            return ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex)
+                ? string.Join("And", curIndex.OrderBy(c => c.Position).Select(c =>
+                    _stringTransform.ApplyConfigTransformClass(c.Name)))
+                : throw new NullReferenceException(
                     $"Cannot find the specified index {indexName} for table {Table.Name}");
         }
 
         protected string GetUkMemberNamesStringAndType(string indexName)
         {
-            if (ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex))
-            {
-                return string.Join(", ", curIndex.OrderBy(c => c.Position).Select(c =>
-                    $"{GetColumnDotNetType(c)} {_stringTransform.ApplyConfigTransformMember(c.Name)}"));
-
-            }
-            else
-                throw new NullReferenceException(
+            return ColumnNamesByIndexNameDic.TryGetValue(indexName, out var curIndex)
+                ? string.Join(", ", curIndex.OrderBy(c => c.Position).Select(c =>
+                    $"{GetColumnDotNetType(c)} {_stringTransform.ApplyConfigTransformMember(c.Name)}"))
+                : throw new NullReferenceException(
                     $"Cannot find the specified index {indexName} for table {Table.Name}");
         }
 
         protected string GetPkMemberNamesStringAndType()
         {
-            return string.Join(", ", PkColumns.Select(c => 
+            return string.Join(", ", PkColumns.Select(c =>
                 $"{GetColumnDotNetType(c)} {_stringTransform.ApplyConfigTransformMember(c.Name)}"));
 
         }
@@ -110,19 +112,16 @@ namespace Dapper_Layers_Generator.Core.Generators
             var output = string.Join(", ", PkColumns.Select(c =>
                 $"{GetColumnDotNetType(c)}"));
 
-            if (PkColumns.Count() > 1)
-                return $"({output})";
-            else
-                return output;
+            return PkColumns.Count() > 1 ? $"({output})" : output;
         }
 
         protected string GetPkMemberNamesStringAndTypeList()
         {
             var output = string.Empty;
-            if(PkColumns.Count()>1)
+            if (PkColumns.Count() > 1)
             {
                 var tuple = string.Join(", ", PkColumns.Select(c => $"{GetColumnDotNetType(c)}"));
-                var varName = string.Join("And",PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)));
+                var varName = string.Join("And", PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)));
                 output = $"IEnumerable<({tuple})> listOf{varName}";
             }
             else
@@ -131,7 +130,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     $"listOf{_stringTransform.ApplyConfigTransformClass(c.Name)}").First();
 
             }
-            
+
             return output;
         }
 

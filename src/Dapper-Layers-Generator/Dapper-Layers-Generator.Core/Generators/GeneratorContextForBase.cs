@@ -68,7 +68,6 @@ using {_settings.TargetNamespaceForRepo};
 
         private string WriteInterface()
         {
-            var tab = _stringTransform.IndentString;
             var interfaceName = "I" + _settings.DbContextClassName;
             var builder = new StringBuilder();
 
@@ -96,7 +95,6 @@ using {_settings.TargetNamespaceForRepo};
 
         private string WriteInterfaceRepoMembers()
         {
-            var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
             {
                 var tableName = _stringTransform.ApplyConfigTransformClass(t.Name);
@@ -113,7 +111,6 @@ using {_settings.TargetNamespaceForRepo};
 
         protected override string WriteClassRepoMembers()
         {
-            var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
             {
                 var tableName = _stringTransform.ApplyConfigTransformClass(t.Name);
@@ -132,8 +129,6 @@ using {_settings.TargetNamespaceForRepo};
 
         protected override string WriteFullClassContent()
         {
-            var tab = _stringTransform.IndentString;
-
             return $@"
 
 {tab}/// <summary>

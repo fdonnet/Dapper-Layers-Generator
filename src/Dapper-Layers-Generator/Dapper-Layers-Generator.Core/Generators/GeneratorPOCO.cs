@@ -34,7 +34,6 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         private string WritePocoHeaderComment()
         {
-            var tab = _stringTransform.IndentString;
             return $@"#nullable disable warnings
 namespace {_settings.TargetNamespaceForPOCO} 
 {{
@@ -52,7 +51,6 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WritePocoClass()
         {
-            var tab = _stringTransform.IndentString;
             var builder = new StringBuilder();
             
             builder.Append(@WritePocoHeaderComment());
@@ -75,8 +73,6 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WritePocoMemberFields()
         {
-            var tab = _stringTransform.IndentString;
-
             if (Table.Columns == null)
                 return "";
 
@@ -122,7 +118,6 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, IColumn col)
         {
-            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
 
             if (memberType == "string" || memberType == "string?")
@@ -140,7 +135,6 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberRequieredDecorator(SettingsColumn settings, IColumn col)
         {
-            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
 
             if (!col.IsNullable && !col.IsAutoIncrement)
@@ -155,7 +149,6 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberJsonIgnoreDecorator(IColumn col)
         {
-            var tab = _stringTransform.IndentString;
             var decorator = string.Empty;
             var colFound = TableSettings.JsonIgnoreDecoration.Split(',').Any(c => c == col.Name);
 
@@ -186,5 +179,6 @@ namespace {_settings.TargetNamespaceForPOCO}
                 curLength = decorators.Length;
             }
         }
+
     }
 }

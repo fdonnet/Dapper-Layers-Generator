@@ -66,7 +66,6 @@ using Microsoft.Extensions.Configuration;
         }
         protected override string WriteClassRepoMembers()
         {
-            var tab = _stringTransform.IndentString;
             var membersDeclaration = String.Join(Environment.NewLine, _selectedTables!.Select(t =>
             {
                 var tableName = _stringTransform.ApplyConfigTransformClass(t.Name);
@@ -91,8 +90,6 @@ using Microsoft.Extensions.Configuration;
 
         protected override string WriteFullClassContent()
         {
-            var tab = _stringTransform.IndentString;
-
             return $@"
 
 {tab}/// <summary>

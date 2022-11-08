@@ -92,7 +92,6 @@ namespace Dapper_Layers_Generator.Core
 
             List<Task> tasksRepo = new();
             progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
-            var tab = _stringTransformation.IndentString;
 
             foreach (var tableName in selectedTableNames)
             {

@@ -87,7 +87,6 @@ using {_settings.TargetNamespaceForDbContext};
 
         private string WriteClass()
         {
-            var tab = _stringTransform.IndentString;
 
             if (string.IsNullOrEmpty(DbProviderString))
                 return @$"
@@ -119,7 +118,6 @@ using {_settings.TargetNamespaceForDbContext};
         /// <returns></returns>
         private string WriteInterface()
         {
-            var tab = _stringTransform.IndentString;
             return $@" 
 {tab}/// =================================================================
 {tab}/// Author: {_settings.AuthorName}
@@ -135,7 +133,6 @@ using {_settings.TargetNamespaceForDbContext};
 
         private string WriteInterfaceMethods()
         {
-            var tab = _stringTransform.IndentString;
             var output = new StringBuilder();
 
             if (TableSettings.GetAllGenerator)
