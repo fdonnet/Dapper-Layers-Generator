@@ -13,7 +13,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
     }
 
-    public class GeneratorRepoGetByPk : GeneratorForOperations, IGeneratorRepoGetAll
+    public class GeneratorRepoGetByPk : GeneratorForOperations, IGeneratorRepoGetByPk
     {
         public GeneratorRepoGetByPk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
@@ -31,14 +31,19 @@ namespace Dapper_Layers_Generator.Core.Generators
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(@GetBaseSql());
+                output.Append(Environment.NewLine);
+                output.Append(GetDapperDynaParams() + @""";");
+                output.Append(Environment.NewLine);
+                output.Append(Environment.NewLine);
+                output.Append(@GetBaseSqlForSelect());
+                output.Append(Environment.NewLine);
+                output.Append(GetSqlWhereClause());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperCall());
-
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};");
+                output.Append($"{tab}{tab}{tab}return {ClassName.ToLower()};");
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -58,12 +63,42 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetDapperCall()
         {
-            return $"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = " +
+            return $"{tab}{tab}{tab}var {ClassName.ToLower()} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"QueryAsync<{ClassName}>(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
+                    $"QuerySingleOrDefaultAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
+        protected virtual string GetSqlWhereClause()
+        {
+            var output = new StringBuilder();
 
+            output.Append($"{tab}{tab}{tab}WHERE ");
+
+            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", PkColumns.Select(col =>
+            {
+                return $"{col.Name} = @{_stringTransform.ApplyConfigTransformMember(col.Name)}";
+            }));
+
+            return output.ToString();
+
+        }
+
+        protected virtual string GetDapperDynaParams()
+        {
+            var output = new StringBuilder();
+            output.Append($"{tab}{tab}{tab}var p = DynamicParameters();");
+            output.Append(Environment.NewLine);
+
+            var spParams = String.Join(Environment.NewLine, PkColumns.Select(col =>
+            {
+                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(col.Name)});";
+            }));
+
+            output.Append(Environment.NewLine);
+            return output.ToString();
+        }
+
+        
 
     }
 }

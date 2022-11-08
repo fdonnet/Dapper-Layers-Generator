@@ -89,6 +89,7 @@ namespace Dapper_Layers_Generator.Core
 
         private Task BuildRepoTasks(IServiceScope scope, IProgress<string> progress, List<string> selectedTableNames)
         {
+            var tab = _stringTransformation.IndentString;
 
             List<Task> tasksRepo = new();
             progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
@@ -110,33 +111,43 @@ namespace Dapper_Layers_Generator.Core
                 }
 
                 var outputRepoBaseMain = generatorRepoBaseMain.Generate();
-                var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
-                var outputAddBase = generatorAddBase.Generate();
+                var generatorGetAllBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
+                var outputGetAllBase = generatorGetAllBase.Generate();
+                
+                var generatorGetByPkBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPk>(tableName, scope);
+                var outputGetByPkBase = generatorGetByPkBase.Generate();
 
 
-                outputRepoBaseMain = outputRepoBaseMain + outputAddBase + $"{tab}}}{Environment.NewLine}}}";
+                outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
+
                 tasksRepo.Add(repoBaseTaskMain);
 
                 //DbProvider specific
                 foreach (var dbType in GlobalGeneratorSettings.TargetDbProviderForGeneration.Split(','))
                 {
                     string outputRepoMain = string.Empty;
-                    var outputAddSpec = string.Empty;
+                    var outputGetAllSpec = string.Empty;
+                    var outputGetByPkSpec = string.Empty;
+
                     string className = string.Empty;
+                    
                     if (dbType == "MySql")
                     {
                         var generatorRepoMain = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoMain>(tableName,scope);
                         outputRepoMain = generatorRepoMain.Generate();
                         className = generatorRepoMain.ClassName;
 
-                        var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
-                        outputAddSpec = generatorAddSpec.Generate();
+                        var generatorGetAllSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
+                        outputGetAllSpec = generatorGetAllSpec.Generate();
+
+                        var generatorGetByPkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPk>(tableName, scope);
+                        outputGetByPkSpec = generatorGetByPkSpec.Generate();
                     }
 
-                    outputRepoMain = outputRepoMain + outputAddSpec + $"{tab}}}{Environment.NewLine}}}";
+                    outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"

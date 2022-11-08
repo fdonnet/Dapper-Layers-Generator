@@ -145,6 +145,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorContextBase, GeneratorContextForBase>();
     services.AddScoped<IGeneratorRepoMain, GeneratorRepoMain>();
     services.AddScoped<IGeneratorRepoGetAll, GeneratorRepoGetAll>();
+    services.AddScoped<IGeneratorRepoGetByPk, GeneratorRepoGetByPk>();
 
     //MySql specific (db provider for source generation)
     //You will be able to generate the code for several db types... 
@@ -152,6 +153,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IMySqlGeneratorContext, MySqlGeneratorContext>();
     services.AddScoped<IMySqlGeneratorRepoMain, MySqlGeneratorRepoMain>();
     services.AddScoped<IMySqlGeneratorRepoGetAll, MySqlGeneratorRepoGetAll>();
+    services.AddScoped<IMySqlGeneratorRepoGetByPk, MySqlGeneratorRepoGetByPk>();
 
     //Service that depend on the dbprovider (in config to read db defintions)
     if (dbProvider == "MySql")

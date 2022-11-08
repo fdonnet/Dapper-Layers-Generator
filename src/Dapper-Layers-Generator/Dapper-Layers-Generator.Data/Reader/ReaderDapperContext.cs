@@ -13,7 +13,7 @@ namespace Dapper_Layers_Generator.Data.Reader
 
     public class ReaderDapperContext : IReaderDapperContext
     {
-        protected readonly IConfiguration? _config;
+        protected readonly IConfiguration _config;
 
         protected IDbConnection _cn = null!;
         protected string _schemas;
@@ -34,7 +34,14 @@ namespace Dapper_Layers_Generator.Data.Reader
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             _config = config;
-            _schemas = _config["DB:Schemas"];
+
+            if(_config["DB:Schemas"] == null)
+            {
+                throw new NullReferenceException("The DB:Schemas needs to be defined in the the configuration");
+            }
+
+            _schemas = _config["DB:Schemas"]!;
+
             DefaultTypeMap.MatchNamesWithUnderscores = true;
             SqlMapper.Settings.CommandTimeout = 60000;
         }

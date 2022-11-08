@@ -27,7 +27,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(@GetBaseSql());
+                output.Append(@GetBaseSqlForSelect()+ @""";");
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperCall());
@@ -52,25 +52,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 {tab}{tab}{{";
         }
 
-        protected string GetBaseSql()
-        {
-            var output = new StringBuilder();
 
-            output.Append(@$"{tab}{tab}{tab}var sql = @""
-{tab}{tab}{tab}SELECT {@GetColumnListString()}");
-            output.Append(Environment.NewLine);
-            output.Append(@$"{tab}{tab}{tab}FROM {ColAndTableIdentifier + Table.Name+ ColAndTableIdentifier}"";");
-
-            return output.ToString();
-
-        }
-
-        protected string GetColumnListString()
-        {
-            var output = string.Empty;
-            return String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},",
-                ColumnForGetOperations!.OrderBy(c => c.Position).Select(c => $"{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
-        }
 
         protected override string GetDapperCall()
         {
