@@ -39,7 +39,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(Environment.NewLine);
                 output.Append(@GetBaseSqlForSelect());
                 output.Append(Environment.NewLine);
-                output.Append(GetSqlWhereClause());
+                output.Append(GetSqlWhereClauseForPk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperCall());
@@ -70,21 +70,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     $"QuerySingleOrDefaultAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected virtual string GetSqlWhereClause()
-        {
-            var output = new StringBuilder();
 
-            output.Append($"{tab}{tab}{tab}WHERE ");
-
-            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", PkColumns.Select(col =>
-            {
-                return $"{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = @{col.Name}";
-            }));
-
-            output.Append(whereClause + "\";");
-            return output.ToString();
-
-        }
 
         protected virtual string GetDapperDynaParams()
         {

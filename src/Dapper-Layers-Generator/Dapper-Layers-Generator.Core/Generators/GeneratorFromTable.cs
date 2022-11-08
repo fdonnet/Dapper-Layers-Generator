@@ -23,6 +23,11 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected virtual string ColAndTableIdentifier { get; init; } = String.Empty;
         protected virtual bool IsBase { get; init; } = true;
 
+        protected IEnumerable<IColumn>? ColumnForGetOperations;
+        protected IEnumerable<IColumn>? ColumnForInsertOperations;
+        protected IEnumerable<IColumn>? ColumnForUpdateOperations;
+
+
         public GeneratorFromTable(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
@@ -30,6 +35,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 : base(settingsGlobal, data, stringTransformationService)
         {
             DataConverter = dataConverter;
+
         }
 
         public override abstract string Generate();
@@ -67,6 +73,18 @@ namespace Dapper_Layers_Generator.Core.Generators
                     }
                 }
             }
+
+            ColumnForGetOperations = Table.Columns != null
+                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForGet.Split(',').Contains(c.Name))
+                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
+
+            ColumnForInsertOperations = Table.Columns != null
+                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForAdd.Split(',').Contains(c.Name))
+                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
+
+            ColumnForUpdateOperations = Table.Columns != null
+                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForUpdate.Split(',').Contains(c.Name))
+                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
         }
 
         protected string GetPkMemberNamesString()

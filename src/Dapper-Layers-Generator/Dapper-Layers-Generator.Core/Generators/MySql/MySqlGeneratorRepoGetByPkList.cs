@@ -26,27 +26,19 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         protected override string GetSqlWhereClause()
         {
-            if (PkColumns.Count() > 1)
-               return string.Empty;
-
-            return base.GetSqlWhereClause();
-
+            return PkColumns.Count() > 1 ? string.Empty : base.GetSqlWhereClause();
         }
 
         protected override string GetDapperDynaParams()
         {
-            if (PkColumns.Count() > 1)
-                return @$"{tab}{tab}{{/*Not Implemented YET for mySQL !!!""";
-
-            return base.GetDapperDynaParams();
+            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Not Implemented YET for mySQL !!!""" : base.GetDapperDynaParams();
         }
 
         protected override string GetReturnObj()
         {
-            if (PkColumns.Count() > 1)
-                return $"-------------  */throw new NotImplementedException(\"Select by PKList with composite pk\");";
-
-            return base.GetReturnObj();
+            return PkColumns.Count() > 1
+                ? $"-------------  */throw new NotImplementedException(\"Select by PKList with composite pk\");"
+                : base.GetReturnObj();
         }
 
     }

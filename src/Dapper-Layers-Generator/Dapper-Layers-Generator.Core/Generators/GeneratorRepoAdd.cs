@@ -77,7 +77,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             var spParams = String.Join(Environment.NewLine, cols.OrderBy(c=>c.Position).Select(col =>
             {
-                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
+                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
             }));
 
             output.Append(spParams);

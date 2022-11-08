@@ -11,35 +11,18 @@ namespace Dapper_Layers_Generator.Core.Generators
 {
     public abstract class GeneratorForOperations : GeneratorFromTable
     {
-        protected IEnumerable<IColumn>? ColumnForGetOperations;
-        protected IEnumerable<IColumn>? ColumnForInsertOperations;
-
         public GeneratorForOperations(SettingsGlobal settingsGlobal
            , IReaderDBDefinitionService data
            , StringTransformationService stringTransformationService
            , IDataTypeConverter dataConverter)
                : base(settingsGlobal, data, stringTransformationService, dataConverter)
         {
-            
-        }
-
-        public override void SetTable(string tableName)
-        {
-            base.SetTable(tableName);
-
-            ColumnForGetOperations = Table.Columns != null
-                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForGet.Split(',').Contains(c.Name))
-                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
-
-            ColumnForInsertOperations = Table.Columns != null
-                ? Table.Columns.Where(c=> !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForAdd.Split(',').Contains(c.Name))
-                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
 
         }
 
         protected string GetBaseSqlForSelect()
         {
-            if(ColumnForGetOperations == null || !ColumnForGetOperations.Any())
+            if (ColumnForGetOperations == null || !ColumnForGetOperations.Any())
                 throw new ArgumentException($"No column available for select for this table{Table.Name}, genererator crash");
 
             var output = new StringBuilder();
@@ -52,6 +35,8 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
 
         }
+
+        //Can maybe be used for BULK
         protected string GetBaseSqlForInsert()
         {
             if (ColumnForInsertOperations == null || !ColumnForInsertOperations.Any())
@@ -90,6 +75,22 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             return String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},",
                 cols!.OrderBy(c => c.Position).Select(c => $"{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
+        }
+
+        protected virtual string GetSqlWhereClauseForPk()
+        {
+            var output = new StringBuilder();
+
+            output.Append($"{tab}{tab}{tab}WHERE ");
+
+            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", PkColumns.Select(col =>
+            {
+                return $"{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = @{col.Name}";
+            }));
+
+            output.Append(whereClause + "\";");
+            return output.ToString();
+
         }
 
 

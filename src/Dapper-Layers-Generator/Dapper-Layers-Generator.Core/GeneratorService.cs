@@ -136,8 +136,13 @@ namespace Dapper_Layers_Generator.Core
                 var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoAdd>(tableName, scope);
                 var outputAddBase = generatorAddBase.Generate();
 
+                //Update base
+                outputAddBase = !string.IsNullOrEmpty(outputAddBase) ? outputAddBase + Environment.NewLine : string.Empty;
+                var generatorUpdateBase = _generatorsProvider.GetGenerator<IGeneratorRepoUpdate>(tableName, scope);
+                var outputUpdateBase = generatorUpdateBase.Generate();
+
                 outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + outputGetByPkListBase
-                    + outputGetByUkBase + outputAddBase + $"{tab}}}{Environment.NewLine}}}";
+                    + outputGetByUkBase + outputAddBase + outputUpdateBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
@@ -153,6 +158,7 @@ namespace Dapper_Layers_Generator.Core
                     var outputGetByPkListSpec = string.Empty;
                     var outputGetByUkSpec = string.Empty;
                     var outputAddSpec = string.Empty;
+                    var outputUpdateSpec = string.Empty;
 
                     string className = string.Empty;
                     
@@ -186,10 +192,15 @@ namespace Dapper_Layers_Generator.Core
                         outputGetByUkSpec = !string.IsNullOrEmpty(outputGetByUkSpec) ? outputGetByUkSpec + Environment.NewLine : string.Empty;
                         var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAdd>(tableName, scope);
                         outputAddSpec = generatorAddSpec.Generate();
+
+                        //Update
+                        outputAddSpec = !string.IsNullOrEmpty(outputAddSpec) ? outputAddSpec + Environment.NewLine : string.Empty;
+                        var generatorUpdateSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoUpdate>(tableName, scope);
+                        outputUpdateSpec = generatorUpdateSpec.Generate();
                     }
 
                     outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + outputGetByPkListSpec 
-                        + outputGetByUkSpec + outputAddSpec + $"{tab}}}{Environment.NewLine}}}";
+                        + outputGetByUkSpec + outputAddSpec + outputUpdateSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"
