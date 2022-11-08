@@ -31,8 +31,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParams() + @""";");
+                output.Append(GetDapperDynaParams());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetBaseSqlForSelect());
@@ -76,9 +75,10 @@ namespace Dapper_Layers_Generator.Core.Generators
 
             var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", PkColumns.Select(col =>
             {
-                return $"{col.Name} = @{_stringTransform.ApplyConfigTransformMember(col.Name)}";
+                return $"{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = @{col.Name}";
             }));
 
+            output.Append(whereClause + "\";");
             return output.ToString();
 
         }
@@ -86,7 +86,7 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected virtual string GetDapperDynaParams()
         {
             var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var p = DynamicParameters();");
+            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
             output.Append(Environment.NewLine);
 
             var spParams = String.Join(Environment.NewLine, PkColumns.Select(col =>
@@ -94,7 +94,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(col.Name)});";
             }));
 
-            output.Append(Environment.NewLine);
+            output.Append(spParams);
             return output.ToString();
         }
 

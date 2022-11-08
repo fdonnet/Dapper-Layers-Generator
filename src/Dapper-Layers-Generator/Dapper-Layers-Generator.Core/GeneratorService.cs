@@ -111,9 +111,12 @@ namespace Dapper_Layers_Generator.Core
                 }
 
                 var outputRepoBaseMain = generatorRepoBaseMain.Generate();
+
                 var generatorGetAllBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
                 var outputGetAllBase = generatorGetAllBase.Generate();
-                
+
+                outputGetAllBase = !string.IsNullOrEmpty(outputGetAllBase) ? outputGetAllBase + Environment.NewLine : string.Empty;
+
                 var generatorGetByPkBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPk>(tableName, scope);
                 var outputGetByPkBase = generatorGetByPkBase.Generate();
 
@@ -138,10 +141,13 @@ namespace Dapper_Layers_Generator.Core
                     {
                         var generatorRepoMain = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoMain>(tableName,scope);
                         outputRepoMain = generatorRepoMain.Generate();
+
                         className = generatorRepoMain.ClassName;
 
                         var generatorGetAllSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
                         outputGetAllSpec = generatorGetAllSpec.Generate();
+
+                        outputGetAllSpec = !string.IsNullOrEmpty(outputGetAllSpec) ? outputGetAllSpec + Environment.NewLine : string.Empty;
 
                         var generatorGetByPkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPk>(tableName, scope);
                         outputGetByPkSpec = generatorGetByPkSpec.Generate();
