@@ -21,7 +21,7 @@ internal partial class ConsoleService
         _dataService = dataService;
         _generatorService = generatorService;
         _config = config;
-        _generatorService.GlobalGeneratorSettings.SelectedSchema = _config["DB:Schemas"].Split(",")[0];
+        _generatorService.GlobalGeneratorSettings.SelectedSchema = _config["DB:Schemas"]!.Split(",")[0];
         _settings = settingsGlobal;
     }
 
@@ -31,7 +31,7 @@ internal partial class ConsoleService
         {
             AnsiConsole.Clear();
             //TMP CODING
-            await _settings.LoadFromFile(@"c:\temp\config.json");
+            //await _settings.LoadFromFile(@"c:\temp\config.json");
 
             await AnsiConsole.Status()
                  .StartAsync(
