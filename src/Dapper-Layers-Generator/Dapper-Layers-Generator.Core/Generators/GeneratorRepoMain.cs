@@ -75,9 +75,7 @@ namespace {_settings.TargetNamespaceForRepo}
         private string WriteUsingStatements()
         {
             string output = $@"using {_settings.TargetNamespaceForPOCO};
-using System.Data;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using {_settings.TargetNamespaceForDbContext};
 {UsingDbProviderSpecific}
 
