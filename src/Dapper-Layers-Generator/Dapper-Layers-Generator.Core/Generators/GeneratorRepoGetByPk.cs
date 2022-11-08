@@ -26,7 +26,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override string Generate()
         {
-            if (TableSettings.GetAllGenerator)
+            if (TableSettings.GetByPkGenerator)
             {
                 if (PkColumns.Count() == 0)
                     throw new ArgumentException($"You cannot run the Get by Pk Generator for table {Table.Name}, no pk defined");

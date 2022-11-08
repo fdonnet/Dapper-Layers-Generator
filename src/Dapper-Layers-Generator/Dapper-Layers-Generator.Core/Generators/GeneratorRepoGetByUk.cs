@@ -1,20 +1,24 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using Dapper_Layers_Generator.Data.POCO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public interface IGeneratorRepoGetByPkList : IGeneratorFromTable
+    public interface IGeneratorRepoGetByUk : IGeneratorFromTable
     {
 
     }
-    public class GeneratorRepoGetByPkList : GeneratorForOperations, IGeneratorRepoGetByPkList
+    public class GeneratorRepoGetByUk : GeneratorForOperations, IGeneratorRepoGetByUk
     {
-        public GeneratorRepoGetByPkList(SettingsGlobal settingsGlobal
+        protected KeyValuePair<string, List<IColumn>> _currentIndex;
+
+        public GeneratorRepoGetByUk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)
@@ -22,15 +26,17 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
 
         }
+
         public override string Generate()
         {
-            if (TableSettings.GetByPkListGenerator)
+            if (TableSettings.GetByUkGenerator && ColumnNamesByIndexNameDic.Any())
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
 
-                if (PkColumns.Count() == 1 || !IsBase)
+                foreach (var index in ColumnNamesByIndexNameDic)
                 {
+                    _currentIndex = index;
+                    output.Append(GetMethodDef());
                     output.Append(Environment.NewLine);
                     output.Append(GetDapperDynaParams());
                     output.Append(Environment.NewLine);
@@ -46,9 +52,9 @@ namespace Dapper_Layers_Generator.Core.Generators
                     output.Append(GetReturnObj());
                     output.Append(Environment.NewLine);
                     output.Append($"{tab}{tab}}}");
+                    output.Append(Environment.NewLine);
                 }
 
-                output.Append(Environment.NewLine);
                 return output.ToString();
             }
 
@@ -57,20 +63,16 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return PkColumns.Count() > 1
-                ? $"{tab}{tab}public {(IsBase ? "abstract" : "override")} " +
-                        $"Task<IEnumerable<{ClassName}>> GetByListOf{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
-                : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
-                $"async Task<IEnumerable<{ClassName}>> GetByListOf{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()})" +
+            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}> GetBy{GetUkMemberNamesString(_currentIndex.Key)}Async({GetUkMemberNamesStringAndType(_currentIndex.Key)})" +
                 @$"
 {tab}{tab}{{";
         }
 
         protected override string GetDapperCall()
         {
-            return $"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = " +
+            return $"{tab}{tab}{tab}var {ClassName.ToLower()} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"QueryAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
+                    $"QuerySingleOrDefaultAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
         protected virtual string GetSqlWhereClause()
@@ -78,16 +80,15 @@ namespace Dapper_Layers_Generator.Core.Generators
             var output = new StringBuilder();
 
             output.Append($"{tab}{tab}{tab}WHERE ");
-            output.Append($"{ColAndTableIdentifier}{PkColumns.First().Name}{ColAndTableIdentifier} IN @listOf");
 
-            output.Append("\";");
+            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", _currentIndex.Value.Select(col =>
+            {
+                return $"{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = @{col.Name}";
+            }));
+
+            output.Append(whereClause + "\";");
             return output.ToString();
 
-        }
-
-        protected override string GetReturnObj()
-        {
-            return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
         }
 
         protected virtual string GetDapperDynaParams()
@@ -96,10 +97,18 @@ namespace Dapper_Layers_Generator.Core.Generators
             output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
             output.Append(Environment.NewLine);
 
-            output.Append($@"{tab}{tab}{tab}p.Add(""@listOf"",{GetPKMemberNamesStringList()});");
+            var spParams = String.Join(Environment.NewLine, _currentIndex.Value.Select(col =>
+            {
+                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(col.Name)});";
+            }));
 
+            output.Append(spParams);
             return output.ToString();
         }
 
+        protected override string GetReturnObj()
+        {
+            return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
+        }
     }
 }

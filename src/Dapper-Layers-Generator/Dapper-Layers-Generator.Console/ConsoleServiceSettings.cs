@@ -13,7 +13,7 @@ internal partial class ConsoleService
 
         //Set first schema from config
         globalSettings.SelectedSchema = string.IsNullOrEmpty(_generatorService.GlobalGeneratorSettings.SelectedSchema)
-             ? globalSettings.SelectedSchema = _config["DB:Schemas"].Split(",")[0]
+             ? globalSettings.SelectedSchema = _config["DB:Schemas"]!.Split(",")[0]
              : globalSettings.SelectedSchema;
 
         //Init settings div
@@ -44,7 +44,7 @@ internal partial class ConsoleService
                     newValue = AnsiConsole.Prompt(
                              new SelectionPrompt<string>()
                                  .Title("Choose at least one schema to be generated: ")
-                                 .AddChoices(_config["DB:Schemas"].Split(",")));
+                                 .AddChoices(_config["DB:Schemas"]!.Split(",")));
                     globalSettings = (SettingsGlobal)UISettingsHelper.SetSettingsStringValue(globalSettings, dic[intValue].PropertyName, newValue);
                     break;
                 case "TargetProjectNamespace":

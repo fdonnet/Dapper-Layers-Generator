@@ -88,8 +88,8 @@ using {_settings.TargetNamespaceForDbContext};
         private string WriteClass()
         {
 
-            if (string.IsNullOrEmpty(DbProviderString))
-                return @$"
+            return string.IsNullOrEmpty(DbProviderString)
+                ? @$"
 {tab}public abstract partial class {ClassName}RepoBase : I{ClassName}Repo
 {tab}{{
 {tab}{tab}protected readonly I{_settings.DbContextClassName} _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)};
@@ -99,9 +99,8 @@ using {_settings.TargetNamespaceForDbContext};
 {tab}{tab}{tab}_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)} = {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)};
 {tab}{tab}}}
 
-";
-            else
-                return @$"
+"
+                : @$"
 {tab}public partial class {ClassName}Repo{DbProviderString} : {ClassName}RepoBase, I{ClassName}Repo
 {tab}{{
 {tab}{tab}public {ClassName}Repo{DbProviderString}(I{_settings.DbContextClassName} {_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}): base ({_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)})
