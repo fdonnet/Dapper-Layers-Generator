@@ -10,11 +10,13 @@ using Dapper_Layers_Generator.Data.Reader.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
+using System.Reflection;
 
 ServiceProvider? _builder = null;
 string? _dbProviderToReadDBDef = string.Empty;
 
 IConfiguration? _config = new ConfigurationBuilder()
+        .SetBasePath(Environment.CurrentDirectory)
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
         .AddUserSecrets<Program>()
         .AddEnvironmentVariables()

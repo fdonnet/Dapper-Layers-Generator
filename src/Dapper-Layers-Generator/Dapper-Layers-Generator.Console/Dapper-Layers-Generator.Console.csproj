@@ -22,4 +22,10 @@
     <ProjectReference Include="..\Dapper-Layers-Generator.Data\Dapper-Layers-Generator.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
