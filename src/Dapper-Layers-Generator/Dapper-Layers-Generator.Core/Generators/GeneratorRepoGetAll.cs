@@ -34,7 +34,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};");
+                output.Append(GetReturnObj());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -53,12 +53,16 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
 
 
-
         protected override string GetDapperCall()
         {
             return  $"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"QueryAsync<{ClassName}>(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
+        }
+
+        protected override string GetReturnObj()
+        {
+            return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
         }
 
     }

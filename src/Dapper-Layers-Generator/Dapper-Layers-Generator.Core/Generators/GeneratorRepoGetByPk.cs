@@ -28,6 +28,9 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.GetAllGenerator)
             {
+                if (PkColumns.Count() == 0)
+                    throw new ArgumentException($"You cannot run the Get by Pk Generator for table {Table.Name}, no pk defined");
+
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
                 output.Append(Environment.NewLine);
@@ -42,7 +45,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(GetDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}{tab}return {ClassName.ToLower()};");
+                output.Append(GetReturnObj());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -98,7 +101,10 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
         }
 
-        
+        protected override string GetReturnObj()
+        {
+            return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
+        }
 
     }
 }

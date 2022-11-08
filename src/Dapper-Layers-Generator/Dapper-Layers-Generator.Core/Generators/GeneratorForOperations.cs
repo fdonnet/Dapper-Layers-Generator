@@ -54,5 +54,6 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected abstract string GetMethodDef();
         protected abstract string GetDapperCall();
+        protected abstract string GetReturnObj();
     }
 }

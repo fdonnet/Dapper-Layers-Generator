@@ -127,6 +127,20 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output;
         }
 
+        protected string GetPKMemberNamesStringList()
+        {
+            string varName = string.Empty;
+            if (PkColumns.Count() > 1)
+            {
+                varName = string.Join("And", PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)));
+            }
+            else
+                varName = PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)).First()!;
+
+            return "listOf" + varName;
+
+        }
+
         protected string GetColumnDotNetType(IColumn column)
         {
             var colSettings = TableSettings.GetColumnSettings(column.Name);

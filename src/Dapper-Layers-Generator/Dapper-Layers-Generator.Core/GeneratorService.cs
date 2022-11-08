@@ -112,16 +112,22 @@ namespace Dapper_Layers_Generator.Core
 
                 var outputRepoBaseMain = generatorRepoBaseMain.Generate();
 
+                //Get all base
                 var generatorGetAllBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
                 var outputGetAllBase = generatorGetAllBase.Generate();
 
+                //Get by PK base
                 outputGetAllBase = !string.IsNullOrEmpty(outputGetAllBase) ? outputGetAllBase + Environment.NewLine : string.Empty;
-
                 var generatorGetByPkBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPk>(tableName, scope);
                 var outputGetByPkBase = generatorGetByPkBase.Generate();
 
+                //Get by PK list base
+                outputGetByPkBase = !string.IsNullOrEmpty(outputGetByPkBase) ? outputGetByPkBase + Environment.NewLine : string.Empty;
+                var generatorGetByPkListBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPkList>(tableName, scope);
+                var outputGetByPkListBase = generatorGetByPkListBase.Generate();
 
-                outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + $"{tab}}}{Environment.NewLine}}}";
+
+                outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + outputGetByPkListBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
@@ -134,6 +140,7 @@ namespace Dapper_Layers_Generator.Core
                     string outputRepoMain = string.Empty;
                     var outputGetAllSpec = string.Empty;
                     var outputGetByPkSpec = string.Empty;
+                    var outputGetByPkListSpec = string.Empty;
 
                     string className = string.Empty;
                     
@@ -144,16 +151,22 @@ namespace Dapper_Layers_Generator.Core
 
                         className = generatorRepoMain.ClassName;
 
+                        //Get all
                         var generatorGetAllSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
                         outputGetAllSpec = generatorGetAllSpec.Generate();
 
+                        //Get by pk
                         outputGetAllSpec = !string.IsNullOrEmpty(outputGetAllSpec) ? outputGetAllSpec + Environment.NewLine : string.Empty;
-
                         var generatorGetByPkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPk>(tableName, scope);
                         outputGetByPkSpec = generatorGetByPkSpec.Generate();
+
+                        //Get by pk list
+                        outputGetByPkSpec = !string.IsNullOrEmpty(outputGetByPkSpec) ? outputGetByPkSpec + Environment.NewLine : string.Empty;
+                        var generatorGetByPkListSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPkList>(tableName, scope);
+                        outputGetByPkListSpec = generatorGetByPkListSpec.Generate();
                     }
 
-                    outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + $"{tab}}}{Environment.NewLine}}}";
+                    outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + outputGetByPkListSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"
