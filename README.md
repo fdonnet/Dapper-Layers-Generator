@@ -29,7 +29,7 @@ Set the mandatory configs in appsettings or environnement or usersecrets
 Set at least the following configs
 - (3) Author name: your name
 - (4) Target project namespace: the main namespace for your generated code
-- (8) Target project path: physical path (where you want to generate) => don't forget the last backslash "\"
+- (8) Target project path: physical path (where you want to generate) => don't forget the last backslash "\\"
 
 Check all the path specified exist on your file system. The generator will not create the folder structure.
 
