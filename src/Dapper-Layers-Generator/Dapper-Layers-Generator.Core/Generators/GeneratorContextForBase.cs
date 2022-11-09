@@ -79,7 +79,7 @@ using {_settings.TargetNamespaceForRepo};
             builder.Append($@"{tab}{tab}IDbConnection Connection {{ get; }}
 {tab}{tab}IDbTransaction? Transaction {{ get; }}
 
-{tab}{tab}Task<IDbTransaction> OpenTransactionAsync(IsolationLevel? level);
+{tab}{tab}Task<IDbTransaction> OpenTransactionAsync(IsolationLevel? level = null);
 {tab}{tab}void CommitTransaction(bool disposeTrans = true);
 {tab}{tab}void RollbackTransaction(bool disposeTrans = true);");
             builder.Append(Environment.NewLine);
