@@ -74,5 +74,11 @@ dal.CommitTransaction();
 
 Open an issue if you have specific questions or if you detect an issue !
 
+And love for
 
+https://github.com/DapperLib/Dapper
+
+https://github.com/spectreconsole/spectre.console
+
+https://github.com/Humanizr/Humanizer
 
