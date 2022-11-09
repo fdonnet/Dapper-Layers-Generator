@@ -70,7 +70,7 @@ int newFailureId = await dal.FailureRepo.AddAsync(new Failure() { Description="F
 dal.CommitTransaction();
 ```
 
-## If you want to extent the generate code, create a new file a declare a partial class with the same name as the class you want to extent !
+## If you want to extent the generated code, create a new file and declare a partial class with the same name as the class you want to extent !
 
 Open an issue if you have specific questions or if you detect an issue !
 
