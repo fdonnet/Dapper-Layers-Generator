@@ -152,9 +152,9 @@ using {_settings.TargetNamespaceForDbContext};
             }
 
             //By unique indexes
-            if(TableSettings.GetByUkGenerator && ColumnNamesByIndexNameDic.Any())
+            if (TableSettings.GetByUkGenerator && ColumnNamesByIndexNameDic.Any())
             {
-                foreach(var index in ColumnNamesByIndexNameDic)
+                foreach (var index in ColumnNamesByIndexNameDic)
                 {
                     output.Append($"{tab}{tab}Task<{ClassName}> GetBy{GetUkMemberNamesString(index.Key)}Async({GetUkMemberNamesStringAndType(index.Key)});");
                     output.Append(Environment.NewLine);
@@ -162,14 +162,19 @@ using {_settings.TargetNamespaceForDbContext};
             }
 
             //Add
-            if(TableSettings.AddGenerator)
+            if (TableSettings.AddGenerator)
             {
-                output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
+                    output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                            $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
+                else
+                    output.Append($"{tab}{tab}Task AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
                     $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
+
 
                 output.Append(Environment.NewLine);
             }
-            
+
             //Update
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
