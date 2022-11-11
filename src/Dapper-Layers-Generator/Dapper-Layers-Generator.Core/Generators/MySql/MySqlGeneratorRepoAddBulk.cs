@@ -129,7 +129,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }
 
-        protected override string GetCloseTransaction()
+        protected virtual string GetCloseTransaction()
         {
             return $@"{tab}{tab}{tab}if (!isTransAlreadyOpen)
 {tab}{tab}{tab}{{
