@@ -3,6 +3,7 @@
     public interface IDataTypeConverter
     {
         string GetDotNetDataType(string sqlDataTypeName, bool nullable = false);
+        string GetSqlType(string sqlDataTypeName);
     }
 
     public abstract class DataTypeConverter
@@ -26,8 +27,8 @@
                 "real" => "single" + (nullable ? "?" : ""),
                 "smallint" => "short" + (nullable ? "?" : ""),
                 "smallint unsigned" => "ushort" + (nullable ? "?" : ""),
-                "tinyint" => "byte" + (nullable ? "?" : ""),
-                "tinyint unsigned" => "byte" + (nullable ? "?" : ""),
+                "tinyint" => "bool" + (nullable ? "?" : ""), //VERY BAD for mySQL tinyint(1)
+                "tinyint unsigned" => "byte" + (nullable ? "?" : ""), 
                 "uniqueidentifier" => "System.Guid" + (nullable ? "?" : ""),
                 "date" => "DateTime" + (nullable ? "?" : ""),
                 "datetime" or "smalldatetime" or "time" or "timestamp" => "DateTime" + (nullable ? "?" : ""),
@@ -73,7 +74,7 @@
                 case "smallint":
                     return "SqlInt16";
                 case "tinyint":
-                    return "SqlByte";
+                    return "SqlBoolean";
                 case "uniqueidentifier":
                     return "SqlGuid";
                 case "date":

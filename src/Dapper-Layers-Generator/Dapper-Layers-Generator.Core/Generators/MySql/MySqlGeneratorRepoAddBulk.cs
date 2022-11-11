@@ -79,8 +79,16 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             var rowsAdd = new List<string>();
             foreach(var colBulk in columnsForBulk)
             {
-                output.Append($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"");" + Environment.NewLine);
-                rowsAdd.Add($@"{tab}{tab}{tab}{tab}r[""{colBulk.Name}""] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
+                output.Append($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));" + Environment.NewLine);
+                if(colBulk.IsNullable)
+                {
+                    output.Append($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;" + Environment.NewLine);
+                    rowsAdd.Add($@"{tab}{tab}{tab}{tab}r[""{colBulk.Name}""] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)} == null ? DBNull.Value : {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
+                }
+                else
+                {
+                    rowsAdd.Add($@"{tab}{tab}{tab}{tab}r[""{colBulk.Name}""] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
+                }
             }
 
             output.Append(Environment.NewLine);
