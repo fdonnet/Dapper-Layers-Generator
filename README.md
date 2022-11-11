@@ -1,3 +1,6 @@
+Bulk insert with MySqlBulk copy is ready in the main branch (use it with batching send 500/1000/1500 rows). Will make a release when bulkupdate is ready too..
+
+
 # Fast first run Dapper-Layers-Generator
 ## Config
 Set the mandatory configs in appsettings or environnement or usersecrets
