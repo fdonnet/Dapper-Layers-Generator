@@ -19,8 +19,9 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService) : base(settingsGlobal, data, stringTransformationService)
         {
-            UsingDbProviderSpecific = "using MySql.Data.MySqlClient;";
-            ConnectionStringInject = $@"Connection = new MySqlConnection(_config.GetConnectionString(""{_settings.ConnectionStringName}""));";
+            UsingDbProviderSpecific = "using MySqlConnector;";
+            //Allow bulk
+            ConnectionStringInject = $@"Connection = new MySqlConnection(_config.GetConnectionString(""{_settings.ConnectionStringName}"") + "";AllowLoadLocalInfile=True"");";
             DapperDefaultMapStrat = "DefaultTypeMap.MatchNamesWithUnderscores = true;";
             DapperCommandTimeOut = "SqlMapper.Settings.CommandTimeout = 60000;";
             DbProviderString = "MySql";

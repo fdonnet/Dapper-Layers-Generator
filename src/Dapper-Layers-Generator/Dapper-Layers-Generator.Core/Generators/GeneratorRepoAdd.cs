@@ -54,12 +54,12 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected override string GetMethodDef()
         {
             if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
-                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{GetPkMemberTypes()}> AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{GetPkMemberTypes()}> AddAsync({ClassName} " +
                         $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
                     @$"
 {tab}{tab}{{";
             else
-                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync({ClassName} " +
                 $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
             @$"
 {tab}{tab}{{";

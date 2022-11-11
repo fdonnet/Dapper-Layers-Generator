@@ -165,12 +165,30 @@ using {_settings.TargetNamespaceForDbContext};
             if (TableSettings.AddGenerator)
             {
                 if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
-                    output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                    output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({ClassName} " +
                             $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
                 else
-                    output.Append($"{tab}{tab}Task AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                    output.Append($"{tab}{tab}Task AddAsync({ClassName} " +
                     $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
 
+
+                output.Append(Environment.NewLine);
+            }
+
+            //Add multi
+            if (TableSettings.AddMultiGenerator)
+            {
+                output.Append($"{tab}{tab}Task AddAsync(IEnumerable<{ClassName}> " +
+                $"{_stringTransform.PluralizeToLower(ClassName)});");
+
+                output.Append(Environment.NewLine);
+            }
+
+            //Add bulk
+            if (TableSettings.AddBulkGenerator)
+            {
+                output.Append($"{tab}{tab}Task AddBulkAsync(IEnumerable<{ClassName}> " +
+                $"{_stringTransform.PluralizeToLower(ClassName)});");
 
                 output.Append(Environment.NewLine);
             }
@@ -178,7 +196,7 @@ using {_settings.TargetNamespaceForDbContext};
             //Update
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
-                output.Append($"{tab}{tab}Task UpdateAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                output.Append($"{tab}{tab}Task UpdateAsync({ClassName} " +
                     $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
 
                 output.Append(Environment.NewLine);
