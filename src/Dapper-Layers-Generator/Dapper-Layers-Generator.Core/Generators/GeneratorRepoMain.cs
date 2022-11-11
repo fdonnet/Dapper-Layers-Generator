@@ -175,6 +175,15 @@ using {_settings.TargetNamespaceForDbContext};
                 output.Append(Environment.NewLine);
             }
 
+            //Add multi
+            if (TableSettings.AddMultiGenerator)
+            {
+                output.Append($"{tab}{tab}Task AddAsync(IEnumerable<{_stringTransform.PluralizeToLower(ClassName)}> " +
+                $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
+
+                output.Append(Environment.NewLine);
+            }
+
             //Update
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {

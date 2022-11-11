@@ -16,6 +16,10 @@ namespace Dapper_Layers_Generator.Core
         Task GenerateAsync(IProgress<string> progress);
     }
 
+
+    /// <summary>
+    /// TODO NEEED to rewrite it is UGLY 
+    /// </summary>
     public class GeneratorService : IGeneratorService
     {
         public SettingsGlobal GlobalGeneratorSettings { get; set; }
@@ -136,8 +140,13 @@ namespace Dapper_Layers_Generator.Core
                 var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoAdd>(tableName, scope);
                 var outputAddBase = generatorAddBase.Generate();
 
-                //Update base
+                //Add Multi base
                 outputAddBase = !string.IsNullOrEmpty(outputAddBase) ? outputAddBase + Environment.NewLine : string.Empty;
+                var generatorAddMultiBase = _generatorsProvider.GetGenerator<IGeneratorRepoAddMulti>(tableName, scope);
+                var outputAddMultiBase = generatorAddMultiBase.Generate();
+
+                //Update base
+                outputAddMultiBase = !string.IsNullOrEmpty(outputAddMultiBase) ? outputAddMultiBase + Environment.NewLine : string.Empty;
                 var generatorUpdateBase = _generatorsProvider.GetGenerator<IGeneratorRepoUpdate>(tableName, scope);
                 var outputUpdateBase = generatorUpdateBase.Generate();
 
@@ -147,7 +156,7 @@ namespace Dapper_Layers_Generator.Core
                 var outputDeleteBase = generatorDeleteBase.Generate();
 
                 outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + outputGetByPkListBase
-                    + outputGetByUkBase + outputAddBase + outputUpdateBase + outputDeleteBase + $"{tab}}}{Environment.NewLine}}}";
+                    + outputGetByUkBase + outputAddBase + outputAddMultiBase + outputUpdateBase + outputDeleteBase + $"{tab}}}{Environment.NewLine}}}";
                 var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                     $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
                                     , outputRepoBaseMain, "RepoGenerator", progress);
@@ -163,6 +172,7 @@ namespace Dapper_Layers_Generator.Core
                     var outputGetByPkListSpec = string.Empty;
                     var outputGetByUkSpec = string.Empty;
                     var outputAddSpec = string.Empty;
+                    var outputAddMultiSpec = string.Empty;
                     var outputUpdateSpec = string.Empty;
                     var outputDeleteSpec = string.Empty;
 
@@ -199,8 +209,13 @@ namespace Dapper_Layers_Generator.Core
                         var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAdd>(tableName, scope);
                         outputAddSpec = generatorAddSpec.Generate();
 
-                        //Update
+                        //Add multi
                         outputAddSpec = !string.IsNullOrEmpty(outputAddSpec) ? outputAddSpec + Environment.NewLine : string.Empty;
+                        var generatorAddMultiSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAddMulti>(tableName, scope);
+                        outputAddMultiSpec = generatorAddMultiSpec.Generate();
+
+                        //Update
+                        outputAddMultiSpec = !string.IsNullOrEmpty(outputAddMultiSpec) ? outputAddMultiSpec + Environment.NewLine : string.Empty;
                         var generatorUpdateSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoUpdate>(tableName, scope);
                         outputUpdateSpec = generatorUpdateSpec.Generate();
 
@@ -211,7 +226,7 @@ namespace Dapper_Layers_Generator.Core
                     }
 
                     outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + outputGetByPkListSpec 
-                        + outputGetByUkSpec + outputAddSpec + outputUpdateSpec + outputDeleteSpec + $"{tab}}}{Environment.NewLine}}}";
+                        + outputGetByUkSpec + outputAddSpec + outputAddMultiSpec + outputUpdateSpec + outputDeleteSpec + $"{tab}}}{Environment.NewLine}}}";
 
                     var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
                                 $"{className}Repo{dbType}.cs"
