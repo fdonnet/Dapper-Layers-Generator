@@ -35,14 +35,14 @@
         [SettingsAttribute(Message = "Enable add function generator (multi-insert): ", Position = 11, Group = "Generator")]
         public bool AddMultiGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update function generator: ", Position = 12, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable add bulk function generator: ", Position = 12, Group = "Generator")]
+        public bool AddBulkGenerator { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable update function generator: ", Position = 13, Group = "Generator")]
         public bool UpdateGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 13, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 14, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
-
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable add bulk function generator: ", Position = 14, Group = "Generator")]
-        public bool AddBulkGenerator { get; set; } = false;
 
         [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 15, Group = "Generator")]
         public bool UpdateBulkGenerator { get; set; } = false;

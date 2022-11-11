@@ -19,7 +19,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             , IDataTypeConverter dataConverter) : base(settingsGlobal, data, stringTransformationService, dataConverter)
         {
 
-            UsingDbProviderSpecific = string.Empty;
+            UsingDbProviderSpecific = "using MySqlConnector;" + Environment.NewLine + "using System.Data;";
             DbProviderString = "MySql";
         }
 

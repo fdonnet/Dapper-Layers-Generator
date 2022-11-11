@@ -184,6 +184,15 @@ using {_settings.TargetNamespaceForDbContext};
                 output.Append(Environment.NewLine);
             }
 
+            //Add bulk
+            if (TableSettings.AddBulkGenerator)
+            {
+                output.Append($"{tab}{tab}Task AddBulkAsync(IEnumerable<{ClassName}> " +
+                $"{_stringTransform.PluralizeToLower(ClassName)});");
+
+                output.Append(Environment.NewLine);
+            }
+
             //Update
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {

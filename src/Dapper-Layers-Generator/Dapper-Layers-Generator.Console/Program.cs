@@ -152,6 +152,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorRepoGetByUk, GeneratorRepoGetByUk>();
     services.AddScoped<IGeneratorRepoAdd, GeneratorRepoAdd>();
     services.AddScoped<IGeneratorRepoAddMulti, GeneratorRepoAddMulti>();
+    services.AddScoped<IGeneratorRepoAddBulk, GeneratorRepoAddBulk>();
     services.AddScoped<IGeneratorRepoUpdate, GeneratorRepoUpdate>();
     services.AddScoped<IGeneratorRepoDelete, GeneratorRepoDelete>();
 
@@ -166,6 +167,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IMySqlGeneratorRepoGetByUk, MySqlGeneratorRepoGetByUk>();
     services.AddScoped<IMySqlGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
     services.AddScoped<IMySqlGeneratorRepoAddMulti, MySqlGeneratorRepoAddMulti>();
+    services.AddScoped<IMySqlGeneratorRepoAddBulk, MySqlGeneratorRepoAddBulk>();
     services.AddScoped<IMySqlGeneratorRepoUpdate, MySqlGeneratorRepoUpdate>();
     services.AddScoped<IMySqlGeneratorRepoDelete, MySqlGeneratorRepoDelete>();
 
