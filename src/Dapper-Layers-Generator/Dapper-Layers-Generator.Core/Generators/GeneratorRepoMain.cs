@@ -187,7 +187,7 @@ using {_settings.TargetNamespaceForDbContext};
             //Update
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
-                output.Append($"{tab}{tab}Task UpdateAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                output.Append($"{tab}{tab}Task UpdateAsync({ClassName} " +
                     $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
 
                 output.Append(Environment.NewLine);

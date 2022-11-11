@@ -50,7 +50,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task UpdateAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task UpdateAsync({ClassName} " +
                    $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
                 @$"
 {tab}{tab}{{";
