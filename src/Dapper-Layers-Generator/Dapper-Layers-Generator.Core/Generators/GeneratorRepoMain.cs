@@ -165,10 +165,10 @@ using {_settings.TargetNamespaceForDbContext};
             if (TableSettings.AddGenerator)
             {
                 if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
-                    output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                    output.Append($"{tab}{tab}Task<{GetPkMemberTypes()}> AddAsync({ClassName} " +
                             $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
                 else
-                    output.Append($"{tab}{tab}Task AddAsync({_stringTransform.ApplyConfigTransformClass(ClassName)} " +
+                    output.Append($"{tab}{tab}Task AddAsync({ClassName} " +
                     $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
 
 
@@ -178,8 +178,8 @@ using {_settings.TargetNamespaceForDbContext};
             //Add multi
             if (TableSettings.AddMultiGenerator)
             {
-                output.Append($"{tab}{tab}Task AddAsync(IEnumerable<{_stringTransform.PluralizeToLower(ClassName)}> " +
-                $"{_stringTransform.ApplyConfigTransformMember(ClassName)});");
+                output.Append($"{tab}{tab}Task AddAsync(IEnumerable<{ClassName}> " +
+                $"{_stringTransform.PluralizeToLower(ClassName)});");
 
                 output.Append(Environment.NewLine);
             }
