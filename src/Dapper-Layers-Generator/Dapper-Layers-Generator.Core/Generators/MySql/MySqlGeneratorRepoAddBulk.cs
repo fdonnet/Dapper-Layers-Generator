@@ -94,6 +94,8 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             output.Append(Environment.NewLine);
             output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""{Table.Name}"";");
             output.Append(Environment.NewLine);
+            output.Append($@"{tab}{tab}{tab}bulkCopy.BulkCopyTimeout = 600;");
+            output.Append(Environment.NewLine);
             output.Append(Environment.NewLine);
 
             output.Append(@$"{tab}{tab}{tab}foreach(var {ClassName.ToLower()} in {_stringTransform.PluralizeToLower(ClassName)})

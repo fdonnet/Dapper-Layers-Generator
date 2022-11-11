@@ -59,7 +59,8 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task AddBulkAsync(IEnumerable<{ClassName}> " +
+            return $"{tab}{tab}//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows" + Environment.NewLine +
+                $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task AddBulkAsync(IEnumerable<{ClassName}> " +
             $"{_stringTransform.PluralizeToLower(ClassName)}){(IsBase ? ";" : string.Empty)}" + (!IsBase ? @$"
 {tab}{tab}{{" : Environment.NewLine);
 
