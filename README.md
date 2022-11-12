@@ -1,7 +1,5 @@
 # Dapper-Layers-Generator
 
-*Bulk insert with MySqlBulkCopy is ready in the main branch (use it with batching send 500/1000/1500 rows). Will make a release when bulkupdate is ready too..*
-
 **For the "always DB first" lovers**:heart:
 
 Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex parts of your app!
