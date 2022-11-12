@@ -147,7 +147,7 @@ using {_settings.TargetNamespaceForDbContext};
             //Will see if we can find a solution for PkList if composite PKs
             if (TableSettings.GetByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
-                output.Append($"{tab}{tab}Task<IEnumerable<{ClassName}>> GetByListOf{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()});");
+                output.Append($"{tab}{tab}Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()});");
                 output.Append(Environment.NewLine);
             }
 

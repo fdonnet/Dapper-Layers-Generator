@@ -59,9 +59,9 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             return PkColumns.Count() > 1
                 ? $"{tab}{tab}public {(IsBase ? "abstract" : "override")} " +
-                        $"Task<IEnumerable<{ClassName}>> GetByListOf{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
+                        $"Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
                 : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
-                $"async Task<IEnumerable<{ClassName}>> GetByListOf{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()})" +
+                $"async Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()})" +
                 @$"
 {tab}{tab}{{";
         }
