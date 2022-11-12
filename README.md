@@ -2,6 +2,7 @@
 
 *Bulk insert with MySqlBulkCopy is ready in the main branch (use it with batching send 500/1000/1500 rows). Will make a release when bulkupdate is ready too..*
 
+**For the "DB first approach" lovers `:heart:`**
 Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex parts of your app!
 At the end, you will keep the control and can extend the code.
 
