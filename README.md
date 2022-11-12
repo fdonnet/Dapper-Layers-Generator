@@ -2,8 +2,6 @@
 
 *Bulk insert with MySqlBulkCopy is ready in the main branch (use it with batching send 500/1000/1500 rows). Will make a release when bulkupdate is ready too..*
 
-## THE GOAL : read the defintion from the dbprovider you want and generate the code for all the dbproviders you want
-
 Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex parts of your app!
 At the end, you will keep the control and can extend the code.
 
