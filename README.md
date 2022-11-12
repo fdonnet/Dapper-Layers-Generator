@@ -5,6 +5,8 @@
 Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex parts of your app!
 At the end, you will keep the control and can extend the code.
 
+---
+
 Read DB definitions from:
 
 - [x] MySql / MariaDB
@@ -37,6 +39,8 @@ Already implemented DAL methods in the generated code:
 - [x] DeleteAsync()
 - [ ] DeletebyPkListAsync() (after update)
 - [ ] DeleteBulkAsync() (after update)
+
+---
 
 ## Config and first simple start
 
@@ -89,6 +93,8 @@ Complete path/filename.json where you want to save your config.
 
 After your first code generation, return, load your config file and test all the available settings in (General settings / adavanced settings). You can go deeper as column config. I let you discover.
 
+---
+
 ## Generated code usage
 
 In your net6 app/asp.net, register the dbcontext :
@@ -114,7 +120,7 @@ int newFailureId = await dal.FailureRepo.AddAsync(new Failure() { Description="F
 dal.CommitTransaction();
 ```
 
-## If you want to extent the generated code, create a new file and declare a partial class with the same name as the class you want to extent !
+### If you want to extent the generated code, create a new file and declare a partial class with the same name as the class you want to extent !
 
 Open an issue if you have specific questions or if you detect an issue !
 
