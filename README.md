@@ -1,11 +1,11 @@
-# Fast first run Dapper-Layers-Generator
+# Dapper-Layers-Generator
 
 *Bulk insert with MySqlBulkCopy is ready in the main branch (use it with batching send 500/1000/1500 rows). Will make a release when bulkupdate is ready too..*
 
-## THE GOAL : read from the dbprovider you want and generate the code for all the dbproviders you want
+## THE GOAL : read the defintion from the dbprovider you want and generate the code for all the dbproviders you want
 
-Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex part of your app!
-At the end, you will keep the control and can extend all the parts.
+Generate all the ez and boring DAL accesses you need at the begining with dapper and you will be able to focus on the complex parts of your app!
+At the end, you will keep the control and can extend the code.
 
 Read DB definitions from:
 
@@ -40,7 +40,7 @@ Already implemented DAL methods in the generated code:
 - [ ] DeletebyPkListAsync() (after update)
 - [ ] DeleteBulkAsync() (after update)
 
-## Config
+## Config and first simple start
 
 Set the mandatory configs in appsettings or environnement or usersecrets
 
