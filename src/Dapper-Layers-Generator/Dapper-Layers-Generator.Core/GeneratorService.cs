@@ -3,9 +3,11 @@ using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using MySqlX.XDevAPI.Relational;
 using System;
 using System.ComponentModel.Design.Serialization;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core
@@ -23,10 +25,20 @@ namespace Dapper_Layers_Generator.Core
     public class GeneratorService : IGeneratorService
     {
         public SettingsGlobal GlobalGeneratorSettings { get; set; }
+
+
         private readonly IReaderDBDefinitionService _dataService;
         private readonly IGeneratorsProvider _generatorsProvider;
         private readonly IServiceProvider _serviceProvider;
         private readonly StringTransformationService _stringTransformation;
+        private string _currentRepoSubDirectory = string.Empty;
+        private string CurrentRepoSubDirectoryFullPath
+        {
+            get
+            {
+                return GlobalGeneratorSettings.TargetFolderForRepo + _currentRepoSubDirectory;
+            }
+        }
 
         public GeneratorService(SettingsGlobal settingsGlobal
             , IGeneratorsProvider generatorsProvider
@@ -45,14 +57,14 @@ namespace Dapper_Layers_Generator.Core
         {
             //To be really SCOPED
             using var scope = _serviceProvider.CreateScope();
-            
+
             //Call to main generator to get selected tables from 
             var selectedTableNames = _generatorsProvider.GetGenerator<IGeneratorContextBase>(scope).GetSelectedTableNames();
 
             //Tasks
             Task contextTasks = BuildContextTasks(scope, progress);
-            Task repoTasks = BuildRepoTasks(scope, progress,selectedTableNames);
-            Task pocoTasks = BuildPocoTasks(scope, progress,selectedTableNames);
+            Task repoTasks = BuildRepoTasks(scope, progress, selectedTableNames);
+            Task pocoTasks = BuildPocoTasks(scope, progress, selectedTableNames);
 
             Task allTask = Task.WhenAll(contextTasks, repoTasks, pocoTasks);
 
@@ -64,8 +76,7 @@ namespace Dapper_Layers_Generator.Core
             //Context
             //Base abstract context gen
             progress.Report("---- Context Generator BEGINS ----");
-            var generatorContextBase = _generatorsProvider.GetGenerator<IGeneratorContextBase>(scope);
-            var outpoutContextBase = generatorContextBase.Generate();
+            var outpoutContextBase = GenerateOutput<IGeneratorContextBase>(scope);
             var contextBaseTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
                         $"{GlobalGeneratorSettings.DbContextClassName}Base.cs"
                         , outpoutContextBase, "ContextGeneratorBase", progress);
@@ -77,8 +88,7 @@ namespace Dapper_Layers_Generator.Core
                 string outputContext = string.Empty;
                 if (dbType == "MySql")
                 {
-                    var generatorContext = _generatorsProvider.GetGenerator<IMySqlGeneratorContext>(scope);
-                    outputContext = generatorContext.Generate();
+                    outputContext = GenerateOutput<IMySqlGeneratorContext>(scope);
                 }
 
                 var contextTask = WriteFileAsync($"{GlobalGeneratorSettings.TargetFolderForDBContext}" +
@@ -98,152 +108,98 @@ namespace Dapper_Layers_Generator.Core
             List<Task> tasksRepo = new();
             progress.Report(Environment.NewLine + "---- Repo Generator BEGINS ----");
 
+            List<string> outputBaseList;
             foreach (var tableName in selectedTableNames)
             {
-
-                //Main Repo
-                var generatorRepoBaseMain = _generatorsProvider.GetGenerator<IGeneratorRepoMain>(tableName, scope);
-                //Create subfolder for each repo (can be messy if not if a lot of db providers)
-                var subDirectoryFullPath=GlobalGeneratorSettings.TargetFolderForRepo
-                    + generatorRepoBaseMain.ClassName
-                    + Path.DirectorySeparatorChar;
-
-                bool existsFolder = Directory.Exists(subDirectoryFullPath);
-                if(!existsFolder)
+                outputBaseList = new List<string>
                 {
-                    Directory.CreateDirectory(subDirectoryFullPath);
-                }
+                    //Main Repo
+                    GenerateOutput<IGeneratorRepoMain>(scope, tableName,false,true),
 
-                var outputRepoBaseMain = generatorRepoBaseMain.Generate();
+                    //Get all base
+                    GenerateOutput<IGeneratorRepoGetAll>(scope, tableName, true),
 
-                //Get all base
-                var generatorGetAllBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetAll>(tableName, scope);
-                var outputGetAllBase = generatorGetAllBase.Generate();
+                    //Get by PK base
+                    GenerateOutput<IGeneratorRepoGetByPk>(scope, tableName, true),
 
-                //Get by PK base
-                outputGetAllBase = !string.IsNullOrEmpty(outputGetAllBase) ? outputGetAllBase + Environment.NewLine : string.Empty;
-                var generatorGetByPkBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPk>(tableName, scope);
-                var outputGetByPkBase = generatorGetByPkBase.Generate();
+                    //Get by PK list base
+                    GenerateOutput<IGeneratorRepoGetByPkList>(scope, tableName, true),
 
-                //Get by PK list base
-                outputGetByPkBase = !string.IsNullOrEmpty(outputGetByPkBase) ? outputGetByPkBase + Environment.NewLine : string.Empty;
-                var generatorGetByPkListBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByPkList>(tableName, scope);
-                var outputGetByPkListBase = generatorGetByPkListBase.Generate();
+                    //Get by UK base
+                    GenerateOutput<IGeneratorRepoGetByUk>(scope, tableName, true),
 
-                //Get by UK base
-                outputGetByPkListBase = !string.IsNullOrEmpty(outputGetByPkListBase) ? outputGetByPkListBase + Environment.NewLine : string.Empty;
-                var generatorGetByUkBase = _generatorsProvider.GetGenerator<IGeneratorRepoGetByUk>(tableName, scope);
-                var outputGetByUkBase = generatorGetByUkBase.Generate();
+                    //Add base
+                    GenerateOutput<IGeneratorRepoAdd>(scope, tableName, true),
 
-                //Add base
-                outputGetByUkBase = !string.IsNullOrEmpty(outputGetByUkBase) ? outputGetByUkBase + Environment.NewLine : string.Empty;
-                var generatorAddBase = _generatorsProvider.GetGenerator<IGeneratorRepoAdd>(tableName, scope);
-                var outputAddBase = generatorAddBase.Generate();
+                    //Add Multi base
+                    GenerateOutput<IGeneratorRepoAddMulti>(scope, tableName, true),
 
-                //Add Multi base
-                outputAddBase = !string.IsNullOrEmpty(outputAddBase) ? outputAddBase + Environment.NewLine : string.Empty;
-                var generatorAddMultiBase = _generatorsProvider.GetGenerator<IGeneratorRepoAddMulti>(tableName, scope);
-                var outputAddMultiBase = generatorAddMultiBase.Generate();
+                    //Add bulk base
+                    GenerateOutput<IGeneratorRepoAddBulk>(scope, tableName, true),
 
-                //Add bulk base
-                outputAddMultiBase = !string.IsNullOrEmpty(outputAddMultiBase) ? outputAddMultiBase + Environment.NewLine : string.Empty;
-                var generatorAddBulkBase = _generatorsProvider.GetGenerator<IGeneratorRepoAddBulk>(tableName, scope);
-                var outputAddBulkBase = generatorAddBulkBase.Generate();
+                    //Update base
+                    GenerateOutput<IGeneratorRepoUpdate>(scope, tableName, true),
 
-                //Update base
-                outputAddMultiBase = !string.IsNullOrEmpty(outputAddMultiBase) ? outputAddMultiBase + Environment.NewLine : string.Empty;
-                var generatorUpdateBase = _generatorsProvider.GetGenerator<IGeneratorRepoUpdate>(tableName, scope);
-                var outputUpdateBase = generatorUpdateBase.Generate();
+                    //Delete base
+                    GenerateOutput<IGeneratorRepoDelete>(scope, tableName, true)
+                };
 
-                //Delete base
-                outputUpdateBase = !string.IsNullOrEmpty(outputUpdateBase) ? outputUpdateBase + Environment.NewLine : string.Empty;
-                var generatorDeleteBase = _generatorsProvider.GetGenerator<IGeneratorRepoDelete>(tableName, scope);
-                var outputDeleteBase = generatorDeleteBase.Generate();
+                var outputbase = String.Join(string.Empty, outputBaseList) + $"{tab}}}{Environment.NewLine}}}"; ;
 
-                outputRepoBaseMain = outputRepoBaseMain + outputGetAllBase + outputGetByPkBase + outputGetByPkListBase
-                    + outputGetByUkBase + outputAddBase + outputAddMultiBase + outputAddBulkBase + outputUpdateBase + outputDeleteBase + $"{tab}}}{Environment.NewLine}}}";
-                var repoBaseTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
-                                    $"{generatorRepoBaseMain.ClassName}RepoBase.cs"
-                                    , outputRepoBaseMain, "RepoGenerator", progress);
+                var repoBaseTaskMain = WriteFileAsync($"{CurrentRepoSubDirectoryFullPath}" +
+                                    $"{_stringTransformation.ApplyConfigTransformClass(tableName)}RepoBase.cs"
+                                    , outputbase, "RepoGenerator", progress);
 
                 tasksRepo.Add(repoBaseTaskMain);
 
                 //DbProvider specific
                 foreach (var dbType in GlobalGeneratorSettings.TargetDbProviderForGeneration.Split(','))
                 {
-                    string outputRepoMain = string.Empty;
-                    var outputGetAllSpec = string.Empty;
-                    var outputGetByPkSpec = string.Empty;
-                    var outputGetByPkListSpec = string.Empty;
-                    var outputGetByUkSpec = string.Empty;
-                    var outputAddSpec = string.Empty;
-                    var outputAddMultiSpec = string.Empty;
-                    var outputAddBulkSpec = string.Empty;
-                    var outputUpdateSpec = string.Empty;
-                    var outputDeleteSpec = string.Empty;
+                    List<string> outputDbSpecificList;
 
-                    string className = string.Empty;
-                    
                     if (dbType == "MySql")
                     {
-                        var generatorRepoMain = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoMain>(tableName,scope);
-                        outputRepoMain = generatorRepoMain.Generate();
+                        outputDbSpecificList = new List<string>
+                        {
+                            GenerateOutput<IMySqlGeneratorRepoMain>(scope, tableName),
 
-                        className = generatorRepoMain.ClassName;
+                            //Get all
+                            GenerateOutput<IMySqlGeneratorRepoGetAll>(scope, tableName, true),
 
-                        //Get all
-                        var generatorGetAllSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetAll>(tableName, scope);
-                        outputGetAllSpec = generatorGetAllSpec.Generate();
+                            //Get by pk
+                            GenerateOutput<IMySqlGeneratorRepoGetByPk>(scope, tableName, true),
 
-                        //Get by pk
-                        outputGetAllSpec = !string.IsNullOrEmpty(outputGetAllSpec) ? outputGetAllSpec + Environment.NewLine : string.Empty;
-                        var generatorGetByPkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPk>(tableName, scope);
-                        outputGetByPkSpec = generatorGetByPkSpec.Generate();
+                            //Get by pk list
+                            GenerateOutput<IMySqlGeneratorRepoGetByPkList>(scope, tableName, true),
 
-                        //Get by pk list
-                        outputGetByPkSpec = !string.IsNullOrEmpty(outputGetByPkSpec) ? outputGetByPkSpec + Environment.NewLine : string.Empty;
-                        var generatorGetByPkListSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByPkList>(tableName, scope);
-                        outputGetByPkListSpec = generatorGetByPkListSpec.Generate();
+                            //Get by uk 
+                            GenerateOutput<IMySqlGeneratorRepoGetByUk>(scope, tableName, true),
 
-                        //Get by uk 
-                        outputGetByPkListSpec = !string.IsNullOrEmpty(outputGetByPkListSpec) ? outputGetByPkListSpec + Environment.NewLine : string.Empty;
-                        var generatorGetByUkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoGetByUk>(tableName, scope);
-                        outputGetByUkSpec = generatorGetByUkSpec.Generate();
+                            //Add
+                            GenerateOutput<IMySqlGeneratorRepoAdd>(scope, tableName, true),
 
-                        //Add
-                        outputGetByUkSpec = !string.IsNullOrEmpty(outputGetByUkSpec) ? outputGetByUkSpec + Environment.NewLine : string.Empty;
-                        var generatorAddSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAdd>(tableName, scope);
-                        outputAddSpec = generatorAddSpec.Generate();
+                            //Add multi
+                            GenerateOutput<IMySqlGeneratorRepoAddMulti>(scope, tableName, true),
 
-                        //Add multi
-                        outputAddSpec = !string.IsNullOrEmpty(outputAddSpec) ? outputAddSpec + Environment.NewLine : string.Empty;
-                        var generatorAddMultiSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAddMulti>(tableName, scope);
-                        outputAddMultiSpec = generatorAddMultiSpec.Generate();
+                            //Add bulk
+                            GenerateOutput<IMySqlGeneratorRepoAddBulk>(scope, tableName, true),
 
-                        //Add bulk
-                        outputAddMultiSpec = !string.IsNullOrEmpty(outputAddMultiSpec) ? outputAddMultiSpec + Environment.NewLine : string.Empty;
-                        var generatorAddBulkSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoAddBulk>(tableName, scope);
-                        outputAddBulkSpec = generatorAddBulkSpec.Generate();
+                            //Update
+                            GenerateOutput<IMySqlGeneratorRepoUpdate>(scope, tableName, true),
 
-                        //Update
-                        outputAddMultiSpec = !string.IsNullOrEmpty(outputAddMultiSpec) ? outputAddMultiSpec + Environment.NewLine : string.Empty;
-                        var generatorUpdateSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoUpdate>(tableName, scope);
-                        outputUpdateSpec = generatorUpdateSpec.Generate();
+                            //Delete
+                            GenerateOutput<IMySqlGeneratorRepoDelete>(scope, tableName, true)
+                        };
 
-                        //Delete
-                        outputUpdateSpec = !string.IsNullOrEmpty(outputUpdateSpec) ? outputUpdateSpec + Environment.NewLine : string.Empty;
-                        var generatorDeleteSpec = _generatorsProvider.GetGenerator<IMySqlGeneratorRepoDelete>(tableName, scope);
-                        outputDeleteSpec = generatorDeleteSpec.Generate();
+                        var outputMySql = String.Join(string.Empty, outputDbSpecificList) + $"{tab}}}{Environment.NewLine}}}";
+
+                        var repoTaskMainMySql = WriteFileAsync($"{CurrentRepoSubDirectoryFullPath}" +
+                                $"{_stringTransformation.ApplyConfigTransformClass(tableName)}Repo{dbType}.cs"
+                                , outputMySql, "RepoGenerator", progress);
+
+                        tasksRepo.Add(repoTaskMainMySql);
+
                     }
-
-                    outputRepoMain = outputRepoMain + outputGetAllSpec + outputGetByPkSpec + outputGetByPkListSpec 
-                        + outputGetByUkSpec + outputAddSpec + outputAddMultiSpec + outputAddBulkSpec + outputUpdateSpec + outputDeleteSpec + $"{tab}}}{Environment.NewLine}}}";
-
-                    var repoTaskMain = WriteFileAsync($"{subDirectoryFullPath}" +
-                                $"{className}Repo{dbType}.cs"
-                                , outputRepoMain, "RepoGenerator", progress);
-
-                    tasksRepo.Add(repoTaskMain);
                 }
             }
 
@@ -277,6 +233,35 @@ namespace Dapper_Layers_Generator.Core
             FileShare.None, bufferSize: Buffer_Size, useAsync: true);
             await fileStream.WriteAsync(buffer.AsMemory(offset, buffer.Length));
             progress.Report($"{WriterType}: {fileFullPath} SUCCESS ...");
+        }
+
+        private string GenerateOutput<T>(IServiceScope scope, string? tableName = null, bool addNewLine = false, bool createFolder = false)
+        {
+            IGenerator generator = tableName == null
+                ? (IGenerator)_generatorsProvider.GetGenerator<T>(scope)!
+                : (IGenerator)_generatorsProvider.GetGenerator<T>(tableName, scope)!;
+
+            //Create sub folder for repo main generator
+            if (createFolder && tableName != null)
+                CreateRepoFolderStructure(_stringTransformation.ApplyConfigTransformClass(tableName)!);
+
+            var output = generator.Generate();
+
+            if (addNewLine && !String.IsNullOrEmpty(output))
+                output += Environment.NewLine;
+
+            return output;
+        }
+
+        private void CreateRepoFolderStructure(string repoBaseClassName)
+        {
+            _currentRepoSubDirectory = repoBaseClassName + Path.DirectorySeparatorChar;
+
+            bool existsFolder = Directory.Exists(CurrentRepoSubDirectoryFullPath);
+            if (!existsFolder)
+            {
+                Directory.CreateDirectory(CurrentRepoSubDirectoryFullPath);
+            }
         }
     }
 }
