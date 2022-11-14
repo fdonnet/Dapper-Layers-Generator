@@ -1,7 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using Microsoft.Extensions.Primitives;
-using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
-    public interface IMySqlGeneratorRepoAddBulk : IGeneratorFromTable
+
+    public interface IMySqlGeneratorRepoUpdateBulk : IGeneratorFromTable
     {
 
     }
-    public class MySqlGeneratorRepoAddBulk : GeneratorRepoAddBulk, IMySqlGeneratorRepoAddBulk
+    public class MySqlGeneratorRepoUpdateBulk : GeneratorRepoUpdateBulk, IMySqlGeneratorRepoUpdateBulk
     {
-        public MySqlGeneratorRepoAddBulk(SettingsGlobal settingsGlobal
+        public MySqlGeneratorRepoUpdateBulk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)
@@ -28,7 +27,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         public override string Generate()
         {
-            if (TableSettings.AddBulkGenerator)
+            if (TableSettings.UpdateBulkGenerator)
             {
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
@@ -36,10 +35,19 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(@GetOpenTransAndInitBulk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetCreateDataTable());
+                output.Append(GetCreateDbTmpTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
+                output.Append(GetCreateDataTable());
+                output.Append(Environment.NewLine);
+                output.Append(Environment.NewLine);
+                output.Append(GetBulkCall());
+                output.Append(Environment.NewLine);
+                output.Append(Environment.NewLine);
+                output.Append(@GetUpdateFromTmpTable());
+                output.Append(Environment.NewLine);
+                output.Append(Environment.NewLine);
+                output.Append(@GetDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCloseTransaction());
@@ -72,10 +80,10 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             var output = new StringBuilder();
             output.Append($"{tab}{tab}{tab}var table = new DataTable();" + Environment.NewLine);
 
-            if (ColumnForInsertOperations == null || !ColumnForInsertOperations.Any())
-                throw new ArgumentException($"No column defined for insert (bulk), for table {Table.Name}");
+            if (ColumnForUpdateOperations == null || !ColumnForUpdateOperations.Any())
+                throw new ArgumentException($"No column defined for update (bulk), for table {Table.Name}");
 
-            var columnsForBulk = ColumnForInsertOperations.Where(c => !c.IsAutoIncrement);
+            var columnsForBulk = ColumnForUpdateOperations;
 
             var rowsAdd = new List<string>();
             foreach (var colBulk in columnsForBulk)
@@ -95,7 +103,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             }
 
             output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""{Table.Name}"";");
+            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""tmp_bulkupd_{Table.Name}"";");
             output.Append(Environment.NewLine);
             output.Append($@"{tab}{tab}{tab}bulkCopy.BulkCopyTimeout = 600;");
             output.Append(Environment.NewLine);
@@ -127,7 +135,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return output.ToString();
         }
 
-        protected override string GetDapperCall()
+        protected virtual string GetBulkCall()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }
@@ -141,5 +149,60 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 {tab}{tab}{tab}}}";
         }
 
+        protected virtual string GetCreateDbTmpTable()
+        {
+            var output = new StringBuilder();
+
+            output.Append($"{tab}{tab}{tab}var sqltmp = \"CREATE TEMPORARY TABLE " +
+                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} LIKE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier};\";");
+
+            output.Append(Environment.NewLine);
+            output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
+                    $"ExecuteAsync(sqltmp,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+
+            return output.ToString();
+
+        }
+
+        protected override string GetDapperCall()
+        {
+            var output = new StringBuilder($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
+                    $"ExecuteAsync(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+
+            output.Append(Environment.NewLine);
+            output.Append(Environment.NewLine);
+            output.Append($"{tab}{tab}{tab}var sqlDrop = \"DROP TABLE {ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier};\";");
+            output.Append(Environment.NewLine);
+            output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
+                    $"ExecuteAsync(sqlDrop,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+
+            return output.ToString();
+        }
+
+        protected virtual string GetUpdateFromTmpTable()
+        {
+            var output = new StringBuilder();
+            output.Append($"{tab}{tab}{tab}var sql = @\"UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1, " +
+                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} t2" + Environment.NewLine +
+                $"{tab}{tab}{tab}{tab}SET" + Environment.NewLine + $"{tab}{tab}{tab}{tab}");
+
+            //Update fields
+            var fields = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}{tab},", ColumnForUpdateOperations!.Where(c=>!c.IsAutoIncrement).Select(c => 
+                $"t1.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
+
+            output.Append(fields);
+            output.Append(Environment.NewLine);
+            output.Append($"{tab}{tab}{tab}{tab}WHERE ");
+
+            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}AND ", PkColumns.Select(col =>
+            {
+                return $"t1.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier}";
+            }));
+
+            output.Append(whereClause + "\";");
+
+            return output.ToString();
+
+        }
     }
 }

@@ -143,6 +143,9 @@ namespace Dapper_Layers_Generator.Core
                     //Update multi base
                     GenerateOutput<IGeneratorRepoUpdateMulti>(scope, tableName, true),
 
+                    //Update bulk base
+                    GenerateOutput<IGeneratorRepoUpdateBulk>(scope, tableName, true),
+
                     //Delete base
                     GenerateOutput<IGeneratorRepoDelete>(scope, tableName, true)
                 };
@@ -192,6 +195,9 @@ namespace Dapper_Layers_Generator.Core
 
                             //Update multi
                             GenerateOutput<IMySqlGeneratorRepoUpdateMulti>(scope, tableName, true),
+
+                            //Update Bulk
+                            GenerateOutput<IMySqlGeneratorRepoUpdateBulk>(scope, tableName, true),
 
                             //Delete
                             GenerateOutput<IMySqlGeneratorRepoDelete>(scope, tableName, true)

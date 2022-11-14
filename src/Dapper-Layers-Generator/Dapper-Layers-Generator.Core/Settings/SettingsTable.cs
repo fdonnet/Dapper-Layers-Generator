@@ -44,11 +44,12 @@
         [SettingsAttribute(Message = "Enable update function generator (multi-update): ", Position = 14, Group = "Generator")]
         public bool UpdateMultiGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 15, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update bulk function generator: ", Position = 15, Group = "Generator")]
+        public bool UpdateBulkGenerator { get; set; } = false;
+
+        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 16, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "(NOT IMPLEMENTED) Enable update bulk function generator: ", Position = 16, Group = "Generator")]
-        public bool UpdateBulkGenerator { get; set; } = false;
 
         //Global table settings 
         public SettingsColumn ColumnGlobalSettings { get; set; } = new SettingsColumn();

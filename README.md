@@ -34,11 +34,11 @@ Already implemented DAL methods in the generated code:
 - [x] AddMultiAsync() loop
 - [x] AddBulkAsync(), with MySqlBulkCopy implementation
 - [x] UpdateAsync()
-- [ ] UpdateMultiAsync() loop (next)
-- [ ] UpdateBulkAsync(), with MySqlBulkCopy implementation and temp table (next)
+- [x] UpdateMultiAsync()
+- [x] UpdateBulkAsync(), with MySqlBulkCopy implementation and temp table
 - [x] DeleteAsync()
-- [ ] DeletebyPkListAsync() (after update)
-- [ ] DeleteBulkAsync() (after update)
+- [ ] DeletebyPkListAsync() (next)
+- [ ] DeleteBulkAsync() (next)
 
 ---
 
