@@ -95,25 +95,6 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
         }
 
-
-        protected virtual string GetValuesToInsert()
-        {
-            var output = new StringBuilder();
-
-            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
-
-            var values = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},", cols.OrderBy(c => c.Position).Select(col =>
-            {
-                return $@"@{col.Name}";
-            }));
-
-
-            output.Append(values);
-            output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab})"";");
-            return output.ToString();
-        }
-
         protected override string GetReturnObj()
         {
             //The base implementation is very minimal (no real return from the DB, need to be override by dbprovider specific)

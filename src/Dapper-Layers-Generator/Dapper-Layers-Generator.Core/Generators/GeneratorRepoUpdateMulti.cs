@@ -8,15 +8,14 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-
-    public interface IGeneratorRepoAddMulti : IGeneratorFromTable
+    public interface IGeneratorRepoUpdateMulti : IGeneratorFromTable
     {
 
     }
-    public class GeneratorRepoAddMulti : GeneratorForOperations, IGeneratorRepoAddMulti
+    public class GeneratorRepoUpdateMulti : GeneratorForOperations, IGeneratorRepoUpdateMulti
     {
 
-        public GeneratorRepoAddMulti(SettingsGlobal settingsGlobal
+        public GeneratorRepoUpdateMulti(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)
@@ -27,7 +26,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override string Generate()
         {
-            if (TableSettings.AddMultiGenerator)
+            if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
@@ -37,8 +36,8 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(GetDapperDynaParams());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
-                output.Append($"{tab}{tab}{tab}{tab}{tab}" + @GetValuesToInsert().Replace($"{tab}{tab}{tab}{tab}",$"{tab}{tab}{tab}{tab}{tab}"));
+                output.Append(GetBaseSqlForUpdate().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
+                output.Append(GetSqlWhereClauseForPk().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperCall());
@@ -57,7 +56,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync(IEnumerable<{ClassName}> " +
+            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task UpdateAsync(IEnumerable<{ClassName}> " +
             $"{_stringTransform.PluralizeToLower(ClassName)})" +
         @$"
 {tab}{tab}{{";
@@ -72,7 +71,6 @@ namespace Dapper_Layers_Generator.Core.Generators
             $"{tab}{tab}{tab}}}";
 
         }
-
         protected virtual string GetOpenTransactionAndLoopBegin()
         {
             return @$"{tab}{tab}{tab}var isTransAlreadyOpen = _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction != null;
@@ -96,7 +94,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             output.Append($"{tab}{tab}{tab}{tab}var p = new DynamicParameters();");
             output.Append(Environment.NewLine);
 
-            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
+            var cols = ColumnForUpdateOperations!;
 
             var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
             {
@@ -106,7 +104,6 @@ namespace Dapper_Layers_Generator.Core.Generators
             output.Append(spParams);
             return output.ToString();
         }
-
 
         protected override string GetReturnObj()
         {
