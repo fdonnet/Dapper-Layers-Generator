@@ -154,6 +154,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorRepoAddMulti, GeneratorRepoAddMulti>();
     services.AddScoped<IGeneratorRepoAddBulk, GeneratorRepoAddBulk>();
     services.AddScoped<IGeneratorRepoUpdate, GeneratorRepoUpdate>();
+    services.AddScoped<IGeneratorRepoUpdateMulti, GeneratorRepoUpdateMulti>();
     services.AddScoped<IGeneratorRepoDelete, GeneratorRepoDelete>();
 
     //MySql specific (db provider for source generation)
@@ -169,6 +170,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IMySqlGeneratorRepoAddMulti, MySqlGeneratorRepoAddMulti>();
     services.AddScoped<IMySqlGeneratorRepoAddBulk, MySqlGeneratorRepoAddBulk>();
     services.AddScoped<IMySqlGeneratorRepoUpdate, MySqlGeneratorRepoUpdate>();
+    services.AddScoped<IMySqlGeneratorRepoUpdateMulti, MySqlGeneratorRepoUpdateMulti>();
     services.AddScoped<IMySqlGeneratorRepoDelete, MySqlGeneratorRepoDelete>();
 
     //Service that depend on the dbprovider (in config to read db defintions)

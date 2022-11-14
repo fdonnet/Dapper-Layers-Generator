@@ -59,6 +59,48 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
 
         }
+        protected virtual string GetValuesToInsert()
+        {
+            var output = new StringBuilder();
+
+            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
+
+            var values = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},", cols.OrderBy(c => c.Position).Select(col =>
+            {
+                return $@"@{col.Name}";
+            }));
+
+
+            output.Append(values);
+            output.Append(Environment.NewLine);
+            output.Append($@"{tab}{tab}{tab})"";");
+            return output.ToString();
+        }
+
+        protected string GetBaseSqlForUpdate()
+        {
+            if (ColumnForUpdateOperations == null || !ColumnForUpdateOperations.Any())
+                throw new ArgumentException($"No column available for update for this table{Table.Name}, genererator crash");
+
+            var output = new StringBuilder();
+
+            output.Append(@$"{tab}{tab}{tab}var sql = @""
+{tab}{tab}{tab}UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier}
+{tab}{tab}{tab}SET ");
+            output.Append(GetColumnListStringForUpdate());
+            output.Append(Environment.NewLine);
+
+            return output.ToString();
+        }
+
+        private string GetColumnListStringForUpdate()
+        {
+            var output = string.Empty;
+            var cols = ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary);
+
+            return String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},",
+                cols!.OrderBy(c => c.Position).Select(c => $"{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = @{c.Name}"));
+        }
 
         protected virtual string GetDapperDynaParamsForPk()
         {

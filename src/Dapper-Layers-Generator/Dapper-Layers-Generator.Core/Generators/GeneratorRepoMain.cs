@@ -202,6 +202,15 @@ using {_settings.TargetNamespaceForDbContext};
                 output.Append(Environment.NewLine);
             }
 
+            //Update multi
+            if (TableSettings.UpdateMultiGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
+            {
+                output.Append($"{tab}{tab}Task UpdateAsync(IEnumerable<{ClassName}> " +
+                $"{_stringTransform.PluralizeToLower(ClassName)});");
+
+                output.Append(Environment.NewLine);
+            }
+
             //Delete
             if (TableSettings.DeleteGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
