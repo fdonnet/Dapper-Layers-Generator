@@ -140,7 +140,7 @@ using {_settings.TargetNamespaceForDbContext};
 
             if (TableSettings.GetByPkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
-                output.Append($"{tab}{tab}Task<{ClassName}> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndType()});");
+                output.Append($"{tab}{tab}Task<{ClassName}?> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndType()});");
                 output.Append(Environment.NewLine);
             }
 
@@ -156,7 +156,7 @@ using {_settings.TargetNamespaceForDbContext};
             {
                 foreach (var index in ColumnNamesByIndexNameDic)
                 {
-                    output.Append($"{tab}{tab}Task<{ClassName}> GetBy{GetUkMemberNamesString(index.Key)}Async({GetUkMemberNamesStringAndType(index.Key)});");
+                    output.Append($"{tab}{tab}Task<{ClassName}?> GetBy{GetUkMemberNamesString(index.Key)}Async({GetUkMemberNamesStringAndType(index.Key)});");
                     output.Append(Environment.NewLine);
                 }
             }
@@ -224,6 +224,14 @@ using {_settings.TargetNamespaceForDbContext};
             if (TableSettings.DeleteGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 output.Append($"{tab}{tab}Task DeleteAsync({GetPkMemberNamesStringAndType()});");
+
+                output.Append(Environment.NewLine);
+            }
+
+            //Delete by pklist
+            if (TableSettings.DeleteByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
+            {
+                output.Append($"{tab}{tab}Task DeleteAsync({GetPkMemberNamesStringAndTypeList()});");
 
                 output.Append(Environment.NewLine);
             }

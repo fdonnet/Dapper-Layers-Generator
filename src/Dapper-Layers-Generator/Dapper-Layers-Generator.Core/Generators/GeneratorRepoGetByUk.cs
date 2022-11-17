@@ -63,7 +63,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}> GetBy{GetUkMemberNamesString(_currentIndex.Key)}Async({GetUkMemberNamesStringAndType(_currentIndex.Key)})" +
+            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}?> GetBy{GetUkMemberNamesString(_currentIndex.Key)}Async({GetUkMemberNamesStringAndType(_currentIndex.Key)})" +
                 @$"
 {tab}{tab}{{";
         }

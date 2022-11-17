@@ -50,6 +50,9 @@
         [SettingsAttribute(Message = "Enable delete function generator: ", Position = 16, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
 
+        [SettingsAttribute(Message = "Enable delete by pklist function generator: ", Position = 17, Group = "Generator")]
+        public bool DeleteByPkListGenerator { get; set; } = true;
+
 
         //Global table settings 
         public SettingsColumn ColumnGlobalSettings { get; set; } = new SettingsColumn();

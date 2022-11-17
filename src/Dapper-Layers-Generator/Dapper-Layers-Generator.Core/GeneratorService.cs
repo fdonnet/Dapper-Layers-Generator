@@ -147,7 +147,10 @@ namespace Dapper_Layers_Generator.Core
                     GenerateOutput<IGeneratorRepoUpdateBulk>(scope, tableName, true),
 
                     //Delete base
-                    GenerateOutput<IGeneratorRepoDelete>(scope, tableName, true)
+                    GenerateOutput<IGeneratorRepoDelete>(scope, tableName, true),
+
+                    //Delete by pklist base
+                    GenerateOutput<IGeneratorRepoDeleteByPkList>(scope, tableName, true)
                 };
 
                 var outputbase = String.Join(string.Empty, outputBaseList) + $"{tab}}}{Environment.NewLine}}}"; ;
@@ -200,7 +203,10 @@ namespace Dapper_Layers_Generator.Core
                             GenerateOutput<IMySqlGeneratorRepoUpdateBulk>(scope, tableName, true),
 
                             //Delete
-                            GenerateOutput<IMySqlGeneratorRepoDelete>(scope, tableName, true)
+                            GenerateOutput<IMySqlGeneratorRepoDelete>(scope, tableName, true),
+
+                            //Delete by pklist
+                            GenerateOutput<IMySqlGeneratorRepoDeleteByPkList>(scope, tableName, true)
                         };
 
                         var outputMySql = String.Join(string.Empty, outputDbSpecificList) + $"{tab}}}{Environment.NewLine}}}";

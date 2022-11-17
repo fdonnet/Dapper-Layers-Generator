@@ -53,20 +53,6 @@ namespace Dapper_Layers_Generator.Core.Generators
             return string.Empty;
         }
         
-        protected virtual string GetBaseSqlForDelete()
-        {
-            if (ColumnForInsertOperations == null || !ColumnForInsertOperations.Any())
-                throw new ArgumentException($"No column available for insert for this table{Table.Name}, genererator crash");
-
-            var output = new StringBuilder();
-
-            output.Append(@$"{tab}{tab}{tab}var sql = @""
-{tab}{tab}{tab}DELETE FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier}");
-
-            return output.ToString();
-        }
-
-
         protected override string GetMethodDef()
         {
             return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task DeleteAsync({GetPkMemberNamesStringAndType()})" +
@@ -82,7 +68,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetReturnObj()
         {
-            return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
+            return string.Empty;
         }
     }
 }

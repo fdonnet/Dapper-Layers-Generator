@@ -32,12 +32,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 if (PkColumns.Count() == 1 || !IsBase)
                 {
                     output.Append(Environment.NewLine);
-                    output.Append(GetDapperDynaParams());
+                    output.Append(GetDapperDynaParamsForPkList());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
                     output.Append(@GetBaseSqlForSelect());
                     output.Append(Environment.NewLine);
-                    output.Append(GetSqlWhereClause());
+                    output.Append(GetSqlPkListWhereClause());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
                     output.Append(GetDapperCall());
@@ -73,32 +73,9 @@ namespace Dapper_Layers_Generator.Core.Generators
                     $"QueryAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected virtual string GetSqlWhereClause()
-        {
-            var output = new StringBuilder();
-
-            output.Append($"{tab}{tab}{tab}WHERE ");
-            output.Append($"{ColAndTableIdentifier}{PkColumns.First().Name}{ColAndTableIdentifier} IN @listOf");
-
-            output.Append("\";");
-            return output.ToString();
-
-        }
-
         protected override string GetReturnObj()
         {
             return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
-        }
-
-        protected virtual string GetDapperDynaParams()
-        {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
-            output.Append(Environment.NewLine);
-
-            output.Append($@"{tab}{tab}{tab}p.Add(""@listOf"",{GetPKMemberNamesStringList()});");
-
-            return output.ToString();
         }
 
     }
