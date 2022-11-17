@@ -211,7 +211,7 @@ using {_settings.TargetNamespaceForDbContext};
                 output.Append(Environment.NewLine);
             }
 
-            //Update multi
+            //Update bulk
             if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
                 output.Append($"{tab}{tab}Task UpdateBulkAsync(IEnumerable<{ClassName}> " +
@@ -232,6 +232,14 @@ using {_settings.TargetNamespaceForDbContext};
             if (TableSettings.DeleteByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 output.Append($"{tab}{tab}Task DeleteAsync({GetPkMemberNamesStringAndTypeList()});");
+
+                output.Append(Environment.NewLine);
+            }
+
+            //Delete bulk
+            if (TableSettings.DeleteBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
+            {
+                output.Append($"{tab}{tab}Task DeleteBulkAsync({GetPkMemberNamesStringAndTypeList()});");
 
                 output.Append(Environment.NewLine);
             }

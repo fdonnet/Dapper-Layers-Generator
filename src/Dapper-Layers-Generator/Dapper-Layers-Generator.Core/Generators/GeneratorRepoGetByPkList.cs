@@ -24,7 +24,7 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
         public override string Generate()
         {
-            if (TableSettings.GetByPkListGenerator)
+            if (TableSettings.GetByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());

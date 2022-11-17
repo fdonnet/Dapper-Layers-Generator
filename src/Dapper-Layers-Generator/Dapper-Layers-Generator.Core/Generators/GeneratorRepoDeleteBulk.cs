@@ -8,15 +8,14 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-
-    public interface IGeneratorRepoUpdateBulk : IGeneratorFromTable
+    public interface IGeneratorRepoDeleteBulk : IGeneratorFromTable
     {
 
     }
-    public class GeneratorRepoUpdateBulk : GeneratorForOperations, IGeneratorRepoUpdateBulk
+    public class GeneratorRepoDeleteBulk : GeneratorForOperations, IGeneratorRepoDeleteBulk
     {
 
-        public GeneratorRepoUpdateBulk(SettingsGlobal settingsGlobal
+        public GeneratorRepoDeleteBulk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)
@@ -27,7 +26,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override string Generate()
         {
-            if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
+            if (TableSettings.DeleteBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
@@ -44,9 +43,9 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows" + Environment.NewLine +
-                $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task UpdateBulkAsync(IEnumerable<{ClassName}> " +
-            $"{_stringTransform.PluralizeToLower(ClassName)}){(IsBase ? ";" : string.Empty)}" + (!IsBase ? @$"
+            return $"{tab}{tab}//Please use this bulk by batch depending on the mem available 1000 / 1500 rows" + Environment.NewLine +
+                $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task DeleteBulkAsync({GetPkMemberNamesStringAndTypeList()})" +
+                $"{(IsBase ? ";" : string.Empty)}" + (!IsBase ? @$"
 {tab}{tab}{{" : Environment.NewLine);
 
         }
@@ -61,6 +60,5 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             return string.Empty;
         }
-
     }
 }

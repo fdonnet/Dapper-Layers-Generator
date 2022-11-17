@@ -158,6 +158,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorRepoUpdateBulk, GeneratorRepoUpdateBulk>();
     services.AddScoped<IGeneratorRepoDelete, GeneratorRepoDelete>();
     services.AddScoped<IGeneratorRepoDeleteByPkList, GeneratorRepoDeleteByPkList>();
+    services.AddScoped<IGeneratorRepoDeleteBulk, GeneratorRepoDeleteBulk>();
 
     //MySql specific (db provider for source generation)
     //You will be able to generate the code for several db types... 
@@ -176,6 +177,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IMySqlGeneratorRepoUpdateBulk, MySqlGeneratorRepoUpdateBulk>();
     services.AddScoped<IMySqlGeneratorRepoDelete, MySqlGeneratorRepoDelete>();
     services.AddScoped<IMySqlGeneratorRepoDeleteByPkList, MySqlGeneratorRepoDeleteByPkList>();
+    services.AddScoped<IMySqlGeneratorRepoDeleteBulk, MySqlGeneratorRepoDeleteBulk>();
 
     //Service that depend on the dbprovider (in config to read db defintions)
     if (dbProvider == "MySql")

@@ -1,5 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
-
-    public interface IMySqlGeneratorRepoUpdateBulk : IGeneratorFromTable
+    public interface IMySqlGeneratorRepoDeleteBulk : IGeneratorFromTable
     {
 
     }
-    public class MySqlGeneratorRepoUpdateBulk : GeneratorRepoUpdateBulk, IMySqlGeneratorRepoUpdateBulk
+    public class MySqlGeneratorRepoDeleteBulk : GeneratorRepoDeleteBulk, IMySqlGeneratorRepoDeleteBulk
     {
-        public MySqlGeneratorRepoUpdateBulk(SettingsGlobal settingsGlobal
+        public MySqlGeneratorRepoDeleteBulk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService
             , IDataTypeConverter dataConverter)
@@ -27,7 +27,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         public override string Generate()
         {
-            if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
+            if (TableSettings.DeleteBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
@@ -44,7 +44,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(GetBulkCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetUpdateFromTmpTable());
+                output.Append(GetDeleteFromTmpTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetDapperCall());
@@ -67,36 +67,23 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             var output = new StringBuilder();
             output.Append($"{tab}{tab}{tab}var table = new DataTable();" + Environment.NewLine);
 
-            if (ColumnForUpdateOperations == null || !ColumnForUpdateOperations.Any())
-                throw new ArgumentException($"No column defined for update (bulk), for table {Table.Name}");
-
-            var columnsForBulk = ColumnForUpdateOperations;
-
             var rowsAdd = new List<string>();
-            foreach (var colBulk in columnsForBulk)
+            var indexItem = 1;
+            foreach (var colBulk in PkColumns)
             {
                 output.Append($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));" + Environment.NewLine);
-                if (colBulk.IsNullable)
-                {
-                    output.Append($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;" + Environment.NewLine);
-                    rowsAdd.Add($"{tab}{tab}{tab}{tab}r[\"{colBulk.Name}\"] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)} == null " +
-                        $"? DBNull.Value : {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
-
-                }
-                else
-                {
-                    rowsAdd.Add($@"{tab}{tab}{tab}{tab}r[""{colBulk.Name}""] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
-                }
+                rowsAdd.Add($@"{tab}{tab}{tab}{tab}r[""{colBulk.Name}""] = identity{(PkColumns.Count()>1 ? ".Item"+indexItem:string.Empty)};");
+                indexItem++;
             }
 
             output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""tmp_bulkupd_{Table.Name}"";");
+            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""tmp_bulkdelete_{Table.Name}"";");
             output.Append(Environment.NewLine);
             output.Append($@"{tab}{tab}{tab}bulkCopy.BulkCopyTimeout = 600;");
             output.Append(Environment.NewLine);
             output.Append(Environment.NewLine);
 
-            output.Append(@$"{tab}{tab}{tab}foreach(var {ClassName.ToLower()} in {_stringTransform.PluralizeToLower(ClassName)})
+            output.Append(@$"{tab}{tab}{tab}foreach(var identity in listOf{string.Join("And", PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)))})
 {tab}{tab}{tab}{{
 {tab}{tab}{tab}{tab}DataRow r = table.NewRow();");
 
@@ -121,18 +108,25 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
             return output.ToString();
         }
-
         protected virtual string GetBulkCall()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }
 
+        //For the moment a complete tmp table is created but we can change that to create only a pklist tmp table
         protected virtual string GetCreateDbTmpTable()
         {
             var output = new StringBuilder();
 
             output.Append($"{tab}{tab}{tab}var sqltmp = \"CREATE TEMPORARY TABLE " +
-                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} LIKE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier};\";");
+                $"{ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier} (");
+
+            //build pk columns
+            var createColumns = String.Join(", ", PkColumns.Select(c =>
+            {
+                if
+            });
+
 
             output.Append(Environment.NewLine);
             output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
@@ -141,7 +135,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return output.ToString();
 
         }
-
         protected override string GetDapperCall()
         {
             var output = new StringBuilder($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
@@ -149,7 +142,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
             output.Append(Environment.NewLine);
             output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}var sqlDrop = \"DROP TABLE {ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier};\";");
+            output.Append($"{tab}{tab}{tab}var sqlDrop = \"DROP TABLE {ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier};\";");
             output.Append(Environment.NewLine);
             output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"ExecuteAsync(sqlDrop,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
@@ -157,30 +150,31 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return output.ToString();
         }
 
-        protected virtual string GetUpdateFromTmpTable()
+        protected virtual string GetDeleteFromTmpTable()
         {
             var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var sql = @\"UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1, " +
-                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} t2" + Environment.NewLine +
-                $"{tab}{tab}{tab}{tab}SET" + Environment.NewLine + $"{tab}{tab}{tab}{tab}");
+            output.Append($"{tab}{tab}{tab}var sql = @\"DELETE FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1" + Environment.NewLine +
+                $"{tab}{tab}{tab}{tab}INNER JOIN {ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier} t2 ON " + Environment.NewLine +
+                $"{tab}{tab}{tab}{tab}");
 
-            //Update fields
-            var fields = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}{tab},", ColumnForUpdateOperations!.Where(c=>!c.IsAutoIncrement).Select(c => 
+            //Delete fields
+            var fields = String.Join($" AND ", PkColumns!.Select(c =>
                 $"t1.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
 
             output.Append(fields);
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}{tab}WHERE ");
+            //output.Append(Environment.NewLine);
+            //output.Append($"{tab}{tab}{tab}{tab}WHERE ");
 
-            var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}AND ", PkColumns.Select(col =>
-            {
-                return $"t1.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier}";
-            }));
+            //var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}AND ", PkColumns.Select(col =>
+            //{
+            //    return $"t1.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier}";
+            //}));
 
-            output.Append(whereClause + "\";");
+            output.Append("\";");
 
             return output.ToString();
 
         }
+
     }
 }
