@@ -32,23 +32,24 @@ namespace Dapper_Layers_Generator.Core.Generators
 
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParamsForPkList());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForDelete());
-                output.Append(Environment.NewLine);
-                output.Append(GetSqlPkListWhereClause());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
 
+                if (PkColumns.Count() == 1 || !IsBase)
+                {
+                    output.Append(Environment.NewLine);
+                    output.Append(GetDapperDynaParamsForPkList());
+                    output.Append(Environment.NewLine);
+                    output.Append(Environment.NewLine);
+                    output.Append(@GetBaseSqlForDelete());
+                    output.Append(Environment.NewLine);
+                    output.Append(GetSqlPkListWhereClause());
+                    output.Append(Environment.NewLine);
+                    output.Append(Environment.NewLine);
+                    output.Append(GetDapperCall());
+                    output.Append(GetReturnObj());
+                    output.Append(Environment.NewLine);
+                    output.Append($"{tab}{tab}}}");
+                }
+                output.Append(Environment.NewLine);
                 return output.ToString();
             }
 
@@ -57,8 +58,12 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()})" +
-                @$"
+            return PkColumns.Count() > 1
+    ? $"{tab}{tab}public {(IsBase ? "abstract" : "override")} " +
+            $"async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
+    : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
+    $"async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()})" +
+    @$"
 {tab}{tab}{{";
         }
 

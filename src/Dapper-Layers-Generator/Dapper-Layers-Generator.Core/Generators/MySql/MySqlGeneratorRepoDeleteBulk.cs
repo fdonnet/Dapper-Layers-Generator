@@ -158,14 +158,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 $"t1.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
 
             output.Append(fields);
-            //output.Append(Environment.NewLine);
-            //output.Append($"{tab}{tab}{tab}{tab}WHERE ");
-
-            //var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}AND ", PkColumns.Select(col =>
-            //{
-            //    return $"t1.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier}";
-            //}));
-
             output.Append("\";");
 
             return output.ToString();

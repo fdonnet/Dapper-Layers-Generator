@@ -84,12 +84,6 @@ namespace Dapper_Layers_Generator.Core.Generators
 {tab}{tab}{tab}{{";
         }
 
-        protected virtual string GetCloseTransaction()
-        {
-            return @$"{tab}{tab}{tab}if (!isTransAlreadyOpen)
-{tab}{tab}{tab}{tab}_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.CommitTransaction();";
-        }
-
         protected virtual string GetDapperDynaParams()
         {
             var output = new StringBuilder();
