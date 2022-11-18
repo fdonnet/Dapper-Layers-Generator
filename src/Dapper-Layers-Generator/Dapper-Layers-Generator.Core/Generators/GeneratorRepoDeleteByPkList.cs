@@ -59,8 +59,8 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected override string GetMethodDef()
         {
             return PkColumns.Count() > 1
-    ? $"{tab}{tab}public {(IsBase ? "abstract" : "override")} " +
-            $"async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
+    ? $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} " +
+            $"Task DeleteAsync({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
     : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
     $"async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()})" +
     @$"
