@@ -125,6 +125,9 @@ namespace Dapper_Layers_Generator.Core
                     //Get by PK list base
                     GenerateOutput<IGeneratorRepoGetByPkList>(scope, tableName, true),
 
+                    //Get by PK bulk base
+                    GenerateOutput<IGeneratorRepoGetByPkBulk>(scope, tableName, true),
+
                     //Get by UK base
                     GenerateOutput<IGeneratorRepoGetByUk>(scope, tableName, true),
 
@@ -183,6 +186,9 @@ namespace Dapper_Layers_Generator.Core
 
                             //Get by pk list
                             GenerateOutput<IMySqlGeneratorRepoGetByPkList>(scope, tableName, true),
+
+                            //Get by pk bulk
+                            GenerateOutput<IMySqlGeneratorRepoGetByPkBulk>(scope, tableName, true),
 
                             //Get by uk 
                             GenerateOutput<IMySqlGeneratorRepoGetByUk>(scope, tableName, true),

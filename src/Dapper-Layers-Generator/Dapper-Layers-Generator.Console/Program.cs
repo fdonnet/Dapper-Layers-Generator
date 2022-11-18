@@ -149,6 +149,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IGeneratorRepoGetAll, GeneratorRepoGetAll>();
     services.AddScoped<IGeneratorRepoGetByPk, GeneratorRepoGetByPk>();
     services.AddScoped<IGeneratorRepoGetByPkList, GeneratorRepoGetByPkList>();
+    services.AddScoped<IGeneratorRepoGetByPkBulk, GeneratorRepoGetByPkBulk>();
     services.AddScoped<IGeneratorRepoGetByUk, GeneratorRepoGetByUk>();
     services.AddScoped<IGeneratorRepoAdd, GeneratorRepoAdd>();
     services.AddScoped<IGeneratorRepoAddMulti, GeneratorRepoAddMulti>();
@@ -168,6 +169,7 @@ ServiceProvider? ServicesConfig(string dbProvider, IServiceCollection services)
     services.AddScoped<IMySqlGeneratorRepoGetAll, MySqlGeneratorRepoGetAll>();
     services.AddScoped<IMySqlGeneratorRepoGetByPk, MySqlGeneratorRepoGetByPk>();
     services.AddScoped<IMySqlGeneratorRepoGetByPkList, MySqlGeneratorRepoGetByPkList>();
+    services.AddScoped<IMySqlGeneratorRepoGetByPkBulk, MySqlGeneratorRepoGetByPkBulk>();
     services.AddScoped<IMySqlGeneratorRepoGetByUk, MySqlGeneratorRepoGetByUk>();
     services.AddScoped<IMySqlGeneratorRepoAdd, MySqlGeneratorRepoAdd>();
     services.AddScoped<IMySqlGeneratorRepoAddMulti, MySqlGeneratorRepoAddMulti>();

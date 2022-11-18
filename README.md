@@ -29,18 +29,19 @@ Already implemented DAL methods in the generated code:
 ` all the generated methods will have custom names based on your columns def, if your pk is "id" the generated method becomes GetByIdAsync(), if your unique index is on columns "firstname" and "lastname" the generated method name becomes GetByFirstnameAndLastNameAsync() etc) `
 
 - [x] GetAllAsync()
-- [x] GetByPkAsync(), composite PK ok.
-- [x] GetByListOfPKAsync(), get by list of composite PKs (not done for the moment, need tmp table)
+- [x] GetByPkAsync()
+- [x] GetByListOfPKAsync()
+- [x] GetByListOfPKBulkAsync() with MySqlBulkCopy and temp table
 - [x] GetByUniqueIndexAsync()
 - [x] AddAsync()
-- [x] AddMultiAsync() loop
-- [x] AddBulkAsync(), with MySqlBulkCopy implementation
+- [x] AddMultiAsync()
+- [x] AddBulkAsync(), with MySqlBulkCopy
 - [x] UpdateAsync()
 - [x] UpdateMultiAsync()
-- [x] UpdateBulkAsync(), with MySqlBulkCopy implementation and temp table
+- [x] UpdateBulkAsync(), with MySqlBulkCopy and temp table
 - [x] DeleteAsync()
 - [x] DeletebyPkListAsync()
-- [x] DeleteBulkAsync(), with MySqlBulkCopy implementation and temp table 
+- [x] DeleteBulkAsync(), with MySqlBulkCopy and temp table
 
 ---
 
@@ -128,8 +129,8 @@ Open an issue if you have specific questions or if you detect an issue !
 
 And love for
 
-https://github.com/DapperLib/Dapper
+<https://github.com/DapperLib/Dapper>
 
-https://github.com/spectreconsole/spectre.console
+<https://github.com/spectreconsole/spectre.console>
 
-https://github.com/Humanizr/Humanizer
+<https://github.com/Humanizr/Humanizer>
