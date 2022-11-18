@@ -26,34 +26,37 @@
         [SettingsAttribute(Message = "Enable get by primary keys list function generator: ", Position = 8, Group = "Generator")]
         public bool GetByPkListGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 9, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable get by primary keys bulk function generator: ", Position = 9, Group = "Generator")]
+        public bool GetByPkBulkGenerator { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable get by unique key function generator: ", Position = 10, Group = "Generator")]
         public bool GetByUkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add function generator: ", Position = 10, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable add function generator: ", Position = 11, Group = "Generator")]
         public bool AddGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add function generator (multi-insert): ", Position = 11, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable add function generator (multi-insert): ", Position = 12, Group = "Generator")]
         public bool AddMultiGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable add bulk function generator: ", Position = 12, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable add bulk function generator: ", Position = 13, Group = "Generator")]
         public bool AddBulkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update function generator: ", Position = 13, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update function generator: ", Position = 14, Group = "Generator")]
         public bool UpdateGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update function generator (multi-update): ", Position = 14, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update function generator (multi-update): ", Position = 15, Group = "Generator")]
         public bool UpdateMultiGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable update bulk function generator: ", Position = 15, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable update bulk function generator: ", Position = 16, Group = "Generator")]
         public bool UpdateBulkGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 16, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete function generator: ", Position = 17, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete by pklist function generator: ", Position = 17, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete by pklist function generator: ", Position = 18, Group = "Generator")]
         public bool DeleteByPkListGenerator { get; set; } = true;
 
-        [SettingsAttribute(Message = "Enable delete bulk function generator: ", Position = 18, Group = "Generator")]
+        [SettingsAttribute(Message = "Enable delete bulk function generator: ", Position = 19, Group = "Generator")]
         public bool DeleteBulkGenerator { get; set; } = true;
 
 

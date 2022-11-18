@@ -144,10 +144,17 @@ using {_settings.TargetNamespaceForDbContext};
                 output.Append(Environment.NewLine);
             }
 
-            //Will see if we can find a solution for PkList if composite PKs
+            //ByPk list
             if (TableSettings.GetByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 output.Append($"{tab}{tab}Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()});");
+                output.Append(Environment.NewLine);
+            }
+
+            //By pk bulk
+            if (TableSettings.GetByPkBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
+            {
+                output.Append($"{tab}{tab}Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}BulkAsync({GetPkMemberNamesStringAndTypeList()});");
                 output.Append(Environment.NewLine);
             }
 

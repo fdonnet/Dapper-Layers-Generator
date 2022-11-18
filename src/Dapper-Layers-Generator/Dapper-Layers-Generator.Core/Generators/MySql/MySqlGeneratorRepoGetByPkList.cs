@@ -24,6 +24,32 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         IsBase = false;
     }
 
+        public override string Generate()
+        {
+            if (PkColumns.Count() == 1)
+                return base.Generate();
+
+            if (TableSettings.GetByPkBulkGenerator)
+            {
+                if (!PkColumns.Any())
+                    throw new ArgumentException($"You cannot run the Delete by PkList Generator for table {Table.Name}, no pk defined");
+
+                var output = new StringBuilder();
+                output.Append(GetMethodDef());
+                output.Append(Environment.NewLine);
+                output.Append(GetDapperDynaParamsForPkList());
+                output.Append(Environment.NewLine);
+                output.Append(Environment.NewLine);
+                output.Append(GetReturnObj());
+                output.Append(Environment.NewLine);
+                output.Append($"{tab}{tab}}}");
+                output.Append(Environment.NewLine);
+                return output.ToString();
+            }
+
+            return string.Empty;
+        }
+
         protected override string GetSqlPkListWhereClause()
         {
             return PkColumns.Count() > 1 ? string.Empty : base.GetSqlPkListWhereClause();
@@ -31,13 +57,13 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         protected override string GetDapperDynaParamsForPkList()
         {
-            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Not Implemented for mySQL !!!""" : base.GetDapperDynaParamsForPkList();
+            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Call bulk for composite pk*/" : base.GetDapperDynaParamsForPkList();
         }
 
         protected override string GetReturnObj()
         {
             return PkColumns.Count() > 1
-                ? $"-------------  */throw new NotImplementedException(\"Select by PKList with composite pk, use GetByPkListBulk funtion\");"
+                ? $"{tab}{tab}{tab}return await GetBy{GetPkMemberNamesString()}BulkAsync({GetPKMemberNamesStringList()});"
                 : base.GetReturnObj();
         }
 

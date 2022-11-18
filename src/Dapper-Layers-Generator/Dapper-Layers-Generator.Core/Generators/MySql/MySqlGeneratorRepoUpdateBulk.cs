@@ -41,7 +41,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(GetCreateDataTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetBulkCall());
+                output.Append(GetBulkCallMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetUpdateFromTmpTable());
@@ -120,11 +120,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 {tab}{tab}{tab}bulkCopy.ColumnMappings.AddRange(colMappings);");
 
             return output.ToString();
-        }
-
-        protected virtual string GetBulkCall()
-        {
-            return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }
 
         protected virtual string GetCreateDbTmpTable()
