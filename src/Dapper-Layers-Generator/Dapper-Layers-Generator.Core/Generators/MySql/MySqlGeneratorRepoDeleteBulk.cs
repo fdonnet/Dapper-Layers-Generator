@@ -118,16 +118,12 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         {
             var output = new StringBuilder();
 
-            output.Append($"{tab}{tab}{tab}var sqltmp = \"CREATE TEMPORARY TABLE " +
+            output.Append($"{tab}{tab}{tab}var sqltmp = @\"CREATE TEMPORARY TABLE " +
                 $"{ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier} (");
 
             //build pk columns
-            var createColumns = String.Join(", ", PkColumns.Select(c =>
-            {
-                if
-            });
-
-
+            var createColumns = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}, ", PkColumns.Select(c => c.Name + " " + c.CompleteType));
+            output.Append(createColumns + ");\";");
             output.Append(Environment.NewLine);
             output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"ExecuteAsync(sqltmp,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
@@ -153,7 +149,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         protected virtual string GetDeleteFromTmpTable()
         {
             var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var sql = @\"DELETE FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1" + Environment.NewLine +
+            output.Append($"{tab}{tab}{tab}var sql = @\"DELETE t1 FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1" + Environment.NewLine +
                 $"{tab}{tab}{tab}{tab}INNER JOIN {ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier} t2 ON " + Environment.NewLine +
                 $"{tab}{tab}{tab}{tab}");
 
