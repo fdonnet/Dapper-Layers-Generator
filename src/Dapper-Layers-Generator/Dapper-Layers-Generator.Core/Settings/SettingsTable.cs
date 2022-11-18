@@ -45,10 +45,16 @@
         public bool UpdateMultiGenerator { get; set; } = true;
 
         [SettingsAttribute(Message = "Enable update bulk function generator: ", Position = 15, Group = "Generator")]
-        public bool UpdateBulkGenerator { get; set; } = false;
+        public bool UpdateBulkGenerator { get; set; } = true;
 
         [SettingsAttribute(Message = "Enable delete function generator: ", Position = 16, Group = "Generator")]
         public bool DeleteGenerator { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable delete by pklist function generator: ", Position = 17, Group = "Generator")]
+        public bool DeleteByPkListGenerator { get; set; } = true;
+
+        [SettingsAttribute(Message = "Enable delete bulk function generator: ", Position = 18, Group = "Generator")]
+        public bool DeleteBulkGenerator { get; set; } = true;
 
 
         //Global table settings 

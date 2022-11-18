@@ -14,5 +14,6 @@
         public bool IsPrimary { get; set; }
         public List<string>? UniqueIndexNames { get; set; }
         public bool IsAutoIncrement { get; set; }
+        public string CompleteType { get; set; } = null!;
     }
 }

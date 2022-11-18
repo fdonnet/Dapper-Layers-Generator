@@ -58,7 +58,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string GetMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndType()})" +
+            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}?> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndType()})" +
                 @$"
 {tab}{tab}{{";
         }

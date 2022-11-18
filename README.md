@@ -37,8 +37,8 @@ Already implemented DAL methods in the generated code:
 - [x] UpdateMultiAsync()
 - [x] UpdateBulkAsync(), with MySqlBulkCopy implementation and temp table
 - [x] DeleteAsync()
-- [ ] DeletebyPkListAsync() (next)
-- [ ] DeleteBulkAsync() (next)
+- [x] DeletebyPkListAsync()
+- [x] DeleteBulkAsync(), with MySqlBulkCopy implementation and temp table 
 
 ---
 
@@ -131,4 +131,3 @@ https://github.com/DapperLib/Dapper
 https://github.com/spectreconsole/spectre.console
 
 https://github.com/Humanizr/Humanizer
-

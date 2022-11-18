@@ -59,6 +59,17 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
 
         }
+
+        protected virtual string GetBaseSqlForDelete()
+        {
+            var output = new StringBuilder();
+
+            output.Append(@$"{tab}{tab}{tab}var sql = @""
+{tab}{tab}{tab}DELETE FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier}");
+
+            return output.ToString();
+        }
+
         protected virtual string GetValuesToInsert()
         {
             var output = new StringBuilder();
@@ -117,6 +128,17 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
         }
 
+        protected virtual string GetDapperDynaParamsForPkList()
+        {
+            var output = new StringBuilder();
+            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
+            output.Append(Environment.NewLine);
+
+            output.Append($@"{tab}{tab}{tab}p.Add(""@listOf"",{GetPKMemberNamesStringList()});");
+
+            return output.ToString();
+        }
+
 
         private string GetColumnListStringForSelect()
         {
@@ -150,6 +172,39 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
+        protected virtual string GetSqlPkListWhereClause()
+        {
+            var output = new StringBuilder();
+
+            output.Append($"{tab}{tab}{tab}WHERE ");
+            output.Append($"{ColAndTableIdentifier}{PkColumns.First().Name}{ColAndTableIdentifier} IN @listOf");
+
+            output.Append("\";");
+            return output.ToString();
+
+        }
+
+        protected virtual string GetOpenTransAndInitBulkMySql()
+        {
+
+            return $@"{tab}{tab}{tab}var isTransAlreadyOpen = _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction != null;
+
+{tab}{tab}{tab}if (!isTransAlreadyOpen)
+{tab}{tab}{tab}{tab}await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.OpenTransactionAsync();
+
+{tab}{tab}{tab}var bulkCopy = new MySqlBulkCopy((MySqlConnection)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection
+{tab}{tab}{tab}{tab}, (MySqlTransaction?)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
+
+        }
+
+        protected virtual string GetCloseTransaction()
+        {
+            return $@"{tab}{tab}{tab}if (!isTransAlreadyOpen)
+{tab}{tab}{tab}{{
+{tab}{tab}{tab}{tab}_dbContext.CommitTransaction();
+{tab}{tab}{tab}{tab}_dbContext.Connection.Close();
+{tab}{tab}{tab}}}";
+        }
 
         protected abstract string GetMethodDef();
         protected abstract string GetDapperCall();

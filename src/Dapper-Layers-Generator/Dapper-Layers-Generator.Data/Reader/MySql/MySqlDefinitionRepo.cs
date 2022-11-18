@@ -72,6 +72,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                         ,numeric_precision
                         ,numeric_scale
                         ,extra
+                        ,column_type
                         FROM columns
                         WHERE table_schema in @schemas";
 
@@ -88,7 +89,8 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
                 Length = (int?)c.character_maximum_length ?? 0,
                 Precision = (int?)c.numeric_precision ?? 0,
                 Scale = (int?)c.numeric_scale ?? 0,
-                IsAutoIncrement = c.extra == "auto_increment" ? true : false
+                IsAutoIncrement = c.extra == "auto_increment" ? true : false,
+                CompleteType = c.column_type
             });
 
             return columns;

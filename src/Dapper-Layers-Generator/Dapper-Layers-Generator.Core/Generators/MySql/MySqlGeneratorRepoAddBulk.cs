@@ -33,7 +33,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 var output = new StringBuilder();
                 output.Append(GetMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(@GetOpenTransAndInitBulk());
+                output.Append(GetOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetCreateDataTable());
@@ -54,18 +54,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return string.Empty;
         }
 
-        protected virtual string GetOpenTransAndInitBulk()
-        {
-
-            return $@"{tab}{tab}{tab}var isTransAlreadyOpen = _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction != null;
-
-{tab}{tab}{tab}if (!isTransAlreadyOpen)
-{tab}{tab}{tab}{tab}await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.OpenTransactionAsync();
-
-{tab}{tab}{tab}var bulkCopy = new MySqlBulkCopy((MySqlConnection)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection
-{tab}{tab}{tab}{tab}, (MySqlTransaction?)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
-
-        }
 
         protected virtual string GetCreateDataTable()
         {
@@ -130,15 +118,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         protected override string GetDapperCall()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
-        }
-
-        protected virtual string GetCloseTransaction()
-        {
-            return $@"{tab}{tab}{tab}if (!isTransAlreadyOpen)
-{tab}{tab}{tab}{{
-{tab}{tab}{tab}{tab}_dbContext.CommitTransaction();
-{tab}{tab}{tab}{tab}_dbContext.Connection.Close();
-{tab}{tab}{tab}}}";
         }
 
     }

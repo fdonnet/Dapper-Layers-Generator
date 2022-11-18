@@ -24,20 +24,20 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         IsBase = false;
     }
 
-        protected override string GetSqlWhereClause()
+        protected override string GetSqlPkListWhereClause()
         {
-            return PkColumns.Count() > 1 ? string.Empty : base.GetSqlWhereClause();
+            return PkColumns.Count() > 1 ? string.Empty : base.GetSqlPkListWhereClause();
         }
 
-        protected override string GetDapperDynaParams()
+        protected override string GetDapperDynaParamsForPkList()
         {
-            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Not Implemented YET for mySQL !!!""" : base.GetDapperDynaParams();
+            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Not Implemented for mySQL !!!""" : base.GetDapperDynaParamsForPkList();
         }
 
         protected override string GetReturnObj()
         {
             return PkColumns.Count() > 1
-                ? $"-------------  */throw new NotImplementedException(\"Select by PKList with composite pk\");"
+                ? $"-------------  */throw new NotImplementedException(\"Select by PKList with composite pk, use GetByPkListBulk funtion\");"
                 : base.GetReturnObj();
         }
 
