@@ -26,6 +26,8 @@ Generated C# code based on your db definitions:
 
 Already implemented DAL methods in the generated code:
 
+` all the generated methods will have custom names based on your columns def, if your pk is "id" the generated method becomes GetByIdAsync(), if your unique index is on columns "firstname" and "lastname" the generated method name becomes GetByFirstnameAndLastNameAsync() etc) `
+
 - [x] GetAllAsync()
 - [x] GetByPkAsync(), composite PK ok.
 - [x] GetByListOfPKAsync(), get by list of composite PKs (not done for the moment, need tmp table)
