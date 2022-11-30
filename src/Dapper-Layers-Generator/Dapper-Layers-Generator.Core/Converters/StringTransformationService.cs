@@ -111,7 +111,7 @@ namespace Dapper_Layers_Generator.Core.Converters
             return theString == null ? null : Humanizer.InflectorExtensions.Pluralize(theString.ToLower());
         }
 
-        public string? SingularizeAndPascalCase(string? theString)
+        public string? ApplyConfigTransformClass(string? theString)
         {
             return theString == null
                 ? null
@@ -120,13 +120,10 @@ namespace Dapper_Layers_Generator.Core.Converters
                     : PascalCase(Singularize(theString));
         }
 
-        public string? ApplyConfigTransformClass(string? theString)
-        {
-            return SingularizeAndPascalCase(theString);
-        }
-
         public string? ApplyConfigTransformMember(string? theString)
         {
+            if (theString == null) return null;
+
             return _settingsGlobal.UsePascalTransform ? Humanizer.InflectorExtensions.Camelize(theString) : theString;
         }
 
