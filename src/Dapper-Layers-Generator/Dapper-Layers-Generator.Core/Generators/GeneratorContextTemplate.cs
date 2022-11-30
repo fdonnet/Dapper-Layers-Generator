@@ -16,7 +16,7 @@ namespace Dapper_Layers_Generator.Core.Generators
     /// </summary>
     public abstract class GeneratorContextTemplate : Generator
     {
-        protected IEnumerable<ITable>? _selectedTables;
+        protected IEnumerable<Table>? _selectedTables;
         public GeneratorContextTemplate(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService)

@@ -11,21 +11,21 @@ namespace Dapper_Layers_Generator.Core.Generators
 
     public abstract class GeneratorFromTable : Generator, IGeneratorFromTable
     {
-        protected ITable Table { get; private set; } = null!;
+        protected Table Table { get; private set; } = null!;
         public string ClassName { get; private set; } = null!;
         protected SettingsTable TableSettings { get; private set; } = null!;
         protected IDataTypeConverter DataConverter { get; private set; } = null!;
-        protected IEnumerable<IColumn> PkColumns { get; private set; } = Enumerable.Empty<IColumn>();
-        protected IEnumerable<IColumn> UkColumns { get; private set; } = Enumerable.Empty<IColumn>();
-        protected Dictionary<string,List<IColumn>> ColumnNamesByIndexNameDic { get; private set; }
-            = new Dictionary<string, List<IColumn>>();
+        protected IEnumerable<Column> PkColumns { get; private set; } = Enumerable.Empty<Column>();
+        protected IEnumerable<Column> UkColumns { get; private set; } = Enumerable.Empty<Column>();
+        protected Dictionary<string,List<Column>> ColumnNamesByIndexNameDic { get; private set; }
+            = new Dictionary<string, List<Column>>();
 
         protected virtual string ColAndTableIdentifier { get; init; } = String.Empty;
         protected virtual bool IsBase { get; init; } = true;
 
-        protected IEnumerable<IColumn>? ColumnForGetOperations;
-        protected IEnumerable<IColumn>? ColumnForInsertOperations;
-        protected IEnumerable<IColumn>? ColumnForUpdateOperations;
+        protected IEnumerable<Column>? ColumnForGetOperations;
+        protected IEnumerable<Column>? ColumnForInsertOperations;
+        protected IEnumerable<Column>? ColumnForUpdateOperations;
 
 
         public GeneratorFromTable(SettingsGlobal settingsGlobal
@@ -52,13 +52,13 @@ namespace Dapper_Layers_Generator.Core.Generators
             TableSettings = _settings.GetTableSettings(Table.Name);
 
             PkColumns = Table.Columns?.Where(t => t.IsPrimary).ToList() 
-                ?? Enumerable.Empty<IColumn>();
+                ?? Enumerable.Empty<Column>();
 
             UkColumns = Table.Columns?.Where(t => t.UniqueIndexNames != null && t.UniqueIndexNames.Any()).ToList() 
-                ?? Enumerable.Empty<IColumn>();
+                ?? Enumerable.Empty<Column>();
 
             //Clear if generator not purelly scoped
-            ColumnNamesByIndexNameDic = new Dictionary<string, List<IColumn>>();
+            ColumnNamesByIndexNameDic = new Dictionary<string, List<Column>>();
             foreach (var col in UkColumns)
             {
                 foreach(var index in col.UniqueIndexNames!)
@@ -69,7 +69,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     }
                     else
                     {
-                        ColumnNamesByIndexNameDic.Add(index, new List<IColumn>() {col});
+                        ColumnNamesByIndexNameDic.Add(index, new List<Column>() {col});
                     }
                 }
             }
@@ -159,7 +159,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
-        protected string GetColumnDotNetType(IColumn column)
+        protected string GetColumnDotNetType(Column column)
         {
             var colSettings = TableSettings.GetColumnSettings(column.Name);
 

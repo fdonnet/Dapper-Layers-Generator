@@ -96,7 +96,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             return members;
         }
 
-        private string WriteMemberDecorators(SettingsColumn settings, string memberType, IColumn col)
+        private string WriteMemberDecorators(SettingsColumn settings, string memberType, Column col)
         {
             var decorators = new StringBuilder();
             var curDecoratorsLength = 0;
@@ -116,7 +116,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             return decorators.ToString();
         }
 
-        private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, IColumn col)
+        private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, Column col)
         {
             var decorator = string.Empty;
 
@@ -133,7 +133,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             return decorator;
         }
 
-        private string WriteMemberRequieredDecorator(SettingsColumn settings, IColumn col)
+        private string WriteMemberRequieredDecorator(SettingsColumn settings, Column col)
         {
             var decorator = string.Empty;
 
@@ -147,7 +147,7 @@ namespace {_settings.TargetNamespaceForPOCO}
             return decorator;
         }
 
-        private string WriteMemberJsonIgnoreDecorator(IColumn col)
+        private string WriteMemberJsonIgnoreDecorator(Column col)
         {
             var decorator = string.Empty;
             var colFound = TableSettings.JsonIgnoreDecoration.Split(',').Any(c => c == col.Name);

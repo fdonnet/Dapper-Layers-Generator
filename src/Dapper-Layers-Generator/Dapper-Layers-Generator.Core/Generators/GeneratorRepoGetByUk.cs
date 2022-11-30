@@ -16,7 +16,7 @@ namespace Dapper_Layers_Generator.Core.Generators
     }
     public class GeneratorRepoGetByUk : GeneratorForOperations, IGeneratorRepoGetByUk
     {
-        protected KeyValuePair<string, List<IColumn>> _currentIndex;
+        protected KeyValuePair<string, List<Column>> _currentIndex;
 
         public GeneratorRepoGetByUk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data

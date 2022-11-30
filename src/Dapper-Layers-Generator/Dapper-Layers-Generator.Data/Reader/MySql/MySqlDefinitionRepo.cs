@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Dapper_Layers_Generator.Data.POCO;
-using Dapper_Layers_Generator.Data.POCO.MySql;
 
 namespace Dapper_Layers_Generator.Data.Reader.MySql
 {
@@ -15,7 +14,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             
         }
 
-        public async Task<IEnumerable<ISchema>> GetAllSchemasAsync()
+        public async Task<IEnumerable<Schema>> GetAllSchemasAsync()
         {
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
@@ -27,7 +26,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var schemasDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
 
-            var schemas = schemasDyna.Select(s => new MySqlSchema()
+            var schemas = schemasDyna.Select(s => new Schema()
             {
                 Name = s.schema_name
             });
@@ -36,7 +35,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
         }
 
-        public async Task<IEnumerable<ITable>> GetAllTablesAsync()
+        public async Task<IEnumerable<Table>> GetAllTablesAsync()
         {
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
@@ -47,7 +46,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var tablesDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql,p);
 
-            var tables = tablesDyna.Select(t => new MySqlTable()
+            var tables = tablesDyna.Select(t => new Table()
             {
                 Schema = t.table_schema,
                 Name = t.table_name
@@ -57,7 +56,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
         }
 
-        public async Task<IEnumerable<IColumn>> GetAllColumnsAsync()
+        public async Task<IEnumerable<Column>> GetAllColumnsAsync()
         {
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
@@ -78,7 +77,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var columnsDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
 
-            var columns = columnsDyna.Select(c => new MySqlColumn()
+            var columns = columnsDyna.Select(c => new Column()
             {
                 Schema = c.table_schema,
                 Table = c.table_name,
@@ -96,7 +95,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
             return columns;
         }
 
-        public async Task<IEnumerable<IKey>> GetAllPrimaryAndUniqueKeysAsync()
+        public async Task<IEnumerable<Key>> GetAllPrimaryAndUniqueKeysAsync()
         {
             var p = new DynamicParameters();
             p.Add("@schemas", _sourceSchemas);
@@ -111,7 +110,7 @@ namespace Dapper_Layers_Generator.Data.Reader.MySql
 
             var constraintsDyna = await _dbContext.Connection.QueryAsync<dynamic>(sql, p);
 
-            var keys = constraintsDyna.Select(c => new MySqlKey()
+            var keys = constraintsDyna.Select(c => new Key()
             {
                 Schema = c.table_schema,
                 Table = c.table_name,

@@ -5,18 +5,18 @@ namespace Dapper_Layers_Generator.Core
 {
     public interface IReaderDBDefinitionService
     {
-        IList<ISchema>? SchemaDefinitions { get; }
+        IList<Schema>? SchemaDefinitions { get; }
         Task ReadAllDBDefinitionsStepAsync();
     }
 
     public class ReaderDBDefinitionService : IReaderDBDefinitionService
     {
-        public IList<ISchema>? SchemaDefinitions { get; private set; }
+        public IList<Schema>? SchemaDefinitions { get; private set; }
 
         private readonly IReaderDapperContext _context;
-        private IEnumerable<ITable>? _tables;
-        private IEnumerable<IColumn>? _columns;
-        private IEnumerable<IKey>? _keys;
+        private IEnumerable<Table>? _tables;
+        private IEnumerable<Column>? _columns;
+        private IEnumerable<Key>? _keys;
 
         public ReaderDBDefinitionService(IReaderDapperContext context)
         {
@@ -39,7 +39,7 @@ namespace Dapper_Layers_Generator.Core
             //Very bad loop => can do it better with linq
             if(SchemaDefinitions != null)
             {
-                foreach (ISchema schema in SchemaDefinitions)
+                foreach (Schema schema in SchemaDefinitions)
                 {
                     schema.Tables = _tables?.Where(t => t.Schema == schema.Name).ToList();
                     
