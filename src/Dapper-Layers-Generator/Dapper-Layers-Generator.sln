@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper-Layers-Generator.Dat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F7B11D2-AEFE-4591-8019-53BACBBD3916}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper-Layers-Generator.Test", "..\..\test\Dapper-Layers-Generator.Test\Dapper-Layers-Generator.Test.csproj", "{DBAE9B8C-858B-41EA-9AFC-B611D1D6E789}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B45C4D01-6A4A-4511-9AA0-4C2630759361}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBAE9B8C-858B-41EA-9AFC-B611D1D6E789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBAE9B8C-858B-41EA-9AFC-B611D1D6E789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBAE9B8C-858B-41EA-9AFC-B611D1D6E789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBAE9B8C-858B-41EA-9AFC-B611D1D6E789}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
