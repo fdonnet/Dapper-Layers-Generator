@@ -1,19 +1,20 @@
-﻿using Dapper_Layers_Generator.Core.Converters;
-using Dapper_Layers_Generator.Core.Settings;
+﻿using Xunit;
+using Dapper_Layers_Generator.Core.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper_Layers_Generator.Core.Settings;
 
-namespace Dapper_Layers_Generator.Test
+namespace Dapper_Layers_Generator.Core.Converters.Tests
 {
-    public class StringTransformationService_Test
+    public class StringTransformationService_Tests
     {
         private StringTransformationService _transform = null!;
         private SettingsGlobal _settings = null!;
 
-        public StringTransformationService_Test()
+        public StringTransformationService_Tests()
         {
             _settings = new SettingsGlobal();
             _transform = new StringTransformationService(_settings);
@@ -96,7 +97,7 @@ namespace Dapper_Layers_Generator.Test
 
             var result = _transform.Singularize("tests");
 
-            Assert.Equal("test",result);
+            Assert.Equal("test", result);
         }
 
         [Fact]
@@ -124,7 +125,7 @@ namespace Dapper_Layers_Generator.Test
         {
             var result = _transform.PluralizeToLower("Customer");
 
-            Assert.Equal("customers",result);
+            Assert.Equal("customers", result);
         }
 
         [Fact]
@@ -219,6 +220,5 @@ namespace Dapper_Layers_Generator.Test
 
             Assert.Null(result);
         }
-
     }
 }

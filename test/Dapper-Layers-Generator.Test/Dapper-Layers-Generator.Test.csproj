@@ -10,7 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,6 +29,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Dapper-Layers-Generator\Dapper-Layers-Generator.Core\Dapper-Layers-Generator.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Generators\MySql\" />
   </ItemGroup>
 
 </Project>
