@@ -1,7 +1,12 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.Primitives;
+using MySqlX.XDevAPI.Relational;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
@@ -26,7 +31,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             if (TableSettings.AddBulkGenerator)
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
@@ -34,7 +39,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(@GetCreateDataTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
+                output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCloseTransaction());
@@ -110,7 +115,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return output.ToString();
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }

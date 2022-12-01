@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
@@ -25,7 +29,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             if (TableSettings.DeleteBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
@@ -42,13 +46,13 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(GetSelectFromTmpTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetDapperCall());
+                output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCloseTransaction());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
+                output.Append(WriteReturnObj());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -60,7 +64,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return string.Empty;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             var output = new StringBuilder($"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"QueryAsync<{ClassName}>(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
@@ -94,7 +98,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
         }

@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -26,7 +30,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 if (!IsBase)
                 {
                     //Will se if we can use some part of code for multi db providers for the moment the implementation is in MySql only child class
@@ -38,7 +42,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
             return $"{tab}{tab}//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows" + Environment.NewLine +
                 $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task UpdateBulkAsync(IEnumerable<{ClassName}> " +
@@ -47,13 +51,13 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return string.Empty;
 
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return string.Empty;
         }

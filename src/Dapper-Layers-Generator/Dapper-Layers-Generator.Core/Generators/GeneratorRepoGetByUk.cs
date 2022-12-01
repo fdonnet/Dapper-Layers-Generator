@@ -1,7 +1,12 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -31,7 +36,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 foreach (var index in ColumnNamesByIndexNameDic)
                 {
                     _currentIndex = index;
-                    output.Append(GetMethodDef());
+                    output.Append(WriteMethodDef());
                     output.Append(Environment.NewLine);
                     output.Append(GetDapperDynaParams());
                     output.Append(Environment.NewLine);
@@ -41,10 +46,10 @@ namespace Dapper_Layers_Generator.Core.Generators
                     output.Append(GetSqlWhereClause());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
-                    output.Append(GetDapperCall());
+                    output.Append(WriteDapperCall());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
-                    output.Append(GetReturnObj());
+                    output.Append(WriteReturnObj());
                     output.Append(Environment.NewLine);
                     output.Append($"{tab}{tab}}}");
                     output.Append(Environment.NewLine);
@@ -56,14 +61,14 @@ namespace Dapper_Layers_Generator.Core.Generators
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
             return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}?> GetBy{GetUkMemberNamesString(_currentIndex.Key)}Async({GetUkMemberNamesStringAndType(_currentIndex.Key)})" +
                 @$"
 {tab}{tab}{{";
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}var {ClassName.ToLower()} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
@@ -101,7 +106,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             return output.ToString();
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
         }

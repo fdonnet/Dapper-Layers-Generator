@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -26,18 +30,18 @@ namespace Dapper_Layers_Generator.Core.Generators
             if (TableSettings.AddMultiGenerator)
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetOpenTransactionAndLoopBegin());
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperDynaParams());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
-                output.Append($"{tab}{tab}{tab}{tab}{tab}" + @GetValuesToInsert().Replace($"{tab}{tab}{tab}{tab}",$"{tab}{tab}{tab}{tab}{tab}"));
+                output.Append(WriteBaseSqlForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
+                output.Append($"{tab}{tab}{tab}{tab}{tab}" + WriteValuesToInsert().Replace($"{tab}{tab}{tab}{tab}",$"{tab}{tab}{tab}{tab}{tab}"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
+                output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCloseTransaction());
@@ -51,7 +55,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
             return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync(IEnumerable<{ClassName}> " +
             $"{_stringTransform.PluralizeToLower(ClassName)})" +
@@ -59,7 +63,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 {tab}{tab}{{";
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}{tab}_ = " +
             $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
@@ -98,7 +102,7 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
 
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return string.Empty;
         }

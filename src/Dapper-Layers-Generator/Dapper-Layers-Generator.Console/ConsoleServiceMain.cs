@@ -31,7 +31,7 @@ internal partial class ConsoleService
         {
             AnsiConsole.Clear();
             //TMP CODING
-            //await _settings.LoadFromFile(@"c:\temp\config.json");
+            await _settings.LoadFromFile(@"c:\temp\config.json");
 
             await AnsiConsole.Status()
                  .StartAsync(

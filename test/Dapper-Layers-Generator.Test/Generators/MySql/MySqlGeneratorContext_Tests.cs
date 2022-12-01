@@ -17,11 +17,6 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql.Tests
 {
     public class MySqlGeneratorContext_Tests : GeneratorBaseTest
     {
-        public MySqlGeneratorContext_Tests() : base()
-        {
-
-        }
-
         [Fact()]
         public void GenerateStandard_Test()
         {

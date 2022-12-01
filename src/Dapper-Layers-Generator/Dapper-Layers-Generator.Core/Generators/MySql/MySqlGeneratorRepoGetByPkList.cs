@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
@@ -31,12 +35,12 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                     throw new ArgumentException($"You cannot run the Delete by PkList Generator for table {Table.Name}, no pk defined");
 
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperDynaParamsForPkList());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
+                output.Append(WriteReturnObj());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -56,11 +60,11 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Call bulk for composite pk*/" : base.GetDapperDynaParamsForPkList();
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return PkColumns.Count() > 1
                 ? $"{tab}{tab}{tab}return await GetBy{GetPkMemberNamesString()}BulkAsync({GetPKMemberNamesStringList()});"
-                : base.GetReturnObj();
+                : base.WriteReturnObj();
         }
 
     }

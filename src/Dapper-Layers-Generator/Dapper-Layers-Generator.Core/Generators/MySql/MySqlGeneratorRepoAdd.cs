@@ -20,35 +20,37 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         IsBase = false;
     }
 
-        protected override string GetValuesToInsert()
+        protected override string WriteValuesToInsert()
         {
-            var output = new StringBuilder();
 
             var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
-
             var values = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},", cols.OrderBy(c => c.Position).Select(col =>
             {
                 return $@"@{col.Name}";
             }));
 
-
-            output.Append(values);
-            output.Append(Environment.NewLine);
+            string identityClause = string.Empty;
 
             if(PkColumns.Count() == 1 && PkColumns.Where(c=>c.IsAutoIncrement).Any())
             {
-                //Add return identity clause
-                output.Append($@"{tab}{tab}{tab});");
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}{tab}SELECT LAST_INSERT_ID();");
-                output.Append($@""";");
+                identityClause =
+                    $""""
+                    {tab}{tab}{tab});
+                    {tab}{tab}{tab}SELECT LAST_INSERT_ID();
+                    {tab}{tab}{tab}""";
+                    """";
             }
             else
-            {
-                output.Append($@"{tab}{tab}{tab})"";");
-            }
-            
-            return output.ToString();
+                identityClause =
+                    $""""
+                    {tab}{tab}{tab})
+                    {tab}{tab}{tab}""";
+                    """";
+            return
+                $"""
+                {tab}{tab}{tab}{tab}{values}
+                {identityClause}
+                """;
         }
     }
 }

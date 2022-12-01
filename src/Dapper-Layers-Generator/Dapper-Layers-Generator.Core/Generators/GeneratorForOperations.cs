@@ -29,21 +29,22 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
 
         //Can maybe be used for BULK
-        protected string GetBaseSqlForInsert()
+        protected string WriteBaseSqlForInsert()
         {
             if (ColumnForInsertOperations == null || !ColumnForInsertOperations.Any())
                 throw new ArgumentException($"No column available for insert for this table{Table.Name}, genererator crash");
 
             return
-                $$"""
-                {{tab}}{{tab}}{{tab}}var sql = @"
+                $$""""
+                {{tab}}{{tab}}{{tab}}var sql = 
+                {{tab}}{{tab}}{{tab}}"""
                 {{tab}}{{tab}}{{tab}}INSERT INTO {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}}
                 {{tab}}{{tab}}{{tab}}(
                 {{tab}}{{tab}}{{tab}}{{tab}}{{@GetColumnListStringForInsert()}}
                 {{tab}}{{tab}}{{tab}})
                 {{tab}}{{tab}}{{tab}}VALUES
                 {{tab}}{{tab}}{{tab}}(
-                """;
+                """";
         }
 
         protected virtual string GetBaseSqlForDelete()
@@ -55,22 +56,21 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetValuesToInsert()
+        protected virtual string WriteValuesToInsert()
         {
-            var output = new StringBuilder();
-
             var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
 
             var values = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},", cols.OrderBy(c => c.Position).Select(col =>
             {
-                return $@"@{col.Name}";
+                return $"""@{col.Name}""";
             }));
 
             return
-                $"""
+                $""""
                 {tab}{tab}{tab}{tab}{values}
-                {tab}{tab}{tab})";
-                """;
+                {tab}{tab}{tab})
+                {tab}{tab}{tab}""";
+                """";
         }
 
         protected string GetBaseSqlForUpdate()
@@ -198,7 +198,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 $$"""
                 {{tab}}{{tab}}{{tab}}var table = new DataTable();
                 {{String.Join(Environment.NewLine, colAdd)}}
-                {{tab}}{{tab}}{{tab}}bulkCopy.DestinationTableName = "tmp_bulk{{opCode}}_{{Table.Name}}"
+                {{tab}}{{tab}}{{tab}}bulkCopy.DestinationTableName = "tmp_bulk{{opCode}}_{{Table.Name}}";
                 {{tab}}{{tab}}{{tab}}bulkCopy.BulkCopyTimeout = 600;
                 
                 {{tab}}{{tab}}{{tab}}foreach(var identity in listOf{{string.Join("And", PkColumns.Select(c => _stringTransform.ApplyConfigTransformClass(c.Name)))}})
@@ -239,8 +239,8 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected abstract string GetMethodDef();
-        protected abstract string GetDapperCall();
-        protected abstract string GetReturnObj();
+        protected abstract string WriteMethodDef();
+        protected abstract string WriteDapperCall();
+        protected abstract string WriteReturnObj();
     }
 }

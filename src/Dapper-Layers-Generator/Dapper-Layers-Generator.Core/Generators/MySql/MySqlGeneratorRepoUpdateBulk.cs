@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
 {
@@ -26,7 +30,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
@@ -43,7 +47,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(@GetUpdateFromTmpTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetDapperCall());
+                output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCloseTransaction());
@@ -133,7 +137,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             var output = new StringBuilder($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"ExecuteAsync(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");

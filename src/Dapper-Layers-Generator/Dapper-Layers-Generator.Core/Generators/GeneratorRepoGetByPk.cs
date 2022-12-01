@@ -1,6 +1,10 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -28,7 +32,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     throw new ArgumentException($"You cannot run the Get by Pk Generator for table {Table.Name}, no pk defined");
 
                 var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperDynaParamsForPk());
                 output.Append(Environment.NewLine);
@@ -38,10 +42,10 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(GetSqlWhereClauseForPk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
+                output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
+                output.Append(WriteReturnObj());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
@@ -52,21 +56,21 @@ namespace Dapper_Layers_Generator.Core.Generators
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
             return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}?> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndType()})" +
                 @$"
 {tab}{tab}{{";
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}var {ClassName.ToLower()} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"QuerySingleOrDefaultAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
         }
