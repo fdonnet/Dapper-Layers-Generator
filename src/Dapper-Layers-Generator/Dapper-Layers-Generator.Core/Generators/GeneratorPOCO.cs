@@ -26,49 +26,39 @@ namespace Dapper_Layers_Generator.Core.Generators
             if (Table == null)
                 throw new NullReferenceException("Cannot use POCO generator without a loaded table (use SetTable)");
 
-
-            string output = WritePocoClass();
-
-            return output;
-        }
-
-        private string WritePocoHeaderComment()
-        {
-            return $@"#nullable disable warnings
-namespace {_settings.TargetNamespaceForPOCO} 
-{{
-{tab}/// =================================================================
-{tab}/// <summary>
-{tab}/// Poco class for the table {Table.Name}
-{tab}/// Author: {_settings.AuthorName}
-{tab}/// Poco: {ClassName}
-{tab}/// Generated: {DateTime.Now}
-{tab}/// WARNING: Never change this file manually (re-generate it)
-{tab}/// </summary>
-{tab}/// =================================================================";
-
+            return WritePocoClass();
         }
 
         private string WritePocoClass()
         {
-            var builder = new StringBuilder();
-            
-            builder.Append(@WritePocoHeaderComment());
-            
-            builder.Append(Environment.NewLine);
-            builder.Append($"{tab}public class {ClassName}");
-            builder.Append(Environment.NewLine);
-            builder.Append($"{tab}{{");
-            builder.Append(Environment.NewLine);
+            return
+                $$"""
+                {{WritePocoHeaderComment()}}
+                {{tab}}public class {{ClassName}}
+                {{tab}}{
+                {{WritePocoMemberFields()}}
+                {{tab}}}
+                }
+                """;
+        }
 
-            builder.Append(WritePocoMemberFields());
-
-            builder.Append($"{tab}}}");
-            builder.Append(Environment.NewLine);
-            builder.Append('}');
-
-            return builder.ToString();
-            
+        private string WritePocoHeaderComment()
+        {
+            return
+                $$"""
+                #nullable disable warnings
+                namespace {{_settings.TargetNamespaceForPOCO}} 
+                {
+                {{tab}}/// =================================================================
+                {{tab}}/// <summary>
+                {{tab}}/// Poco class for the table {{Table.Name}}
+                {{tab}}/// Author: {{_settings.AuthorName}}
+                {{tab}}/// Poco: {{ClassName}}
+                {{tab}}/// Generated: {{_settings.GenerationTimestamp.ToString("yyyy-MM-dd HH:mm:ss")}} UTC
+                {{tab}}/// WARNING: Never change this file manually (re-generate it)
+                {{tab}}/// </summary>
+                {{tab}}/// =================================================================
+                """;
         }
 
         private string WritePocoMemberFields()
@@ -98,22 +88,15 @@ namespace {_settings.TargetNamespaceForPOCO}
 
         private string WriteMemberDecorators(SettingsColumn settings, string memberType, Column col)
         {
-            var decorators = new StringBuilder();
-            var curDecoratorsLength = 0;
+            var decorators = new List<string>
+            {
+                WriteMemberRequieredDecorator(settings, col),
+                WriteMemberStringDecorator(settings, memberType, col),
+                WriteMemberJsonIgnoreDecorator(col),
+                WriteMemberCustomDecorator(settings)
+            };
 
-            decorators.Append(WriteMemberRequieredDecorator(settings, col));
-            SpaceBetweenDecorators(ref decorators, ref curDecoratorsLength);
-
-            decorators.Append(WriteMemberStringDecorator(settings, memberType, col));
-            SpaceBetweenDecorators(ref decorators, ref curDecoratorsLength);
-
-            decorators.Append(WriteMemberJsonIgnoreDecorator(col));
-            SpaceBetweenDecorators(ref decorators, ref curDecoratorsLength);
-
-            decorators.Append(WriteMemberCustomDecorator(settings));
-            SpaceBetweenDecorators(ref decorators, ref curDecoratorsLength);
-
-            return decorators.ToString();
+            return String.Join(Environment.NewLine, decorators.Where(d => !string.IsNullOrEmpty(d))) + Environment.NewLine;
         }
 
         private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, Column col)
@@ -170,15 +153,5 @@ namespace {_settings.TargetNamespaceForPOCO}
 
             return decorator;
         }
-
-        private static void SpaceBetweenDecorators(ref StringBuilder decorators, ref int curLength)
-        {
-            if (decorators.Length > curLength)
-            {
-                decorators.Append(Environment.NewLine);
-                curLength = decorators.Length;
-            }
-        }
-
     }
 }
