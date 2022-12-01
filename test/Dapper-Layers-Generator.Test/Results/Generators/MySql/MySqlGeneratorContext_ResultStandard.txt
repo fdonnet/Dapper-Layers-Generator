@@ -1,0 +1,137 @@
+﻿using DapperTest.Repo;
+using System.Data;
+using MySqlConnector;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+
+// =================================================================
+// DBContext implements all repo management + a small context factory
+// Inherits from DbContext base abstract class
+// Specific for DB provider MySql
+// Author: Dapper Generator
+// Context name: DbContext
+// Generated: 2022-12-01 12:46:29 UTC
+// WARNING: Never change this file manually (re-generate it)
+// =================================================================
+
+namespace DapperTest.DbContext
+{
+	/// <summary>
+	/// Used when the DBcontext itself is not suffisent to manage its lifecycle 
+	/// Factory specific for the dbprovider MySql
+	/// Inherits from factory base
+	/// </summary>
+	public class DbContextMySqlFactory :  DbContextFactoryBase, IDbContextFactory
+	{
+		public DbContextMySqlFactory(IConfiguration config) : base (config)
+		{
+		}
+		
+		public override IDbContext Create()
+		{
+			return new DbContextMySql(_config);
+		}
+	}
+
+	/// <summary>
+	/// Used when the DBcontext
+	/// Specific for the dbprovider MySql
+	/// Inherits from DbContextBase
+	/// </summary>
+	public class DbContextMySql : DbContextBase,  IDbContext
+	{
+		public override IDbConnection Connection {get;init;}
+		
+		public override IStateRepo StateRepo 
+		{
+			get {
+				_stateRepo ??= new StateRepoMySql(this);
+				return _stateRepo;
+			}
+		}
+		public override IClientRepo ClientRepo 
+		{
+			get {
+				_clientRepo ??= new ClientRepoMySql(this);
+				return _clientRepo;
+			}
+		}
+		public override IRefreshTokenRepo RefreshTokenRepo 
+		{
+			get {
+				_refreshTokenRepo ??= new RefreshTokenRepoMySql(this);
+				return _refreshTokenRepo;
+			}
+		}
+		public override IHistorystateRepo HistorystateRepo 
+		{
+			get {
+				_historystateRepo ??= new HistorystateRepoMySql(this);
+				return _historystateRepo;
+			}
+		}
+		public override IRepairerRepo RepairerRepo 
+		{
+			get {
+				_repairerRepo ??= new RepairerRepoMySql(this);
+				return _repairerRepo;
+			}
+		}
+		public override IUserRepo UserRepo 
+		{
+			get {
+				_userRepo ??= new UserRepoMySql(this);
+				return _userRepo;
+			}
+		}
+		public override IDamageRepo DamageRepo 
+		{
+			get {
+				_damageRepo ??= new DamageRepoMySql(this);
+				return _damageRepo;
+			}
+		}
+		public override IDamageFailureRepo DamageFailureRepo 
+		{
+			get {
+				_damageFailureRepo ??= new DamageFailureRepoMySql(this);
+				return _damageFailureRepo;
+			}
+		}
+		public override IFailureRepo FailureRepo 
+		{
+			get {
+				_failureRepo ??= new FailureRepoMySql(this);
+				return _failureRepo;
+			}
+		}
+
+		/// <summary>
+		/// Main constructor, inject standard config : Default connection string
+		/// </summary>
+		public DbContextMySql(IConfiguration config) : base (config)
+		{
+			DefaultTypeMap.MatchNamesWithUnderscores = true;
+			SqlMapper.Settings.CommandTimeout = 60000;
+			Connection = new MySqlConnection(_config.GetConnectionString("Default") + ";AllowLoadLocalInfile=True");
+		}
+
+		/// <summary>
+		/// Open a transaction with a specified isolation level
+		/// </summary>
+		public override async Task<IDbTransaction> OpenTransactionAsync(IsolationLevel? level = null)
+		{
+			if(_trans != null)
+				throw new Exception("A transaction is already open, you need to use a new DbContext for parallel job.");
+			
+			if (Connection.State == ConnectionState.Closed)
+			{
+				await ((MySqlConnection)Connection).OpenAsync();
+			}
+			
+			_trans = level == null ? Connection.BeginTransaction() : Connection.BeginTransaction((IsolationLevel)level);
+			
+			return _trans;
+		}
+	}
+}

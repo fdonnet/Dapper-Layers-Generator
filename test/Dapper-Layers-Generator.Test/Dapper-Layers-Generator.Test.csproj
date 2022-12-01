@@ -15,6 +15,7 @@
     <None Remove="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
     <None Remove="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <None Remove="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,10 +44,7 @@
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Generators\MySql\" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
   </ItemGroup>
 
 </Project>
