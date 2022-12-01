@@ -6,7 +6,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
     public interface IMySqlGeneratorContext : IGenerator
     {
     }
-    public class MySqlGeneratorContext : GeneratorContext, IMySqlGeneratorContext
+    public class MySqlGeneratorContext : GeneratorContextForProvider, IMySqlGeneratorContext
     {
         protected override string UsingDbProviderSpecific { get; init; }
         protected override string DbProviderString { get; init; }

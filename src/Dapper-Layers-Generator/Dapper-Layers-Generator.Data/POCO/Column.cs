@@ -1,6 +1,6 @@
-﻿namespace Dapper_Layers_Generator.Data.POCO.MySql
+﻿namespace Dapper_Layers_Generator.Data.POCO
 {
-    public class MySqlColumn : IColumn
+    public class Column
     {
         public string Schema { get; set; } = null!;
         public string Table { get; set; } = null!;
@@ -15,5 +15,7 @@
         public List<string>? UniqueIndexNames { get; set; }
         public bool IsAutoIncrement { get; set; }
         public string CompleteType { get; set; } = null!;
+
     }
+
 }

@@ -1,7 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -14,7 +13,7 @@ namespace Dapper_Layers_Generator.Core.Generators
     public abstract class Generator : IGenerator
     {
         protected readonly SettingsGlobal _settings;
-        protected readonly ISchema _currentSchema;
+        protected readonly Schema _currentSchema;
         protected readonly StringTransformationService _stringTransform;
         private readonly IReaderDBDefinitionService _data;
 #pragma warning disable IDE1006 // Naming Styles

@@ -2,6 +2,7 @@
 using Dapper_Layers_Generator.Data.POCO;
 using Spectre.Console;
 using System.Text.Json;
+using Table = Dapper_Layers_Generator.Data.POCO.Table;
 
 internal partial class ConsoleService
 {
@@ -16,7 +17,7 @@ internal partial class ConsoleService
         var settings = _generatorService.GlobalGeneratorSettings;
 
         var selectedTables = _dataService.SchemaDefinitions?.FirstOrDefault(s => s.Name ==
-            settings.SelectedSchema)?.Tables ?? new List<ITable>();
+            settings.SelectedSchema)?.Tables ?? new List<Table>();
 
         //Exclude if not selected for generation
         if (!settings.RunGeneratorForAllTables)

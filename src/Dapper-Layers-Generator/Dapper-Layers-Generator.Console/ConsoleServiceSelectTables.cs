@@ -1,6 +1,8 @@
 ﻿using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
 using Spectre.Console;
+using Table = Dapper_Layers_Generator.Data.POCO.Table;
+
 internal partial class ConsoleService
 {
     internal async Task ShowSelectTablesAsync()
@@ -8,7 +10,7 @@ internal partial class ConsoleService
         AnsiConsole.Clear();
         var settings = _generatorService.GlobalGeneratorSettings;
 
-        var tables = _dataService.SchemaDefinitions?.FirstOrDefault(s => s.Name == settings.SelectedSchema)?.Tables ?? new List<ITable>();
+        var tables = _dataService.SchemaDefinitions?.FirstOrDefault(s => s.Name == settings.SelectedSchema)?.Tables ?? new List<Table>();
 
         if (settings.RunGeneratorForAllTables)
         {
@@ -24,7 +26,7 @@ Continue like this (y) or select tables(n):"))
         }
         else
         {
-            var tableUI = new Table();
+            var tableUI = new Spectre.Console.Table();
             tableUI.AddColumn("Table name");
             tableUI.AddColumn("Selected");
 
@@ -60,7 +62,7 @@ Continue like this (y) or select tables(n):"))
         }
     }
 
-    private static List<string> BuildSelectionTable(SettingsGlobal settings, IList<ITable> tables)
+    private static List<string> BuildSelectionTable(SettingsGlobal settings, IList<Dapper_Layers_Generator.Data.POCO.Table> tables)
     {
         if (tables != null)
         {
