@@ -1,0 +1,49 @@
+﻿#nullable disable warnings
+namespace DapperTest.POCO 
+{
+	/// =================================================================
+	/// <summary>
+	/// Poco class for the table clients
+	/// Author: Dapper Generator
+	/// Poco: Client
+	/// Generated: 2022-12-01 12:46:29 UTC
+	/// WARNING: Never change this file manually (re-generate it)
+	/// </summary>
+	/// =================================================================
+	public class Client
+	{
+
+		public int Id { get; set; }
+
+		[System.ComponentModel.DataAnnotations.Required]
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string Firstname { get; set; }
+
+		[System.ComponentModel.DataAnnotations.Required]
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string Lastname { get; set; }
+
+		[System.ComponentModel.DataAnnotations.Required]
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string Address { get; set; }
+
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string? Comment { get; set; }
+
+		[System.ComponentModel.DataAnnotations.Required]
+		public DateTime CreatedAt { get; set; }
+
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string? Postal { get; set; }
+
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string? City { get; set; }
+
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string? Phone { get; set; }
+
+		[System.ComponentModel.DataAnnotations.StringLength(255)]
+		public string? Email { get; set; }
+
+	}
+}
