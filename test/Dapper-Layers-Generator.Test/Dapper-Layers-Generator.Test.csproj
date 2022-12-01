@@ -16,6 +16,8 @@
     <None Remove="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <None Remove="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorPOCO_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDeco.txt" />
+    <None Remove="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDecoOneCol.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
   </ItemGroup>
 
@@ -46,6 +48,8 @@
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDeco.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDecoOneCol.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
   </ItemGroup>
 

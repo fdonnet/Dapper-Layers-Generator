@@ -19,7 +19,6 @@ namespace DapperTest.POCO
 		public string Firstname { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string Lastname { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]

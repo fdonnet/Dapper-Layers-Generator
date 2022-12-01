@@ -15,33 +15,25 @@ namespace DapperTest.POCO
 		public int Id { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string Firstname { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string Lastname { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string Address { get; set; }
 
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string? Comment { get; set; }
 
 		[System.ComponentModel.DataAnnotations.Required]
 		public DateTime CreatedAt { get; set; }
 
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string? Postal { get; set; }
 
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string? City { get; set; }
 
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string? Phone { get; set; }
 
-		[System.ComponentModel.DataAnnotations.StringLength(255)]
 		public string? Email { get; set; }
 	}
 }

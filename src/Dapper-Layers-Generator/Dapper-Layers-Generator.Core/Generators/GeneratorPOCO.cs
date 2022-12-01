@@ -70,7 +70,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                           ? Table.Columns
                           : Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name));
 
-            var members = String.Join(Environment.NewLine, columns.Select(col =>
+            var members = String.Join(Environment.NewLine + Environment.NewLine, columns.Select(col =>
             {
                 var memberName = _stringTransform.PascalCase(col.Name);
                 var colSettings = TableSettings.GetColumnSettings(col.Name);
@@ -78,8 +78,9 @@ namespace Dapper_Layers_Generator.Core.Generators
 
                 var decorators = WriteMemberDecorators(colSettings, memberType, col);
 
-                return  $"{decorators}{tab}{tab}public {memberType} {memberName} {{ get; set; }}"
-                    + Environment.NewLine;
+                return $"{(string.IsNullOrEmpty(decorators)
+                    ? string.Empty
+                    : decorators + Environment.NewLine)}{tab}{tab}public {memberType} {memberName} {{ get; set; }}";
 
             }));
 
@@ -96,7 +97,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 WriteMemberCustomDecorator(settings)
             };
 
-            return String.Join(Environment.NewLine, decorators.Where(d => !string.IsNullOrEmpty(d))) + Environment.NewLine;
+            return String.Join(Environment.NewLine, decorators.Where(d => !string.IsNullOrEmpty(d)));
         }
 
         private string WriteMemberStringDecorator(SettingsColumn settings, string memberType, Column col)
