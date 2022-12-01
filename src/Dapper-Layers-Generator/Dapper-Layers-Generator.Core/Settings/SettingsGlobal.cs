@@ -64,7 +64,7 @@ namespace Dapper_Layers_Generator.Core.Settings
         //Override table global seetings (table_name key / table_seetings)
         public Dictionary<string, SettingsTable> TableSettings { get; set; } = new Dictionary<string, SettingsTable>();
 
-        public DateTime GenerationTimestamp { get; set; } = DateTime.Now;
+        public DateTime GenerationTimestamp { get; set; } = DateTime.UtcNow;
 
         public async Task SaveToFile(string configPath)
         {

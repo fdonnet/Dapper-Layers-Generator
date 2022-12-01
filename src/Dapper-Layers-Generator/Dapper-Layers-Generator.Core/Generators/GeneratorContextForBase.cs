@@ -44,7 +44,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 //           base classes for factory and DB context
                 // Author: {{_settings.AuthorName}}
                 // Context name: {{_settings.DbContextClassName}}
-                // Generated: {{_settings.GenerationTimestamp}}
+                // Generated: {{_settings.GenerationTimestamp.ToString("yyyy-MM-dd HH:mm:ss")}} UTC
                 // WARNING: Never change this file manually (re-generate it)
                 // =================================================================
                 
