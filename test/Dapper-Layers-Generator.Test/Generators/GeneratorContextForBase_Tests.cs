@@ -10,11 +10,6 @@ namespace Dapper_Layers_Generator.Core.Generators.Tests
 {
     public class GeneratorContextForBase_Tests : GeneratorBaseTest
     {
-        public GeneratorContextForBase_Tests() : base()
-        {
-
-        }
-
         [Fact()]
         public void GenerateStandard_Test()
         {

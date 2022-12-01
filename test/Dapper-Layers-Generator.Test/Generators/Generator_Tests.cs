@@ -7,23 +7,10 @@ using Dapper_Layers_Generator.Test.Config;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 
 
-namespace Dapper_Layers_Generator.Core.Generators.Tests
+namespace Dapper_Layers_Generator.Test.Generators
 {
-    public class Generator_Tests
+    public class Generator_Tests : GeneratorBaseTest
     {
-        private Mock<IReaderDBDefinitionService> _mockDbDefinitions;
-        //No need for a base config
-        private SettingsGlobal _settings = new();
-        
-        public Generator_Tests()
-        {
-            var jsonDB = ResourceTool.Read("Dapper_Layers_Generator.Test/Data/schema.json");
-            var schemas = JsonSerializer.Deserialize<List<Schema>>(jsonDB) ?? throw new NullReferenceException("Cannot test without JSON DB");
-            _mockDbDefinitions = new Mock<IReaderDBDefinitionService>();
-            _mockDbDefinitions.Setup(x => x.SchemaDefinitions).Returns(schemas);
-            _settings.SelectedSchema = "mobileflow";
-        }
-
         [Fact]
         public void GetSelectedTableNamesWithSelection_Test()
         {
