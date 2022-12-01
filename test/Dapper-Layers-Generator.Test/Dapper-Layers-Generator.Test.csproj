@@ -12,6 +12,8 @@
   <ItemGroup>
     <None Remove="Data\baseconfig.json" />
     <None Remove="Data\schema.json" />
+    <None Remove="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
+    <None Remove="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <None Remove="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
   </ItemGroup>
 
@@ -38,6 +40,8 @@
     <EmbeddedResource Include="Data\schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
   </ItemGroup>
 

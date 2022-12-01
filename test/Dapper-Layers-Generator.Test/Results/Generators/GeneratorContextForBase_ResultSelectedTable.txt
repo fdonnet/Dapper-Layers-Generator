@@ -1,0 +1,147 @@
+using System.Data;
+using Microsoft.Extensions.Configuration;
+using DapperTest.Repo;
+
+// =================================================================
+// DBContext implements all repo management + a small context factory
+//           this file contains interfaces declaration and abstract
+//           base classes for factory and DB context
+// Author: Dapper Generator
+// Context name: DbContext
+// Generated: 2022-12-01 12:46:29 UTC
+// WARNING: Never change this file manually (re-generate it)
+// =================================================================
+
+namespace DapperTest.DbContext
+{
+	public interface IDbContext : IDisposable
+	{
+		IDbConnection Connection { get; }
+		IDbTransaction? Transaction { get; }
+
+		Task<IDbTransaction> OpenTransactionAsync(IsolationLevel? level = null);
+		void CommitTransaction(bool disposeTrans = true);
+		void RollbackTransaction(bool disposeTrans = true);
+
+		IClientRepo ClientRepo { get; }
+		IFailureRepo FailureRepo { get; }
+	}
+
+	/// <summary>
+	///Interface for DbContextFactory
+	/// </summary>
+	public interface IDbContextFactory
+	{
+	    IDbContext Create();
+	}
+
+	/// <summary>
+	/// Used when the DBcontext itself is not suffisent to manage its lifecycle 
+	/// Very simple implementation
+	/// </summary>
+	public abstract class DbContextFactoryBase : IDbContextFactory
+	{
+		protected readonly IConfiguration _config;
+		
+		public DbContextFactoryBase(IConfiguration config)
+		{
+			_config = config;
+		}
+		
+		public abstract IDbContext Create();
+	}
+
+	/// <summary>
+	/// Abstract DBContext base 
+	/// </summary>
+	public abstract class DbContextBase : IDbContext
+	{
+		protected readonly IConfiguration _config;
+		public abstract IDbConnection Connection {get;init;}
+		
+		protected IDbTransaction? _trans = null;
+		public IDbTransaction? Transaction { 
+		    get => _trans;
+		}
+		
+		private bool _disposed = false;
+
+		protected IClientRepo? _clientRepo;
+		public abstract IClientRepo ClientRepo { get; }
+		protected IFailureRepo? _failureRepo;
+		public abstract IFailureRepo FailureRepo { get; }
+
+		/// <summary>
+		/// Main constructor, inject standard config
+		/// </summary>
+		public DbContextBase(IConfiguration config)
+		{
+			_config = config;
+		}
+		
+		/// <summary>
+		/// Open a transaction with a specified isolation level
+		/// </summary>
+		public abstract Task<IDbTransaction> OpenTransactionAsync(IsolationLevel? level);
+
+		/// <summary>
+		/// Commit the current transaction, and optionally dispose all resources related to the transaction.
+		/// </summary>
+		public void CommitTransaction(bool disposeTrans = true)
+		{
+			if  (_trans == null)
+				throw new NullReferenceException("DB Transaction is not present.");
+			
+			_trans.Commit();
+			
+			if (disposeTrans)
+			{
+				_trans.Dispose();
+				_trans = null;
+			}
+		}
+
+		/// <summary>
+		/// Rollback the transaction and all the operations linked to it, and optionally dispose all resources related to the transaction.
+		/// </summary>
+		public void RollbackTransaction(bool disposeTrans = true)
+		{
+			if  (_trans == null)
+				throw new NullReferenceException("DB Transaction is not present.");
+			
+			_trans.Rollback();
+			
+			if (disposeTrans)
+			{
+				_trans.Dispose();
+				_trans = null;
+			}
+		}
+
+		/// <summary>
+		/// Will be call at the end of the service (ex : transient service in api net core)
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Better way to dispose if someone needs to inherit the DB context and have to dispose unmanaged ressources
+		/// </summary>
+		private void Dispose(bool disposing)
+		{
+			if(! _disposed)
+			{
+				if(disposing)
+				{
+					_trans?.Dispose();
+					Connection.Close();
+					Connection.Dispose();
+				}
+			}
+			_disposed = true;             
+		}
+	}
+}
