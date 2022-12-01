@@ -30,7 +30,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetBaseSqlForInsert());
-                output.Append($"{tab}{tab}{tab}{tab}" + @GetValuesToInsert());
+                output.Append(@GetValuesToInsert());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDapperCall());
