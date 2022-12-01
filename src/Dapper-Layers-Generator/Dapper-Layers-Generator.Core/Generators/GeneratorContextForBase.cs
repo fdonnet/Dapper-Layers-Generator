@@ -1,7 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using Dapper_Layers_Generator.Data.POCO;
-using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -173,8 +171,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 {{tab}}{{tab}}{{tab}}{{tab}}throw new NullReferenceException("DB Transaction is not present.");
                 {{tab}}{{tab}}{{tab}}
                 {{tab}}{{tab}}{{tab}}_trans.Commit();
-                {{tab}}{{tab}}{{tab}}if (disposeTrans) _trans.Dispose();
-                {{tab}}{{tab}}{{tab}}if (disposeTrans) _trans = null;
+                {{tab}}{{tab}}{{tab}}
+                {{tab}}{{tab}}{{tab}}if (disposeTrans)
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}_trans.Dispose();
+                {{tab}}{{tab}}{{tab}}{{tab}}_trans = null;
+                {{tab}}{{tab}}{{tab}}}
                 {{tab}}{{tab}}}
                 
                 {{tab}}{{tab}}/// <summary>
@@ -186,12 +188,16 @@ namespace Dapper_Layers_Generator.Core.Generators
                 {{tab}}{{tab}}{{tab}}{{tab}}throw new NullReferenceException("DB Transaction is not present.");
                 {{tab}}{{tab}}{{tab}}
                 {{tab}}{{tab}}{{tab}}_trans.Rollback();
-                {{tab}}{{tab}}{{tab}}if (disposeTrans) _trans.Dispose();
-                {{tab}}{{tab}}{{tab}}if (disposeTrans) _trans = null;
+                {{tab}}{{tab}}{{tab}}
+                {{tab}}{{tab}}{{tab}}if (disposeTrans)
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}_trans.Dispose();
+                {{tab}}{{tab}}{{tab}}{{tab}}_trans = null;
+                {{tab}}{{tab}}{{tab}}}
                 {{tab}}{{tab}}}
                 
                 {{tab}}{{tab}}/// <summary>
-                {{tab}}{{tab}}/// Will be call at the end of the service (ex : transient service in api net core) GC correct way
+                {{tab}}{{tab}}/// Will be call at the end of the service (ex : transient service in api net core)
                 {{tab}}{{tab}}/// </summary>
                 {{tab}}{{tab}}public void Dispose()
                 {{tab}}{{tab}}{

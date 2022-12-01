@@ -1,20 +1,10 @@
-﻿using Xunit;
-using Dapper_Layers_Generator.Core.Generators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Moq;
-using Dapper_Layers_Generator.Data.Reader;
+﻿using Moq;
 using Dapper_Layers_Generator.Data.POCO;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Test.Config;
 using Dapper_Layers_Generator.Core.Generators.MySql;
-using System.Reflection.Emit;
 
 
 namespace Dapper_Layers_Generator.Core.Generators.Tests
@@ -22,11 +12,12 @@ namespace Dapper_Layers_Generator.Core.Generators.Tests
     public class Generator_Tests
     {
         private Mock<IReaderDBDefinitionService> _mockDbDefinitions;
+        //No need for a base config
         private SettingsGlobal _settings = new();
         
         public Generator_Tests()
         {
-            var jsonDB = JsonDB.Read("Dapper_Layers_Generator.Test/Data/schema.json");
+            var jsonDB = ResourceTool.Read("Dapper_Layers_Generator.Test/Data/schema.json");
             var schemas = JsonSerializer.Deserialize<List<Schema>>(jsonDB) ?? throw new NullReferenceException("Cannot test without JSON DB");
             _mockDbDefinitions = new Mock<IReaderDBDefinitionService>();
             _mockDbDefinitions.Setup(x => x.SchemaDefinitions).Returns(schemas);

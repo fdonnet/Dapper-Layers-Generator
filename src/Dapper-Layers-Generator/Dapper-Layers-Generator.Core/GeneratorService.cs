@@ -3,11 +3,6 @@ using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlX.XDevAPI.Relational;
-using System;
-using System.ComponentModel.Design.Serialization;
-using System.Data;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core

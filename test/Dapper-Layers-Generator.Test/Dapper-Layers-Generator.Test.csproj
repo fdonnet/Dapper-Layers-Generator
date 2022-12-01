@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\baseconfig.json" />
     <None Remove="Data\schema.json" />
+    <None Remove="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,9 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\baseconfig.json" />
     <EmbeddedResource Include="Data\schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>

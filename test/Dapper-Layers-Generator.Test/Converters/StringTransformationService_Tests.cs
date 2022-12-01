@@ -1,11 +1,4 @@
-﻿using Xunit;
-using Dapper_Layers_Generator.Core.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper_Layers_Generator.Core.Settings;
+﻿using Dapper_Layers_Generator.Core.Settings;
 
 namespace Dapper_Layers_Generator.Core.Converters.Tests
 {

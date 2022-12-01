@@ -1,7 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Data.POCO;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
