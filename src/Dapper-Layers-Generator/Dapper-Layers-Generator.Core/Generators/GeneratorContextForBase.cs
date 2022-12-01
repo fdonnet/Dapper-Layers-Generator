@@ -15,7 +15,6 @@ namespace Dapper_Layers_Generator.Core.Generators
     /// </summary>
     public class GeneratorContextForBase : GeneratorContextTemplate, IGeneratorContextBase
     {
-
         public GeneratorContextForBase(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService)
@@ -47,7 +46,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 //           base classes for factory and DB context
                 // Author: {{_settings.AuthorName}}
                 // Context name: {{_settings.DbContextClassName}}
-                // Generated: {{DateTime.Now}}
+                // Generated: {{_settings.GenerationTimestamp}}
                 // WARNING: Never change this file manually (re-generate it)
                 // =================================================================
                 

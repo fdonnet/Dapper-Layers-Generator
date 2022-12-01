@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
-    public abstract class GeneratorContext : GeneratorContextTemplate 
+    public abstract class GeneratorContextForProvider : GeneratorContextTemplate 
     {
         protected abstract string UsingDbProviderSpecific { get; init; }
         protected abstract string DbProviderString { get; init; }
@@ -14,7 +14,7 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected abstract string DapperCommandTimeOut { get; init; }
         protected abstract string ConnectionClassName { get; init; }
 
-        public GeneratorContext(SettingsGlobal settingsGlobal
+        public GeneratorContextForProvider(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService)
             : base(settingsGlobal, data, stringTransformationService)
