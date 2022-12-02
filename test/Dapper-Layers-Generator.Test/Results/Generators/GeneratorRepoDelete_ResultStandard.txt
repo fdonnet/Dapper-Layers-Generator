@@ -1,0 +1,13 @@
+﻿		public virtual async Task DeleteAsync(int id)
+		{
+			var p = new DynamicParameters();
+			p.Add("@id",id);
+
+			var sql = 
+			$"""
+			DELETE FROM clients
+			WHERE id = @id
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,p,transaction:_dbContext.Transaction);
+		}
