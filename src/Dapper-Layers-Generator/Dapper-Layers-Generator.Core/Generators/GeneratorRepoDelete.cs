@@ -27,23 +27,18 @@ namespace Dapper_Layers_Generator.Core.Generators
                 if (!PkColumns.Any())
                     throw new ArgumentException($"You cannot run the Get by Pk Generator for table {Table.Name}, no pk defined");
 
-                var output = new StringBuilder();
-                output.Append(WriteMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(WriteDapperDynaParamsForPk());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteBaseSqlForDelete());
-                output.Append(Environment.NewLine);
-                output.Append(WriteSqlWhereClauseForPk());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteDapperDynaParamsForPk()}}
 
-                return output.ToString();
+                    {{WriteBaseSqlForDelete()}}
+                    {{WriteSqlWhereClauseForPk()}}
+
+                    {{WriteDapperCall()}}
+                    {{tab}}{{tab}}}
+
+                    """;
             }
 
             return string.Empty;
@@ -51,9 +46,11 @@ namespace Dapper_Layers_Generator.Core.Generators
         
         protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task DeleteAsync({GetPkMemberNamesStringAndType()})" +
-                @$"
-{tab}{tab}{{";
+            return
+                $$"""
+                {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task DeleteAsync({{GetPkMemberNamesStringAndType()}})
+                {{tab}}{{tab}}{
+                """;
         }
 
         protected override string WriteDapperCall()

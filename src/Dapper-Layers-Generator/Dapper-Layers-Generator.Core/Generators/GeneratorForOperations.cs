@@ -50,10 +50,11 @@ namespace Dapper_Layers_Generator.Core.Generators
         protected virtual string WriteBaseSqlForDelete()
         {
             return
-                $$"""
-                {{tab}}{{tab}}{{tab}}var sql = @"
+                $$""""
+                {{tab}}{{tab}}{{tab}}var sql = 
+                {{tab}}{{tab}}{{tab}}$"""
                 {{tab}}{{tab}}{{tab}}DELETE FROM {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}}
-                """;
+                """";
         }
 
         protected virtual string WriteValuesToInsert()
@@ -156,17 +157,19 @@ namespace Dapper_Layers_Generator.Core.Generators
             }));
             
             return
-                $"""
-                {tab}{tab}{tab}WHERE {whereClause}";
-                """;
+                $""""
+                {tab}{tab}{tab}WHERE {whereClause}
+                {tab}{tab}{tab}""";
+                """";
         }
 
         protected virtual string WriteSqlPkListWhereClause()
         {
             return
-                $"""
-                {tab}{tab}{tab}WHERE {ColAndTableIdentifier}{PkColumns.First().Name}{ColAndTableIdentifier} IN @listOf";
-                """;
+                $""""
+                {tab}{tab}{tab}WHERE {ColAndTableIdentifier}{PkColumns.First().Name}{ColAndTableIdentifier} IN @listOf
+                {tab}{tab}{tab}""";
+                """";
         }
 
         protected virtual string WriteOpenTransAndInitBulkMySql()
