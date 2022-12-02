@@ -1,0 +1,29 @@
+﻿		public virtual async Task<Client?> GetByFirstnameAndLastnameAndAddresAsync(string firstname, string lastname, string address)
+		{
+			var p = new DynamicParameters();
+			p.Add("@firstname",firstname);
+			p.Add("@lastname",lastname);
+			p.Add("@address",address);
+
+			var sql = 
+			"""
+			SELECT id
+				,firstname
+				,lastname
+				,address
+				,comment
+				,created_at
+				,postal
+				,city
+				,phone
+				,email
+			FROM clients 
+			WHERE firstname = @firstname
+			AND lastname = @lastname
+			AND address = @address
+			""";
+
+			var client = await _dbContext.Connection.QuerySingleOrDefaultAsync<Client>(sql,p,transaction:_dbContext.Transaction);
+
+			return client;
+		}
