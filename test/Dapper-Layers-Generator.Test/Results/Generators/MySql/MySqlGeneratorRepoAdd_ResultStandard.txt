@@ -1,0 +1,45 @@
+﻿		public override async Task<int> AddAsync(Client client)
+		{
+			var p = new DynamicParameters();
+			p.Add("@firstname", client.Firstname);
+			p.Add("@lastname", client.Lastname);
+			p.Add("@address", client.Address);
+			p.Add("@comment", client.Comment);
+			p.Add("@created_at", client.CreatedAt);
+			p.Add("@postal", client.Postal);
+			p.Add("@city", client.City);
+			p.Add("@phone", client.Phone);
+			p.Add("@email", client.Email);
+
+			var sql = 
+			"""
+			INSERT INTO `clients`
+			(
+				`firstname`
+				,`lastname`
+				,`address`
+				,`comment`
+				,`created_at`
+				,`postal`
+				,`city`
+				,`phone`
+				,`email`
+			)
+			VALUES
+			(
+				@firstname
+				,@lastname
+				,@address
+				,@comment
+				,@created_at
+				,@postal
+				,@city
+				,@phone
+				,@email
+			);
+			SELECT LAST_INSERT_ID();
+			""";
+
+			var identity = await _dbContext.Connection.ExecuteScalarAsync<int>(sql,p,transaction:_dbContext.Transaction);
+			return identity;
+		}

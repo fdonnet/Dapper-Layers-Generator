@@ -27,7 +27,8 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         {
             //Arrange
             var generator = new MySqlGeneratorRepoAdd(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorContext_ResultStandard.txt");
+            generator.SetTable("clients");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoAdd_ResultStandard.txt");
 
             //Act
             var result = generator.Generate();

@@ -29,8 +29,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     {{WriteBaseSqlForInsert()}}
                     {{WriteValuesToInsert()}}
 
-                    {{WriteDapperCall()}}
-                    {{WriteReturnObj()}}
+                    {{WriteDapperCall()}}{{WriteReturnObj()}}
                     {{tab}}{{tab}}}
 
                     """
@@ -84,7 +83,11 @@ namespace Dapper_Layers_Generator.Core.Generators
             //The base implementation is very minimal (no real return from the DB, need to be override by dbprovider specific)
             if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
             {
-                return $"{tab}{tab}{tab}return identity;";
+                return 
+                    $"""
+
+                    {tab}{tab}{tab}return identity;
+                    """;
             }
             else
             {
