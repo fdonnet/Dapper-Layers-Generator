@@ -2,11 +2,6 @@
 using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Generators;
 using Dapper_Layers_Generator.Test.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Test.Generators
 {

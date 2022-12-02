@@ -1,11 +1,4 @@
-﻿using Xunit;
-using Dapper_Layers_Generator.Core.Generators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper_Layers_Generator.Test.Generators;
+﻿using Dapper_Layers_Generator.Test.Generators;
 using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Test.Config;
 using Dapper_Layers_Generator.Core.Converters.MySql;

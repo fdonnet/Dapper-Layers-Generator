@@ -1,11 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Settings;
 using Dapper_Layers_Generator.Core;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Dapper_Layers_Generator.Test.Config;
 using System.Text.Json;
 using Dapper_Layers_Generator.Data.POCO;

@@ -5,12 +5,12 @@ using Dapper_Layers_Generator.Test.Config;
 
 namespace Dapper_Layers_Generator.Test.Generators
 {
-    public class GeneratorRepoGetAll_Tests : GeneratorBaseTest
+    public class GeneratorRepoGetByPk_Tests : GeneratorBaseTest
     {
         private MySqlDataTypeConverter _dataConverter;
         private StringTransformationService _transformString;
 
-        public GeneratorRepoGetAll_Tests() : base()
+        public GeneratorRepoGetByPk_Tests() : base()
         {
             _dataConverter = new MySqlDataTypeConverter();
             _transformString = new StringTransformationService(_settings);
@@ -20,9 +20,9 @@ namespace Dapper_Layers_Generator.Test.Generators
         public void GenerateStandard_Test()
         {
             //Arrange
-            var generator = new GeneratorRepoGetAll(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new GeneratorRepoGetByPk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("clients");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetAll_ResultStandard.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPk_ResultStandard.txt");
 
             //Act
             var result = generator.Generate();
