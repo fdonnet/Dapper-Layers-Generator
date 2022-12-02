@@ -9,7 +9,7 @@
 			var bulkCopy = new MySqlBulkCopy((MySqlConnection)_dbContext.Connection
 				, (MySqlTransaction?)_dbContext.Transaction);
 
-				var sqltmp = $"CREATE TEMPORARY TABLE `tmp_bulkupd_clients` LIKE `clients`;";
+			var sqltmp = $"CREATE TEMPORARY TABLE `tmp_bulkupd_clients` LIKE `clients`;";
 
 			_ = await _dbContext.Connection.ExecuteAsync(sqltmp,transaction:_dbContext.Transaction);
 

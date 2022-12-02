@@ -100,7 +100,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         {
             return
                 $$""""
-                {{tab}}{{tab}}{{tab}}{{tab}}var sqltmp = $"CREATE TEMPORARY TABLE {{ColAndTableIdentifier}}tmp_bulkupd_{{Table.Name}}{{ColAndTableIdentifier}} LIKE {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}};";
+                {{tab}}{{tab}}{{tab}}var sqltmp = $"CREATE TEMPORARY TABLE {{ColAndTableIdentifier}}tmp_bulkupd_{{Table.Name}}{{ColAndTableIdentifier}} LIKE {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}};";
 
                 {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sqltmp,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
                 """";
