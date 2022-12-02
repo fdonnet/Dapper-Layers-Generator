@@ -1,0 +1,13 @@
+﻿		public override async Task DeleteAsync(IEnumerable<int> listOfId)
+		{
+			var p = new DynamicParameters();
+			p.Add("@listOf",listOfId);
+
+			var sql = 
+			$"""
+			DELETE FROM `clients`
+			WHERE `id` IN @listOf
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,p,transaction:_dbContext.Transaction);
+		}

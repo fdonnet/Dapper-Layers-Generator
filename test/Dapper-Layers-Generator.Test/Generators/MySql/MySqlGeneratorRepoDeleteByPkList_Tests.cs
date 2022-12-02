@@ -11,12 +11,12 @@ using Dapper_Layers_Generator.Core.Generators.MySql;
 
 namespace Dapper_Layers_Generator.Test.Generators.MySql
 {
-    public class MySqlGenertatorRepoDeleteBulk_Tests : GeneratorBaseTest
+    public class MySqlGeneratorRepoDeleteByPkList_Tests : GeneratorBaseTest
     {
         private MySqlDataTypeConverter _dataConverter;
         private StringTransformationService _transformString;
 
-        public MySqlGenertatorRepoDeleteBulk_Tests() : base()
+        public MySqlGeneratorRepoDeleteByPkList_Tests() : base()
         {
             _dataConverter = new MySqlDataTypeConverter();
             _transformString = new StringTransformationService(_settings);
@@ -26,9 +26,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateStandard_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoDeleteBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new MySqlGeneratorRepoDeleteByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("clients");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoDeleteBulk_ResultStandard.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt");
 
             //Act
             var result = generator.Generate();
@@ -41,9 +41,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateCompositePk_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoDeleteBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new MySqlGeneratorRepoDeleteByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("damages_failures");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt");
 
             //Act
             var result = generator.Generate();

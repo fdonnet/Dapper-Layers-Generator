@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Test.Generators
 {
-    public class GenertatorRepoAddMulti_Tests : GeneratorBaseTest
+    public class GeneratorRepoAddMulti_Tests : GeneratorBaseTest
     {
         private MySqlDataTypeConverter _dataConverter;
         private StringTransformationService _transformString;
 
-        public GenertatorRepoAddMulti_Tests() : base()
+        public GeneratorRepoAddMulti_Tests() : base()
         {
             _dataConverter = new MySqlDataTypeConverter();
             _transformString = new StringTransformationService(_settings);

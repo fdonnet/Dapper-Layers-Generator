@@ -62,7 +62,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 return
                     $$"""
                     {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task DeleteAsync({{GetPkMemberNamesStringAndTypeList()}})
-                    {
+                    {{tab}}{{tab}}{
                     """;
         }
 

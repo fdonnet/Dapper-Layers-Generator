@@ -1,0 +1,5 @@
+﻿		public override async Task DeleteAsync(IEnumerable<(int, int)> listOfDamageIdAndFailureId)
+		{/*Call bulk for composite pk*/
+
+			await DeleteBulkAsync(listOfDamageIdAndFailureId);
+		}

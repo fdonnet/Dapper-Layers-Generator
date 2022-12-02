@@ -21,6 +21,8 @@
     <None Remove="Results\Generators\GeneratorRepoAddMulti_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoAdd_ResultCompositePk.txt" />
     <None Remove="Results\Generators\GeneratorRepoAdd_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
@@ -29,6 +31,8 @@
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +67,8 @@
     <EmbeddedResource Include="Results\Generators\GeneratorRepoAddMulti_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoAdd_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoAdd_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
@@ -71,6 +77,8 @@
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
   </ItemGroup>
 
 </Project>
