@@ -248,7 +248,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 {{tab}}{{tab}}{{tab}}{{tab}}colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
                 {{tab}}{{tab}}{{tab}}{{tab}}i++;
                 {{tab}}{{tab}}{{tab}}}
-                
+                {{tab}}{{tab}}{{tab}}
                 {{tab}}{{tab}}{{tab}}bulkCopy.ColumnMappings.AddRange(colMappings);
                 """;
         }
@@ -266,10 +266,17 @@ namespace Dapper_Layers_Generator.Core.Generators
                 $".Connection.ExecuteAsync(sqltmp,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
 
             return
-                $"""
-                {tab}{tab}{tab}var sqltmp = @"CREATE TEMPORARY TABLE {ColAndTableIdentifier}tmp_bulk{opCode}_{Table.Name}{ColAndTableIdentifier} ({createColumns});";
+                $""""
+                {tab}{tab}{tab}var sqltmp = 
+                {tab}{tab}{tab}$"""
+                {tab}{tab}{tab}CREATE TEMPORARY TABLE {ColAndTableIdentifier}tmp_bulk{opCode}_{Table.Name}{ColAndTableIdentifier}
+                {tab}{tab}{tab}(
+                {tab}{tab}{tab}{tab}{createColumns}
+                {tab}{tab}{tab});
+                {tab}{tab}{tab}""";
+                {tab}{tab}{tab}
                 {functionCall};
-                """;
+                """";
         }
 
         protected abstract string WriteMethodDef();
