@@ -21,11 +21,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 throw new ArgumentException($"No column available for select for this table{Table.Name}, genererator crash");
 
             return
-                $$"""
-                {{tab}}{{tab}}{{tab}}var sql = @"
+                $$""""
+                {{tab}}{{tab}}{{tab}}var sql = 
+                {{tab}}{{tab}}{{tab}}"""
                 {{tab}}{{tab}}{{tab}}SELECT {{WriteColumnListStringForSelect(tableIdentifier)}}
                 {{tab}}{{tab}}{{tab}}FROM {{ColAndTableIdentifier + Table.Name + ColAndTableIdentifier}} {{tableIdentifier.Replace(".", "")}}
-                """;
+                """";
         }
 
         //Can maybe be used for BULK
