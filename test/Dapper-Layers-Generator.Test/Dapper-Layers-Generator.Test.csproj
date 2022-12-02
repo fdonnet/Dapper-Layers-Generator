@@ -45,6 +45,7 @@
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultCompositePk.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoMain_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoUpdateBulk_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +56,7 @@
     <EmbeddedResource Include="Results\Generators\GeneratorRepoUpdate_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoMain_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoUpdateBulk_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
