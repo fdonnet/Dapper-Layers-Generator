@@ -81,11 +81,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 throw new ArgumentException($"No column available for update for this table{Table.Name}, genererator crash");
 
             return
-                $"""
-                {tab}{tab}{tab}var sql = @"
+                $""""
+                {tab}{tab}{tab}var sql = 
+                {tab}{tab}{tab}"""
                 {tab}{tab}{tab}UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier}
                 {tab}{tab}{tab}SET {WriteColumnListStringForUpdate()}
-                """;
+                """";
         }
 
         private string WriteColumnListStringForUpdate()

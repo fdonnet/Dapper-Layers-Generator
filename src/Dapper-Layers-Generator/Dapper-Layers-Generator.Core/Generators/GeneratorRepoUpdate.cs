@@ -23,22 +23,18 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.UpdateGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
-                var output = new StringBuilder();
-                output.Append(WriteMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParams());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteBaseSqlForUpdate());
-                output.Append(WriteSqlWhereClauseForPk());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteDapperDynaParams()}}
 
-                return output.ToString();
+                    {{WriteBaseSqlForUpdate()}}
+                    {{WriteSqlWhereClauseForPk()}}
+
+                    {{WriteDapperCall()}}
+                    {{tab}}{{tab}}}
+
+                    """;
             }
 
             return string.Empty;
@@ -46,10 +42,11 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task UpdateAsync({ClassName} " +
-                   $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
-                @$"
-{tab}{tab}{{";
+            return
+                $$"""
+                {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task UpdateAsync({{ClassName}} {{_stringTransform.ApplyConfigTransformMember(ClassName)}})
+                {{tab}}{{tab}}{
+                """;
         }
 
         protected override string WriteDapperCall()
@@ -58,12 +55,8 @@ namespace Dapper_Layers_Generator.Core.Generators
                     $"ExecuteAsync(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected virtual string GetDapperDynaParams()
+        protected virtual string WriteDapperDynaParams()
         {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
-            output.Append(Environment.NewLine);
-
             var cols = ColumnForUpdateOperations!;
 
             var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
@@ -71,15 +64,16 @@ namespace Dapper_Layers_Generator.Core.Generators
                 return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
             }));
 
-            output.Append(spParams);
-            return output.ToString();
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}var p = new DynamicParameters();
+                {{spParams}}
+                """;
         }
 
         protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {ClassName.ToLower()};";
         }
-
-
     }
 }
