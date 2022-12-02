@@ -27,6 +27,8 @@
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +69,8 @@
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
   </ItemGroup>
 
 </Project>
