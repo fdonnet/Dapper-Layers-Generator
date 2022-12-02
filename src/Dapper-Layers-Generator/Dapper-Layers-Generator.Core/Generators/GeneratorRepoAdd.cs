@@ -1,6 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {

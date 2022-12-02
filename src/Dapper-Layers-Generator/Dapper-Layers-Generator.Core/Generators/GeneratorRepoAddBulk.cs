@@ -1,10 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -14,7 +10,6 @@ namespace Dapper_Layers_Generator.Core.Generators
     }
     public class GeneratorRepoAddBulk : GeneratorForOperations, IGeneratorRepoAddBulk
     {
-
         public GeneratorRepoAddBulk(SettingsGlobal settingsGlobal
             , IReaderDBDefinitionService data
             , StringTransformationService stringTransformationService

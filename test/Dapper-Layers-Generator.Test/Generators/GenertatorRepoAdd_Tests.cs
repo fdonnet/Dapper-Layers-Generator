@@ -37,5 +37,20 @@ namespace Dapper_Layers_Generator.Test.Generators
             Assert.Equal(expected, result);
         }
 
+        [Fact()]
+        public void GenerateCompositePk_Test()
+        {
+            //Arrange
+            var generator = new GeneratorRepoAdd(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            generator.SetTable("damages_failures");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoAdd_ResultCompositePk.txt");
+
+            //Act
+            var result = generator.Generate();
+
+            //Assert
+            Assert.Equal(expected, result);
+        }
+
     }
 }
