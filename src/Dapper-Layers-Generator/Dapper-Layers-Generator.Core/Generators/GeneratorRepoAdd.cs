@@ -23,7 +23,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             return TableSettings.AddGenerator
                 ? $$"""
                     {{WriteMethodDef()}}
-                    {{WriteDapperDynaParams()}}
+                    {{WriteDapperDynaParamsForInsert()}}
 
                     {{WriteBaseSqlForInsert()}}
                     {{WriteValuesToInsert()}}
@@ -59,22 +59,6 @@ namespace Dapper_Layers_Generator.Core.Generators
                 $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                 $"ExecuteAsync(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
 
-        }
-
-        protected virtual string WriteDapperDynaParams()
-        {
-            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
-
-            var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
-            {
-                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
-            }));
-
-            return
-                $"""
-                {tab}{tab}{tab}var p = new DynamicParameters();
-                {spParams}
-                """;
         }
 
         protected override string WriteReturnObj()

@@ -118,6 +118,22 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
+        protected virtual string WriteDapperDynaParamsForInsert()
+        {
+            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
+
+            var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
+            {
+                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
+            }));
+
+            return
+                $"""
+                {tab}{tab}{tab}var p = new DynamicParameters();
+                {spParams}
+                """;
+        }
+
         private string GetColumnListStringForSelect(string tableIdentifier = "")
         {
             return String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},",
@@ -164,6 +180,20 @@ namespace Dapper_Layers_Generator.Core.Generators
                 
                 {tab}{tab}{tab}var bulkCopy = new MySqlBulkCopy((MySqlConnection)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection
                 {tab}{tab}{tab}{tab}, (MySqlTransaction?)_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);
+                """;
+        }
+
+        protected virtual string WriteOpenTransactionAndLoopBegin()
+        {
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}var isTransAlreadyOpen = _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction != null;
+                
+                {{tab}}{{tab}}{{tab}}if (!isTransAlreadyOpen)
+                {{tab}}{{tab}}{{tab}}{{tab}}await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.OpenTransactionAsync();
+                
+                {{tab}}{{tab}}{{tab}}foreach(var {{_stringTransform.ApplyConfigTransformMember(ClassName)}} in {{_stringTransform.PluralizeToLower(ClassName)}})
+                {{tab}}{{tab}}{{tab}}{
                 """;
         }
 

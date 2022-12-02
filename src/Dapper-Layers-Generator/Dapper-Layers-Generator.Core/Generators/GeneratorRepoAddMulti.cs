@@ -25,27 +25,21 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.AddMultiGenerator)
             {
-                var output = new StringBuilder();
-                output.Append(WriteMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetOpenTransactionAndLoopBegin());
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParams());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteBaseSqlForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}"));
-                output.Append($"{tab}{tab}{tab}{tab}{tab}" + WriteValuesToInsert().Replace($"{tab}{tab}{tab}{tab}",$"{tab}{tab}{tab}{tab}{tab}"));
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteCloseTransaction());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteOpenTransactionAndLoopBegin()}}
+                    {{WriteDapperDynaParamsForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}")}}
 
-                return output.ToString();
+                    {{WriteBaseSqlForInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}")}}
+                    {{WriteValuesToInsert().Replace($"{tab}{tab}{tab}", $"{tab}{tab}{tab}{tab}")}}
+
+                    {{WriteDapperCall()}}
+
+                    {{WriteCloseTransaction()}}
+                    {{tab}}{{tab}}}
+
+                    """;
             }
 
             return string.Empty;
@@ -53,50 +47,25 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync(IEnumerable<{ClassName}> " +
-            $"{_stringTransform.PluralizeToLower(ClassName)})" +
-        @$"
-{tab}{tab}{{";
+            return
+                $$"""
+                {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task AddAsync(IEnumerable<{{ClassName}}> {{_stringTransform.PluralizeToLower(ClassName)}})
+                {{tab}}{{tab}}{
+                """;
         }
 
         protected override string WriteDapperCall()
         {
-            return $"{tab}{tab}{tab}{tab}_ = " +
+            var methodCall = $"{tab}{tab}{tab}{tab}_ = " +
             $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-            $"ExecuteAsync(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);" +
-            Environment.NewLine +
-            $"{tab}{tab}{tab}}}";
+            $"ExecuteAsync(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
 
+            return
+                $$"""
+                {{methodCall}}
+                {{tab}}{{tab}}{{tab}}}
+                """;
         }
-
-        protected virtual string GetOpenTransactionAndLoopBegin()
-        {
-            return @$"{tab}{tab}{tab}var isTransAlreadyOpen = _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction != null;
-
-{tab}{tab}{tab}if (!isTransAlreadyOpen)
-{tab}{tab}{tab}{tab}await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.OpenTransactionAsync();
-
-{tab}{tab}{tab}foreach(var {_stringTransform.ApplyConfigTransformMember(ClassName)} in {_stringTransform.PluralizeToLower(ClassName)})
-{tab}{tab}{tab}{{";
-        }
-
-        protected virtual string GetDapperDynaParams()
-        {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}{tab}var p = new DynamicParameters();");
-            output.Append(Environment.NewLine);
-
-            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
-
-            var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
-            {
-                return $@"{tab}{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
-            }));
-
-            output.Append(spParams);
-            return output.ToString();
-        }
-
 
         protected override string WriteReturnObj()
         {
