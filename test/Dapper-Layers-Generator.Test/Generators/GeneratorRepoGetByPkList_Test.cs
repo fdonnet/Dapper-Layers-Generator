@@ -37,7 +37,7 @@ namespace Dapper_Layers_Generator.Test.Generators
             //Arrange
             var generator = new GeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("damages_failures");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultCompositePk.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultCompositePk2.txt");
 
             //Act
             var result = generator.Generate();
