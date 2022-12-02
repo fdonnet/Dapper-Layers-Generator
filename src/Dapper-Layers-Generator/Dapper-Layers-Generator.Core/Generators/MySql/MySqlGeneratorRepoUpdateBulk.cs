@@ -28,7 +28,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 var output = new StringBuilder();
                 output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(GetOpenTransAndInitBulkMySql());
+                output.Append(WriteOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetCreateDbTmpTable());
@@ -46,7 +46,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCloseTransaction());
+                output.Append(WriteCloseTransaction());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);

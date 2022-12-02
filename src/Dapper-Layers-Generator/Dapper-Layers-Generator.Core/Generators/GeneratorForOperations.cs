@@ -153,7 +153,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetOpenTransAndInitBulkMySql()
+        protected virtual string WriteOpenTransAndInitBulkMySql()
         {
             return
                 $"""
@@ -167,7 +167,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetCloseTransaction()
+        protected virtual string WriteCloseTransaction()
         {
             return
                 $$"""

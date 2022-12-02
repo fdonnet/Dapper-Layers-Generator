@@ -40,7 +40,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(WriteDapperCall());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCloseTransaction());
+                output.Append(WriteCloseTransaction());
                 output.Append(Environment.NewLine);
                 output.Append($"{tab}{tab}}}");
                 output.Append(Environment.NewLine);
