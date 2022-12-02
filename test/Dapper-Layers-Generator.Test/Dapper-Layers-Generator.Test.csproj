@@ -35,6 +35,8 @@
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -83,6 +85,8 @@
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt" />
   </ItemGroup>
 
 </Project>
