@@ -1,16 +1,16 @@
 ﻿using Dapper_Layers_Generator.Core.Converters.MySql;
 using Dapper_Layers_Generator.Core.Converters;
-using Dapper_Layers_Generator.Core.Generators.MySql;
 using Dapper_Layers_Generator.Test.Config;
+using Dapper_Layers_Generator.Core.Generators;
 
-namespace Dapper_Layers_Generator.Test.Generators.MySql
+namespace Dapper_Layers_Generator.Test.Generators
 {
-    public class MySqlGeneratorRepoGetByPkBulk_Tests : GeneratorBaseTest
+    public class GeneratorRepoGetByPkList_Test : GeneratorBaseTest
     {
         private MySqlDataTypeConverter _dataConverter;
         private StringTransformationService _transformString;
 
-        public MySqlGeneratorRepoGetByPkBulk_Tests() : base()
+        public GeneratorRepoGetByPkList_Test() : base()
         {
             _dataConverter = new MySqlDataTypeConverter();
             _transformString = new StringTransformationService(_settings);
@@ -20,9 +20,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateStandard_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoGetByPkBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new GeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("clients");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultStandard.txt");
 
             //Act
             var result = generator.Generate();
@@ -35,9 +35,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateCompositePk_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoGetByPkBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new GeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("damages_failures");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultCompositePk.txt");
 
             //Act
             var result = generator.Generate();

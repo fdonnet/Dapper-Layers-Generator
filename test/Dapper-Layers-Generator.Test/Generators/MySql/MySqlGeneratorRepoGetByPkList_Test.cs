@@ -5,12 +5,12 @@ using Dapper_Layers_Generator.Test.Config;
 
 namespace Dapper_Layers_Generator.Test.Generators.MySql
 {
-    public class MySqlGeneratorRepoGetByPkBulk_Tests : GeneratorBaseTest
+    public class MySqlGeneratorRepoGetByPkList_Test : GeneratorBaseTest
     {
         private MySqlDataTypeConverter _dataConverter;
         private StringTransformationService _transformString;
 
-        public MySqlGeneratorRepoGetByPkBulk_Tests() : base()
+        public MySqlGeneratorRepoGetByPkList_Test() : base()
         {
             _dataConverter = new MySqlDataTypeConverter();
             _transformString = new StringTransformationService(_settings);
@@ -20,9 +20,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateStandard_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoGetByPkBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new MySqlGeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("clients");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkList_ResultStandard.txt");
 
             //Act
             var result = generator.Generate();
@@ -35,9 +35,9 @@ namespace Dapper_Layers_Generator.Test.Generators.MySql
         public void GenerateCompositePk_Test()
         {
             //Arrange
-            var generator = new MySqlGeneratorRepoGetByPkBulk(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            var generator = new MySqlGeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
             generator.SetTable("damages_failures");
-            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/MySql/MySqlGeneratorRepoGetByPkList_ResultCompositePk.txt");
 
             //Act
             var result = generator.Generate();
