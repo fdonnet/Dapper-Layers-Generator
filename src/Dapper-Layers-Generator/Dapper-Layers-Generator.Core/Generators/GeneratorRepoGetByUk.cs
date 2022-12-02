@@ -31,23 +31,23 @@ namespace Dapper_Layers_Generator.Core.Generators
                 foreach (var index in ColumnNamesByIndexNameDic)
                 {
                     _currentIndex = index;
-                    output.Append(WriteMethodDef());
-                    output.Append(Environment.NewLine);
-                    output.Append(GetDapperDynaParams());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteBaseSqlForSelect());
-                    output.Append(Environment.NewLine);
-                    output.Append(GetSqlWhereClause());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteDapperCall());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteReturnObj());
-                    output.Append(Environment.NewLine);
-                    output.Append($"{tab}{tab}}}");
-                    output.Append(Environment.NewLine);
+
+                    var toBeAdded =
+                        $$"""
+                        {{WriteMethodDef()}}
+                        {{WriteDapperDynaParams()}}
+
+                        {{WriteBaseSqlForSelect()}}
+                        {{WriteSqlWhereClause()}}
+
+                        {{WriteDapperCall()}}
+
+                        {{WriteReturnObj()}}
+                        {{tab}}{{tab}}}
+
+                        """;
+
+                    output.Append(toBeAdded);
                 }
 
                 return output.ToString();
@@ -58,9 +58,11 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{ClassName}?> GetBy{GetUkMemberNamesString(_currentIndex.Key)}Async({GetUkMemberNamesStringAndType(_currentIndex.Key)})" +
-                @$"
-{tab}{tab}{{";
+            return
+                $$"""
+                {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task<{{ClassName}}?> GetBy{{GetUkMemberNamesString(_currentIndex.Key)}}Async({{GetUkMemberNamesStringAndType(_currentIndex.Key)}})
+                {{tab}}{{tab}}{
+                """;
         }
 
         protected override string WriteDapperCall()
@@ -70,35 +72,32 @@ namespace Dapper_Layers_Generator.Core.Generators
                     $"QuerySingleOrDefaultAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected virtual string GetSqlWhereClause()
+        protected virtual string WriteSqlWhereClause()
         {
-            var output = new StringBuilder();
-
-            output.Append($"{tab}{tab}{tab}WHERE ");
-
             var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", _currentIndex.Value.Select(col =>
             {
                 return $"{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = @{col.Name}";
             }));
 
-            output.Append(whereClause + "\";");
-            return output.ToString();
-
+            return
+                $$""""
+                {{tab}}{{tab}}{{tab}}WHERE {{whereClause}}
+                {{tab}}{{tab}}{{tab}}""";
+                """";
         }
 
-        protected virtual string GetDapperDynaParams()
+        protected virtual string WriteDapperDynaParams()
         {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
-            output.Append(Environment.NewLine);
-
             var spParams = String.Join(Environment.NewLine, _currentIndex.Value.Select(col =>
             {
                 return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"",{_stringTransform.ApplyConfigTransformMember(col.Name)});";
             }));
 
-            output.Append(spParams);
-            return output.ToString();
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}var p = new DynamicParameters();
+                {{spParams}}
+                """;
         }
 
         protected override string WriteReturnObj()
