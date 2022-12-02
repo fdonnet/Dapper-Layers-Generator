@@ -1,0 +1,49 @@
+﻿using DapperTest.POCO;
+using Dapper;
+using DapperTest.DbContext;
+                                
+// =================================================================
+// Repo class for table clients
+// Base abstract class that can be used with no specific db provider
+// You can extend it via other partial files where you know that a 
+// query can run the same on different db providers
+// Author: Dapper Generator
+// Repo name: ClientRepoBase
+// Generated: 2022-12-01 12:46:29 UTC
+// WARNING: Never change this file manually (re-generate it)
+// =================================================================
+
+namespace DapperTest.Repo
+{
+	/// =================================================================
+	/// Author: Dapper Generator
+	/// Description:	Interface for the repo ClientRepo
+	/// You can extend it with partial file
+	/// ================================================================= 
+	public partial interface IClientRepo
+	{
+		Task<IEnumerable<Client>> GetAllAsync();
+		Task<Client?> GetByIdAsync(int id);
+		Task<IEnumerable<Client>> GetByIdAsync(IEnumerable<int> listOfId);
+		Task<IEnumerable<Client>> GetByIdBulkAsync(IEnumerable<int> listOfId);
+		Task<Client?> GetByFirstnameAndLastnameAndAddresAsync(string firstname, string lastname, string address);
+		Task<int> AddAsync(Client client);
+		Task AddAsync(IEnumerable<Client> clients);
+		Task AddBulkAsync(IEnumerable<Client> clients);
+		Task UpdateAsync(Client client);
+		Task UpdateAsync(IEnumerable<Client> clients);
+		Task UpdateBulkAsync(IEnumerable<Client> clients);
+		Task DeleteAsync(int id);
+		Task DeleteAsync(IEnumerable<int> listOfId);
+		Task DeleteBulkAsync(IEnumerable<int> listOfId);
+	}
+
+	public abstract partial class ClientRepoBase : IClientRepo
+	{
+		protected readonly IDbContext _dbContext;
+		
+		public ClientRepoBase(IDbContext dbContext)
+		{
+			_dbContext = dbContext;
+		}
+
