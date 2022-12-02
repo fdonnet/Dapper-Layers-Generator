@@ -31,19 +31,19 @@ namespace Dapper_Layers_Generator.Test.Generators
             Assert.Equal(expected, result);
         }
 
-        //[Fact()]
-        //public void GenerateCompositePk_Test()
-        //{
-        //    //Arrange
-        //    var generator = new GeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
-        //    generator.SetTable("damages_failures");
-        //    var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultCompositePk.txt");
+        [Fact()]
+        public void GenerateCompositePk_Test()
+        {
+            //Arrange
+            var generator = new GeneratorRepoGetByPkList(_settings, _mockDbDefinitions.Object, _transformString, _dataConverter);
+            generator.SetTable("damages_failures");
+            var expected = ResourceTool.Read("Dapper_Layers_Generator.Test/Results/Generators/GeneratorRepoGetByPkList_ResultCompositePk.txt");
 
-        //    //Act
-        //    var result = generator.Generate();
+            //Act
+            var result = generator.Generate();
 
-        //    //Assert
-        //    Assert.Equal(expected, result);
-        //}
+            //Assert
+            Assert.Equal(expected, result);
+        }
     }
 }
