@@ -50,7 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePk.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByUk_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoMain_ResultStandard.txt" />
