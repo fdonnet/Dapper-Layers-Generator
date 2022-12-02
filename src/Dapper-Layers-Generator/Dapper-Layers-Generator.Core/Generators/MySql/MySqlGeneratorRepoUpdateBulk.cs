@@ -23,61 +23,45 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
 
         public override string Generate()
         {
-            if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
-            {
-                var output = new StringBuilder();
-                output.Append(WriteMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(WriteOpenTransAndInitBulkMySql());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCreateDbTmpTable());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCreateDataTable());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteBulkCallMySql());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(@GetUpdateFromTmpTable());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(WriteCloseTransaction());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
+            return TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any()
+                ? $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteOpenTransAndInitBulkMySql()}}
 
-                return output.ToString();
-            }
+                    {{WriteCreateDbTmpTable()}}
 
-            return string.Empty;
+                    {{WriteCreateDataTable()}}
+
+                    {{WriteBulkCallMySql()}}
+
+                    {{WriteUpdateFromTmpTable()}}
+
+                    {{WriteDapperCall()}}
+
+                    {{WriteCloseTransaction()}}
+                    {{tab}}{{tab}}}
+
+                    """
+                : string.Empty;
         }
 
-        protected virtual string GetCreateDataTable()
+        protected virtual string WriteCreateDataTable()
         {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var table = new DataTable();" + Environment.NewLine);
-
             if (ColumnForUpdateOperations == null || !ColumnForUpdateOperations.Any())
                 throw new ArgumentException($"No column defined for update (bulk), for table {Table.Name}");
 
             var columnsForBulk = ColumnForUpdateOperations;
 
             var rowsAdd = new List<string>();
+            var colAdd = new List<string>();
             foreach (var colBulk in columnsForBulk)
             {
-                output.Append($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));" + Environment.NewLine);
+                colAdd.Add($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));");
                 if (colBulk.IsNullable)
                 {
-                    output.Append($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;" + Environment.NewLine);
+                    colAdd.Add($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;");
                     rowsAdd.Add($"{tab}{tab}{tab}{tab}r[\"{colBulk.Name}\"] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)} == null " +
                         $"? DBNull.Value : {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
-
                 }
                 else
                 {
@@ -85,93 +69,75 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 }
             }
 
-            output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""tmp_bulkupd_{Table.Name}"";");
-            output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.BulkCopyTimeout = 600;");
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}var table = new DataTable();
+                {{String.Join(Environment.NewLine, colAdd)}}
 
-            output.Append(@$"{tab}{tab}{tab}foreach(var {ClassName.ToLower()} in {_stringTransform.PluralizeToLower(ClassName)})
-{tab}{tab}{tab}{{
-{tab}{tab}{tab}{tab}DataRow r = table.NewRow();");
+                {{tab}}{{tab}}{{tab}}bulkCopy.DestinationTableName = "tmp_bulkupd_{{Table.Name}}";
+                {{tab}}{{tab}}{{tab}}bulkCopy.BulkCopyTimeout = 600;
 
-            output.Append(Environment.NewLine);
-            output.Append(String.Join(Environment.NewLine, rowsAdd));
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}{tab}table.Rows.Add(r);");
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}}}");
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
+                {{tab}}{{tab}}{{tab}}foreach(var {{ClassName.ToLower()}} in {{_stringTransform.PluralizeToLower(ClassName)}})
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}DataRow r = table.NewRow();
+                {{String.Join(Environment.NewLine, rowsAdd)}}
+                {{tab}}{{tab}}{{tab}}{{tab}}table.Rows.Add(r);
+                {{tab}}{{tab}}{{tab}}}
 
-            output.Append($@"{tab}{tab}{tab}List<MySqlBulkCopyColumnMapping> colMappings = new();
-{tab}{tab}{tab}int i = 0;
-{tab}{tab}{tab}foreach (DataColumn col in table.Columns)
-{tab}{tab}{tab}{{
-{tab}{tab}{tab}{tab}colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
-{tab}{tab}{tab}{tab}i++;
-{tab}{tab}{tab}}}
-
-{tab}{tab}{tab}bulkCopy.ColumnMappings.AddRange(colMappings);");
-
-            return output.ToString();
+                {{tab}}{{tab}}{{tab}}List<MySqlBulkCopyColumnMapping> colMappings = new();
+                {{tab}}{{tab}}{{tab}}int i = 0;
+                {{tab}}{{tab}}{{tab}}foreach (DataColumn col in table.Columns)
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
+                {{tab}}{{tab}}{{tab}}{{tab}}i++;
+                {{tab}}{{tab}}{{tab}}}
+                
+                {{tab}}{{tab}}{{tab}}bulkCopy.ColumnMappings.AddRange(colMappings);
+                """;
         }
 
-        protected virtual string GetCreateDbTmpTable()
+        protected virtual string WriteCreateDbTmpTable()
         {
-            var output = new StringBuilder();
+            return
+                $$""""
+                {{tab}}{{tab}}{{tab}}{{tab}}var sqltmp = $"CREATE TEMPORARY TABLE {{ColAndTableIdentifier}}tmp_bulkupd_{{Table.Name}}{{ColAndTableIdentifier}} LIKE {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}};";
 
-            output.Append($"{tab}{tab}{tab}var sqltmp = \"CREATE TEMPORARY TABLE " +
-                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} LIKE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier};\";");
-
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"ExecuteAsync(sqltmp,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
-
-            return output.ToString();
-
+                {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sqltmp,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
+                """";
         }
 
         protected override string WriteDapperCall()
         {
-            var output = new StringBuilder($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"ExecuteAsync(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sql,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
 
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}var sqlDrop = \"DROP TABLE {ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier};\";");
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"ExecuteAsync(sqlDrop,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
-
-            return output.ToString();
+                {{tab}}{{tab}}{{tab}}var sqlDrop = "DROP TABLE {{ColAndTableIdentifier}}tmp_bulkupd_{{Table.Name}}{{ColAndTableIdentifier}};";
+                {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sqlDrop,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
+                """;
         }
 
-        protected virtual string GetUpdateFromTmpTable()
+        protected virtual string WriteUpdateFromTmpTable()
         {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var sql = @\"UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1, " +
-                $"{ColAndTableIdentifier}tmp_bulkupd_{Table.Name}{ColAndTableIdentifier} t2" + Environment.NewLine +
-                $"{tab}{tab}{tab}{tab}SET" + Environment.NewLine + $"{tab}{tab}{tab}{tab}");
-
             //Update fields
             var fields = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}{tab},", ColumnForUpdateOperations!.Where(c=>!c.IsAutoIncrement).Select(c => 
                 $"t1.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
-
-            output.Append(fields);
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}{tab}WHERE ");
 
             var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}AND ", PkColumns.Select(col =>
             {
                 return $"t1.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{col.Name}{ColAndTableIdentifier}";
             }));
 
-            output.Append(whereClause + "\";");
-
-            return output.ToString();
-
+            return
+                $$""""
+                {{tab}}{{tab}}{{tab}}var sql = 
+                {{tab}}{{tab}}{{tab}}"""
+                {{tab}}{{tab}}{{tab}}UPDATE {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}} t1, {{ColAndTableIdentifier}}tmp_bulkupd_{{Table.Name}}{{ColAndTableIdentifier}} t2
+                {{tab}}{{tab}}{{tab}}{{tab}}SET
+                {{tab}}{{tab}}{{tab}}{{tab}}{{fields}}
+                {{tab}}{{tab}}{{tab}}{{tab}}WHERE {{whereClause}};
+                {{tab}}{{tab}}{{tab}}""";
+                """";
         }
     }
 }
