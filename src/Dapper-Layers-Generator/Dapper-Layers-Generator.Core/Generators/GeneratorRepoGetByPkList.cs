@@ -22,44 +22,46 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.GetByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
-                var output = new StringBuilder();
-                output.Append(WriteMethodDef());
+                var output = string.Empty;
 
                 if (PkColumns.Count() == 1 || !IsBase)
                 {
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteDapperDynaParamsForPkList());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteBaseSqlForSelect());
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteSqlPkListWhereClause());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteDapperCall());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(WriteReturnObj());
-                    output.Append(Environment.NewLine);
-                    output.Append($"{tab}{tab}}}");
+                    output =
+                        $$"""
+
+                        {{WriteDapperDynaParamsForPkList()}}
+
+                        {{WriteBaseSqlForSelect()}}
+                        {{WriteSqlPkListWhereClause()}}
+
+                        {{WriteDapperCall()}}
+
+                        {{WriteReturnObj()}}
+                        {{tab}}{{tab}}}
+                        """;
                 }
+                return
+                    $$"""
+                    {{WriteMethodDef()}}{{output}}
 
-                output.Append(Environment.NewLine);
-                return output.ToString();
+                    """;
             }
-
             return string.Empty;
         }
 
         protected override string WriteMethodDef()
         {
-            return PkColumns.Count() > 1
-                ? $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} " +
-                        $"Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
-                : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
-                $"async Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()})" +
-                @$"
-{tab}{tab}{{";
+            if (PkColumns.Count() > 1)
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "abstract" : "override async")}} Task<IEnumerable<{{ClassName}}>> GetBy{{GetPkMemberNamesString()}}Async({{GetPkMemberNamesStringAndTypeList()}}){{(IsBase ? ";" : String.Empty)}}
+                    """;
+            else
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task<IEnumerable<{{ClassName}}>> GetBy{{GetPkMemberNamesString()}}Async({{GetPkMemberNamesStringAndTypeList()}})
+                    {{tab}}{{tab}}{
+                    """;
         }
 
         protected override string WriteDapperCall()
