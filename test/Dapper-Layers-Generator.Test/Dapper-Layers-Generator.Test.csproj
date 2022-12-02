@@ -25,6 +25,7 @@
     <None Remove="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetAll_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
     <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />
@@ -71,6 +72,7 @@
     <EmbeddedResource Include="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetAll_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />

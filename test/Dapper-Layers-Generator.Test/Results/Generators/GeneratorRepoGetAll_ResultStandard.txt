@@ -1,0 +1,21 @@
+﻿		public virtual async Task<IEnumerable<Client>> GetAllAsync()
+		{
+			var sql = 
+			"""
+			SELECT id
+				,firstname
+				,lastname
+				,address
+				,comment
+				,created_at
+				,postal
+				,city
+				,phone
+				,email
+			FROM clients 
+			""";
+
+			var clients = await _dbContext.Connection.QueryAsync<Client>(sql,transaction:_dbContext.Transaction);
+
+			return clients;
+		}
