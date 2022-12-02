@@ -1,0 +1,45 @@
+﻿		public virtual async Task UpdateAsync(IEnumerable<Client> clients)
+		{
+			var isTransAlreadyOpen = _dbContext.Transaction != null;
+
+			if (!isTransAlreadyOpen)
+				await _dbContext.OpenTransactionAsync();
+
+			foreach(var client in clients)
+			{
+				var p = new DynamicParameters();
+				p.Add("@id", client.Id);
+				p.Add("@firstname", client.Firstname);
+				p.Add("@lastname", client.Lastname);
+				p.Add("@address", client.Address);
+				p.Add("@comment", client.Comment);
+				p.Add("@created_at", client.CreatedAt);
+				p.Add("@postal", client.Postal);
+				p.Add("@city", client.City);
+				p.Add("@phone", client.Phone);
+				p.Add("@email", client.Email);
+
+				var sql = 
+				"""
+				UPDATE clients
+				SET firstname = @firstname
+					,lastname = @lastname
+					,address = @address
+					,comment = @comment
+					,created_at = @created_at
+					,postal = @postal
+					,city = @city
+					,phone = @phone
+					,email = @email
+				WHERE id = @id
+				""";
+
+				_ = await _dbContext.Connection.ExecuteAsync(sql,p,transaction:_dbContext.Transaction);
+			}
+
+			if (!isTransAlreadyOpen)
+			{
+				_dbContext.CommitTransaction();
+				_dbContext.Connection.Close();
+			}
+		}
