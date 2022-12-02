@@ -26,7 +26,6 @@
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
     <None Remove="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoGetAll_ResultStandard.txt" />
-    <None Remove="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePK.txt" />
     <None Remove="Results\Generators\GeneratorRepoGetByPkList_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoGetByPk_ResultStandard.txt" />
     <None Remove="Results\Generators\GeneratorRepoGetByUk_ResultStandard.txt" />
@@ -50,9 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePk.txt">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByUk_ResultStandard.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorRepoMain_ResultStandard.txt" />
