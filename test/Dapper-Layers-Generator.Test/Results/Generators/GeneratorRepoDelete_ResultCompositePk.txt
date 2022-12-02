@@ -1,0 +1,15 @@
+﻿		public virtual async Task DeleteAsync(int damageId, int failureId)
+		{
+			var p = new DynamicParameters();
+			p.Add("@damage_id",damageId);
+			p.Add("@failure_id",failureId);
+
+			var sql = 
+			$"""
+			DELETE FROM damages_failures
+			WHERE damage_id = @damage_id
+			AND failure_id = @failure_id
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,p,transaction:_dbContext.Transaction);
+		}

@@ -1,6 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using Microsoft.Extensions.Primitives;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
@@ -25,71 +24,57 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         {
             if (TableSettings.DeleteBulkGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetOpenTransAndInitBulkMySql());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCreateDbTmpTableForPksMySql("delete"));
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCreateDataTableForPkMySql("delete"));
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetBulkCallMySql());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDeleteFromTmpTable());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(@GetDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCloseTransaction());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteOpenTransAndInitBulkMySql()}}
 
-                return output.ToString();
+                    {{WriteCreateDbTmpTableForPksMySql("delete")}}
+
+                    {{WriteCreateDataTableForPkMySql("delete")}}
+
+                    {{WriteBulkCallMySql()}}
+
+                    {{WriteDeleteFromTmpTable()}}
+                    
+                    {{WriteDapperCall()}}
+
+                    {{WriteCloseTransaction()}}
+                    {{tab}}{{tab}}}
+
+                    """;
             }
 
             return string.Empty;
         }
 
-
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
-            var output = new StringBuilder($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"ExecuteAsync(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sql,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
 
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}var sqlDrop = \"DROP TABLE {ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier};\";");
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
-                    $"ExecuteAsync(sqlDrop,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);");
+                {{tab}}{{tab}}{{tab}}var sqlDrop = "DROP TABLE {{ColAndTableIdentifier}}tmp_bulkdelete_{{Table.Name}}{{ColAndTableIdentifier}};";
 
-            return output.ToString();
+                {{tab}}{{tab}}{{tab}}_ = await _{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Connection.ExecuteAsync(sqlDrop,transaction:_{{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}}.Transaction);
+                """;
         }
 
-        protected virtual string GetDeleteFromTmpTable()
+        protected virtual string WriteDeleteFromTmpTable()
         {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var sql = @\"DELETE t1 FROM {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier} t1" + Environment.NewLine +
-                $"{tab}{tab}{tab}{tab}INNER JOIN {ColAndTableIdentifier}tmp_bulkdelete_{Table.Name}{ColAndTableIdentifier} t2 ON " + Environment.NewLine +
-                $"{tab}{tab}{tab}{tab}");
-
             //Delete fields
             var fields = String.Join($" AND ", PkColumns!.Select(c =>
                 $"t1.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = t2.{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
 
-            output.Append(fields);
-            output.Append("\";");
-
-            return output.ToString();
-
+            return
+                $$""""
+                {{tab}}{{tab}}{{tab}}var sql = 
+                {{tab}}{{tab}}{{tab}}"""
+                {{tab}}{{tab}}{{tab}}DELETE t1 FROM {{ColAndTableIdentifier}}{{Table.Name}}{{ColAndTableIdentifier}} t1
+                {{tab}}{{tab}}{{tab}}INNER JOIN {{ColAndTableIdentifier}}tmp_bulkdelete_{{Table.Name}}{{ColAndTableIdentifier}} t2 ON 
+                {{tab}}{{tab}}{{tab}}{{fields}};
+                {{tab}}{{tab}}{{tab}}""";
+                """";
         }
 
     }

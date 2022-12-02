@@ -1,0 +1,90 @@
+﻿		//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows
+		public override async Task UpdateBulkAsync(IEnumerable<Client> clients)
+		{
+			var isTransAlreadyOpen = _dbContext.Transaction != null;
+
+			if (!isTransAlreadyOpen)
+				await _dbContext.OpenTransactionAsync();
+
+			var bulkCopy = new MySqlBulkCopy((MySqlConnection)_dbContext.Connection
+				, (MySqlTransaction?)_dbContext.Transaction);
+
+			var sqltmp = $"CREATE TEMPORARY TABLE `tmp_bulkupd_clients` LIKE `clients`;";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sqltmp,transaction:_dbContext.Transaction);
+
+			var table = new DataTable();
+			table.Columns.Add("id",typeof(int));
+			table.Columns.Add("firstname",typeof(string));
+			table.Columns.Add("lastname",typeof(string));
+			table.Columns.Add("address",typeof(string));
+			table.Columns.Add("comment",typeof(string));
+			table.Columns["comment"]!.AllowDBNull = true;
+			table.Columns.Add("created_at",typeof(DateTime));
+			table.Columns.Add("postal",typeof(string));
+			table.Columns["postal"]!.AllowDBNull = true;
+			table.Columns.Add("city",typeof(string));
+			table.Columns["city"]!.AllowDBNull = true;
+			table.Columns.Add("phone",typeof(string));
+			table.Columns["phone"]!.AllowDBNull = true;
+			table.Columns.Add("email",typeof(string));
+			table.Columns["email"]!.AllowDBNull = true;
+
+			bulkCopy.DestinationTableName = "tmp_bulkupd_clients";
+			bulkCopy.BulkCopyTimeout = 600;
+
+			foreach(var client in clients)
+			{
+				DataRow r = table.NewRow();
+				r["id"] = client.Id;
+				r["firstname"] = client.Firstname;
+				r["lastname"] = client.Lastname;
+				r["address"] = client.Address;
+				r["comment"] = client.Comment == null ? DBNull.Value : client.Comment;
+				r["created_at"] = client.CreatedAt;
+				r["postal"] = client.Postal == null ? DBNull.Value : client.Postal;
+				r["city"] = client.City == null ? DBNull.Value : client.City;
+				r["phone"] = client.Phone == null ? DBNull.Value : client.Phone;
+				r["email"] = client.Email == null ? DBNull.Value : client.Email;
+				table.Rows.Add(r);
+			}
+
+			List<MySqlBulkCopyColumnMapping> colMappings = new();
+			int i = 0;
+			foreach (DataColumn col in table.Columns)
+			{
+				colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
+				i++;
+			}
+
+			bulkCopy.ColumnMappings.AddRange(colMappings);
+
+			await bulkCopy.WriteToServerAsync(table);
+
+			var sql = 
+			"""
+			UPDATE `clients` t1, `tmp_bulkupd_clients` t2
+				SET
+				t1.`firstname` = t2.`firstname`
+					,t1.`lastname` = t2.`lastname`
+					,t1.`address` = t2.`address`
+					,t1.`comment` = t2.`comment`
+					,t1.`created_at` = t2.`created_at`
+					,t1.`postal` = t2.`postal`
+					,t1.`city` = t2.`city`
+					,t1.`phone` = t2.`phone`
+					,t1.`email` = t2.`email`
+				WHERE t1.`id` = t2.`id`;
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,transaction:_dbContext.Transaction);
+
+			var sqlDrop = "DROP TABLE `tmp_bulkupd_clients`;";
+			_ = await _dbContext.Connection.ExecuteAsync(sqlDrop,transaction:_dbContext.Transaction);
+
+			if (!isTransAlreadyOpen)
+			{
+				_dbContext.CommitTransaction();
+				_dbContext.Connection.Close();
+			}
+		}

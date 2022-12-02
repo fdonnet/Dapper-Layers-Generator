@@ -1,0 +1,25 @@
+﻿		public override async Task<IEnumerable<Client>> GetByIdAsync(IEnumerable<int> listOfId)
+		{
+			var p = new DynamicParameters();
+			p.Add("@listOf",listOfId);
+
+			var sql = 
+			"""
+			SELECT `id`
+				,`firstname`
+				,`lastname`
+				,`address`
+				,`comment`
+				,`created_at`
+				,`postal`
+				,`city`
+				,`phone`
+				,`email`
+			FROM `clients` 
+			WHERE `id` IN @listOf
+			""";
+
+			var clients = await _dbContext.Connection.QueryAsync<Client>(sql,p,transaction:_dbContext.Transaction);
+
+			return clients;
+		}

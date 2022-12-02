@@ -25,35 +25,37 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.UpdateBulkGenerator && ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary).Any())
             {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
                 if (!IsBase)
                 {
                     //Will se if we can use some part of code for multi db providers for the moment the implementation is in MySql only child class
                 }
 
-                return output.ToString();
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    """;
             }
 
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows" + Environment.NewLine +
-                $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} Task UpdateBulkAsync(IEnumerable<{ClassName}> " +
-            $"{_stringTransform.PluralizeToLower(ClassName)}){(IsBase ? ";" : string.Empty)}" + (!IsBase ? @$"
-{tab}{tab}{{" : Environment.NewLine);
-
+            return
+                $$"""
+                {{tab}}{{tab}}//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows
+                {{tab}}{{tab}}public {{(IsBase ? "abstract" : "override async")}} Task UpdateBulkAsync(IEnumerable<{{ClassName}}> {{_stringTransform.PluralizeToLower(ClassName)}}){{(IsBase ? ";" : string.Empty)}}
+                {{(!IsBase ? @$"{tab}{tab}{{" : string.Empty)}}
+                """;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return string.Empty;
 
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return string.Empty;
         }

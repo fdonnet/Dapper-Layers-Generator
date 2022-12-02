@@ -1,0 +1,63 @@
+﻿		//Please use this bulk by batch depending on the mem available 500 / 1000 / 1500 rows
+		public override async Task AddBulkAsync(IEnumerable<Client> clients)
+		{
+			var isTransAlreadyOpen = _dbContext.Transaction != null;
+
+			if (!isTransAlreadyOpen)
+				await _dbContext.OpenTransactionAsync();
+
+			var bulkCopy = new MySqlBulkCopy((MySqlConnection)_dbContext.Connection
+				, (MySqlTransaction?)_dbContext.Transaction);
+
+			var table = new DataTable();
+			table.Columns.Add("firstname",typeof(string));
+			table.Columns.Add("lastname",typeof(string));
+			table.Columns.Add("address",typeof(string));
+			table.Columns.Add("comment",typeof(string));
+			table.Columns["comment"]!.AllowDBNull = true;
+			table.Columns.Add("created_at",typeof(DateTime));
+			table.Columns.Add("postal",typeof(string));
+			table.Columns["postal"]!.AllowDBNull = true;
+			table.Columns.Add("city",typeof(string));
+			table.Columns["city"]!.AllowDBNull = true;
+			table.Columns.Add("phone",typeof(string));
+			table.Columns["phone"]!.AllowDBNull = true;
+			table.Columns.Add("email",typeof(string));
+			table.Columns["email"]!.AllowDBNull = true;
+
+			bulkCopy.DestinationTableName = "clients";
+			bulkCopy.BulkCopyTimeout = 600;
+
+			foreach(var client in clients)
+			{
+				DataRow r = table.NewRow();
+				r["firstname"] = client.Firstname;
+				r["lastname"] = client.Lastname;
+				r["address"] = client.Address;
+				r["comment"] = client.Comment == null ? DBNull.Value : client.Comment;
+				r["created_at"] = client.CreatedAt;
+				r["postal"] = client.Postal == null ? DBNull.Value : client.Postal;
+				r["city"] = client.City == null ? DBNull.Value : client.City;
+				r["phone"] = client.Phone == null ? DBNull.Value : client.Phone;
+				r["email"] = client.Email == null ? DBNull.Value : client.Email;
+				table.Rows.Add(r);
+			}
+
+			List<MySqlBulkCopyColumnMapping> colMappings = new();
+			int i = 0;
+			foreach (DataColumn col in table.Columns)
+			{
+				colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
+				i++;
+			}
+
+			bulkCopy.ColumnMappings.AddRange(colMappings);
+
+			await bulkCopy.WriteToServerAsync(table);
+
+			if (!isTransAlreadyOpen)
+			{
+				_dbContext.CommitTransaction();
+				_dbContext.Connection.Close();
+			}
+		}

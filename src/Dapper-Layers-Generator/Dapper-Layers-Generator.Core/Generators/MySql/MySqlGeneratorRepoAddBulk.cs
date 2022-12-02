@@ -1,6 +1,6 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using Microsoft.Extensions.Primitives;
+using MySqlX.XDevAPI.Relational;
 using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators.MySql
@@ -25,35 +25,27 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         {
             if (TableSettings.AddBulkGenerator)
             {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetOpenTransAndInitBulkMySql());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(@GetCreateDataTable());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetCloseTransaction());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteOpenTransAndInitBulkMySql()}}
 
-                return output.ToString();
+                    {{WriteCreateDataTable()}}
+
+                    {{WriteDapperCall()}}
+
+                    {{WriteCloseTransaction()}}
+                    {{tab}}{{tab}}}
+
+                    """;
             }
 
             return string.Empty;
         }
 
-
-        protected virtual string GetCreateDataTable()
+        protected virtual string WriteCreateDataTable()
         {
             var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var table = new DataTable();" + Environment.NewLine);
 
             if (ColumnForInsertOperations == null || !ColumnForInsertOperations.Any())
                 throw new ArgumentException($"No column defined for insert (bulk), for table {Table.Name}");
@@ -61,12 +53,13 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             var columnsForBulk = ColumnForInsertOperations.Where(c => !c.IsAutoIncrement);
 
             var rowsAdd = new List<string>();
+            var colAdd = new List<string>();
             foreach (var colBulk in columnsForBulk)
             {
-                output.Append($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));" + Environment.NewLine);
+                colAdd.Add($@"{tab}{tab}{tab}table.Columns.Add(""{colBulk.Name}"",typeof({DataConverter.GetDotNetDataType(colBulk.DataType)}));");
                 if (colBulk.IsNullable)
                 {
-                    output.Append($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;" + Environment.NewLine);
+                    colAdd.Add($@"{tab}{tab}{tab}table.Columns[""{colBulk.Name}""]!.AllowDBNull = true;");
                     rowsAdd.Add($"{tab}{tab}{tab}{tab}r[\"{colBulk.Name}\"] = {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)} == null " +
                         $"? DBNull.Value : {ClassName.ToLower()}.{_stringTransform.PascalCase(colBulk.Name)};");
 
@@ -77,40 +70,34 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 }
             }
 
-            output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.DestinationTableName = ""{Table.Name}"";");
-            output.Append(Environment.NewLine);
-            output.Append($@"{tab}{tab}{tab}bulkCopy.BulkCopyTimeout = 600;");
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
+            return
+                $$"""
+                {{tab}}{{tab}}{{tab}}var table = new DataTable();
+                {{String.Join(Environment.NewLine,colAdd)}}
 
-            output.Append(@$"{tab}{tab}{tab}foreach(var {ClassName.ToLower()} in {_stringTransform.PluralizeToLower(ClassName)})
-{tab}{tab}{tab}{{
-{tab}{tab}{tab}{tab}DataRow r = table.NewRow();");
+                {{tab}}{{tab}}{{tab}}bulkCopy.DestinationTableName = "{{Table.Name}}";
+                {{tab}}{{tab}}{{tab}}bulkCopy.BulkCopyTimeout = 600;
 
-            output.Append(Environment.NewLine);
-            output.Append(String.Join(Environment.NewLine, rowsAdd));
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}{tab}table.Rows.Add(r);");
-            output.Append(Environment.NewLine);
-            output.Append($"{tab}{tab}{tab}}}");
-            output.Append(Environment.NewLine);
-            output.Append(Environment.NewLine);
+                {{tab}}{{tab}}{{tab}}foreach(var {{ClassName.ToLower()}} in {{_stringTransform.PluralizeToLower(ClassName)}})
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}DataRow r = table.NewRow();
+                {{String.Join(Environment.NewLine, rowsAdd)}}
+                {{tab}}{{tab}}{{tab}}{{tab}}table.Rows.Add(r);
+                {{tab}}{{tab}}{{tab}}}
 
-            output.Append($@"{tab}{tab}{tab}List<MySqlBulkCopyColumnMapping> colMappings = new();
-{tab}{tab}{tab}int i = 0;
-{tab}{tab}{tab}foreach (DataColumn col in table.Columns)
-{tab}{tab}{tab}{{
-{tab}{tab}{tab}{tab}colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
-{tab}{tab}{tab}{tab}i++;
-{tab}{tab}{tab}}}
-
-{tab}{tab}{tab}bulkCopy.ColumnMappings.AddRange(colMappings);");
-
-            return output.ToString();
+                {{tab}}{{tab}}{{tab}}List<MySqlBulkCopyColumnMapping> colMappings = new();
+                {{tab}}{{tab}}{{tab}}int i = 0;
+                {{tab}}{{tab}}{{tab}}foreach (DataColumn col in table.Columns)
+                {{tab}}{{tab}}{{tab}}{
+                {{tab}}{{tab}}{{tab}}{{tab}}colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
+                {{tab}}{{tab}}{{tab}}{{tab}}i++;
+                {{tab}}{{tab}}{{tab}}}
+                
+                {{tab}}{{tab}}{{tab}}bulkCopy.ColumnMappings.AddRange(colMappings);
+                """;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }

@@ -1,6 +1,5 @@
 ﻿using Dapper_Layers_Generator.Core.Converters;
 using Dapper_Layers_Generator.Core.Settings;
-using System.Text;
 
 namespace Dapper_Layers_Generator.Core.Generators
 {
@@ -21,46 +20,35 @@ namespace Dapper_Layers_Generator.Core.Generators
         }
         public override string Generate()
         {
-            if (TableSettings.AddGenerator)
-            {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParams());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForInsert());
-                output.Append($"{tab}{tab}{tab}{tab}" + @GetValuesToInsert());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
+            return TableSettings.AddGenerator
+                ? $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteDapperDynaParamsForInsert()}}
 
-                return output.ToString();
-            }
+                    {{WriteBaseSqlForInsert()}}
+                    {{WriteValuesToInsert()}}
 
-            return string.Empty;
+                    {{WriteDapperCall()}}{{WriteReturnObj()}}
+                    {{tab}}{{tab}}}
+
+                    """
+                : string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
-            if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
-                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task<{GetPkMemberTypes()}> AddAsync({ClassName} " +
-                        $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
-                    @$"
-{tab}{tab}{{";
-            else
-                return $"{tab}{tab}public {(IsBase ? "virtual" : "override")} async Task AddAsync({ClassName} " +
-                $"{_stringTransform.ApplyConfigTransformMember(ClassName)})" +
-            @$"
-{tab}{tab}{{";
+            return PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any()
+                ? $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task<{{GetPkMemberTypes()}}> AddAsync({{ClassName}} {{_stringTransform.ApplyConfigTransformMember(ClassName)}})
+                    {{tab}}{{tab}}{
+                    """
+                : $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task AddAsync({{ClassName}} {{_stringTransform.ApplyConfigTransformMember(ClassName)}})
+                    {{tab}}{{tab}}{
+                    """;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
                 return $"{tab}{tab}{tab}var identity = " +
@@ -73,29 +61,16 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
-        protected virtual string GetDapperDynaParams()
-        {
-            var output = new StringBuilder();
-            output.Append($"{tab}{tab}{tab}var p = new DynamicParameters();");
-            output.Append(Environment.NewLine);
-
-            var cols = ColumnForInsertOperations!.Where(c => !c.IsAutoIncrement);
-
-            var spParams = String.Join(Environment.NewLine, cols.OrderBy(c => c.Position).Select(col =>
-            {
-                return $@"{tab}{tab}{tab}p.Add(""@{col.Name}"", {_stringTransform.ApplyConfigTransformMember(ClassName)}.{_stringTransform.PascalCase(col.Name)});";
-            }));
-
-            output.Append(spParams);
-            return output.ToString();
-        }
-
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             //The base implementation is very minimal (no real return from the DB, need to be override by dbprovider specific)
             if (PkColumns.Count() == 1 && PkColumns.Where(c => c.IsAutoIncrement).Any())
             {
-                return $"{tab}{tab}{tab}return identity;" + Environment.NewLine;
+                return 
+                    $"""
+
+                    {tab}{tab}{tab}return identity;
+                    """;
             }
             else
             {

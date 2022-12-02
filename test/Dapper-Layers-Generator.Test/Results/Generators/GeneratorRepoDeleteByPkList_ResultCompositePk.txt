@@ -1,0 +1,1 @@
+﻿		public abstract Task DeleteAsync(IEnumerable<(int, int)> listOfDamageIdAndFailureId);

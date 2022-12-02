@@ -1,0 +1,4 @@
+﻿		public override async Task<IEnumerable<DamageFailure>> GetByDamageIdAndFailureIdAsync(IEnumerable<(int, int)> listOfDamageIdAndFailureId)
+		{
+			return await GetByDamageIdAndFailureIdBulkAsync(listOfDamageIdAndFailureId);
+		}

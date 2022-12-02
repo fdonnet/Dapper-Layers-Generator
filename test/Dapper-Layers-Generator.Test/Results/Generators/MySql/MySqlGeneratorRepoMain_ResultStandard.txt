@@ -1,0 +1,25 @@
+﻿using DapperTest.POCO;
+using Dapper;
+using DapperTest.DbContext;
+using MySqlConnector;
+using System.Data;
+                                
+// =================================================================
+// Repo class for table clients
+// Specific repo implementation for dbprovider : MySql
+// You can extend it via other partial files where you have specific 
+// queries for specific dbs (if standard SQL is not sufficent)
+// Author: Dapper Generator
+// Repo name: ClientRepoMySql
+// Generated: 2022-12-01 12:46:29 UTC
+// WARNING: Never change this file manually (re-generate it)
+// =================================================================
+
+namespace DapperTest.Repo
+{
+	public partial class ClientRepoMySql : ClientRepoBase, IClientRepo
+	{
+		public ClientRepoMySql(IDbContext dbContext): base (dbContext)
+		{
+		}
+

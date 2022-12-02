@@ -30,37 +30,33 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 if (!PkColumns.Any())
                     throw new ArgumentException($"You cannot run the Delete by PkList Generator for table {Table.Name}, no pk defined");
 
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParamsForPkList());
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
-                return output.ToString();
-            }
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{WriteDapperDynaParamsForPkList()}}
+                    {{WriteReturnObj()}}
+                    {{tab}}{{tab}}}
 
+                    """;
+            }
             return string.Empty;
         }
 
-        protected override string GetSqlPkListWhereClause()
+        protected override string WriteSqlPkListWhereClause()
         {
-            return PkColumns.Count() > 1 ? string.Empty : base.GetSqlPkListWhereClause();
+            return PkColumns.Count() > 1 ? string.Empty : base.WriteSqlPkListWhereClause();
         }
 
-        protected override string GetDapperDynaParamsForPkList()
+        protected override string WriteDapperDynaParamsForPkList()
         {
-            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Call bulk for composite pk*/" : base.GetDapperDynaParamsForPkList();
+            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{" : base.WriteDapperDynaParamsForPkList();
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return PkColumns.Count() > 1
                 ? $"{tab}{tab}{tab}return await GetBy{GetPkMemberNamesString()}BulkAsync({GetPKMemberNamesStringList()});"
-                : base.GetReturnObj();
+                : base.WriteReturnObj();
         }
 
     }

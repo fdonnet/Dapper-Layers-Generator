@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -12,7 +12,53 @@
   <ItemGroup>
     <None Remove="Data\baseconfig.json" />
     <None Remove="Data\schema.json" />
+    <None Remove="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
+    <None Remove="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <None Remove="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorPOCO_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDeco.txt" />
+    <None Remove="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDecoOneCol.txt" />
+    <None Remove="Results\Generators\GeneratorRepoAddMulti_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoAdd_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\GeneratorRepoAdd_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetAll_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePk2.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetByPkList_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetByPk_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoGetByUk_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoMain_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoUpdateMulti_ResultStandard.txt" />
+    <None Remove="Results\Generators\GeneratorRepoUpdate_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultCompositePk.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoMain_ResultStandard.txt" />
+    <None Remove="Results\Generators\MySql\MySqlGeneratorRepoUpdateBulk_ResultStandard.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultCompositePk2.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPkList_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByUk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoMain_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoUpdateMulti_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoUpdate_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoMain_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoUpdateBulk_ResultStandard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,11 +84,32 @@
     <EmbeddedResource Include="Data\schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultOtherDbContextName.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultSelectedTable.txt" />
     <EmbeddedResource Include="Results\Generators\GeneratorContextForBase_ResultStandard.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Generators\MySql\" />
+    <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDeco.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorPOCO_ResultWithoutStringLengthDecoOneCol.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoAddMulti_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoAdd_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoAdd_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoDelete_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetAll_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\GeneratorRepoGetByPk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorContext_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAddBulk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoAdd_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteBulk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoDeleteByPkList_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultCompositePk.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkBulk_ResultStandard.txt" />
+    <EmbeddedResource Include="Results\Generators\MySql\MySqlGeneratorRepoGetByPkList_ResultCompositePk.txt" />
   </ItemGroup>
 
 </Project>

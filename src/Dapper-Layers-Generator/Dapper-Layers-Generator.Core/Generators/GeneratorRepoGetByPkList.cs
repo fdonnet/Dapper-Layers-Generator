@@ -22,54 +22,56 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.GetByPkListGenerator && !string.IsNullOrEmpty(GetPkMemberNamesString()))
             {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                var output = string.Empty;
 
                 if (PkColumns.Count() == 1 || !IsBase)
                 {
-                    output.Append(Environment.NewLine);
-                    output.Append(GetDapperDynaParamsForPkList());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(@GetBaseSqlForSelect());
-                    output.Append(Environment.NewLine);
-                    output.Append(GetSqlPkListWhereClause());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(GetDapperCall());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(GetReturnObj());
-                    output.Append(Environment.NewLine);
-                    output.Append($"{tab}{tab}}}");
+                    output =
+                        $$"""
+
+                        {{WriteDapperDynaParamsForPkList()}}
+
+                        {{WriteBaseSqlForSelect()}}
+                        {{WriteSqlPkListWhereClause()}}
+
+                        {{WriteDapperCall()}}
+
+                        {{WriteReturnObj()}}
+                        {{tab}}{{tab}}}
+                        """;
                 }
+                return
+                    $$"""
+                    {{WriteMethodDef()}}{{output}}
 
-                output.Append(Environment.NewLine);
-                return output.ToString();
+                    """;
             }
-
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
-            return PkColumns.Count() > 1
-                ? $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} " +
-                        $"Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
-                : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
-                $"async Task<IEnumerable<{ClassName}>> GetBy{GetPkMemberNamesString()}Async({GetPkMemberNamesStringAndTypeList()})" +
-                @$"
-{tab}{tab}{{";
+            if (PkColumns.Count() > 1)
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "abstract" : "override async")}} Task<IEnumerable<{{ClassName}}>> GetBy{{GetPkMemberNamesString()}}Async({{GetPkMemberNamesStringAndTypeList()}}){{(IsBase ? ";" : String.Empty)}}
+                    """;
+            else
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task<IEnumerable<{{ClassName}}>> GetBy{{GetPkMemberNamesString()}}Async({{GetPkMemberNamesStringAndTypeList()}})
+                    {{tab}}{{tab}}{
+                    """;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"QueryAsync<{ClassName}>(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
         }

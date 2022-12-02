@@ -40,7 +40,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         public override abstract string Generate();
 
-        public virtual void SetTable(string tableName)
+        public void SetTable(string tableName)
         {
             var table = _currentSchema.Tables?.Where(t => t.Name == tableName).SingleOrDefault();
 
@@ -74,17 +74,19 @@ namespace Dapper_Layers_Generator.Core.Generators
                 }
             }
 
-            ColumnForGetOperations = Table.Columns != null
-                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForGet.Split(',').Contains(c.Name))
-                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
+            if(Table.Columns != null)
+            {
+                ColumnForGetOperations = Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',')
+                    .Contains(c.Name) && !TableSettings.IgnoredColumnNamesForGet.Split(',').Contains(c.Name));
 
-            ColumnForInsertOperations = Table.Columns != null
-                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForAdd.Split(',').Contains(c.Name))
-                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
+                ColumnForInsertOperations = Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',')
+                    .Contains(c.Name) && !TableSettings.IgnoredColumnNamesForAdd.Split(',').Contains(c.Name));
 
-            ColumnForUpdateOperations = Table.Columns != null
-                ? Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',').Contains(c.Name) && !TableSettings.IgnoredColumnNamesForUpdate.Split(',').Contains(c.Name))
-                : throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
+                ColumnForUpdateOperations = Table.Columns.Where(c => !TableSettings.IgnoredColumnNames.Split(',')
+                .Contains(c.Name) && !TableSettings.IgnoredColumnNamesForUpdate.Split(',').Contains(c.Name));
+            }
+            else
+                throw new ArgumentException($"No column available for this table{Table.Name}, genererator crash");
         }
 
         protected string GetPkMemberNamesString()

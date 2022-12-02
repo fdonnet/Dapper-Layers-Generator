@@ -23,43 +23,39 @@ namespace Dapper_Layers_Generator.Core.Generators
         {
             if (TableSettings.GetAllGenerator)
             {
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
-                output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForSelect()+ @""";");
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetDapperCall());
+                return
+                    $$""""
+                    {{WriteMethodDef()}}
+                    {{WriteBaseSqlForSelect()}}
+                    {{tab}}{{tab}}{{tab}}""";
 
-                output.Append(Environment.NewLine);
-                output.Append(Environment.NewLine);
-                output.Append(GetReturnObj());
-                output.Append(Environment.NewLine);
-                output.Append($"{tab}{tab}}}");
-                output.Append(Environment.NewLine);
+                    {{WriteDapperCall()}}
 
-                return output.ToString();
+                    {{WriteReturnObj()}}
+                    {{tab}}{{tab}}}
+
+                    """";
             }
-
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
-            return $"{tab}{tab}public {(IsBase?"virtual":"override")} async Task<IEnumerable<{ClassName}>> GetAllAsync()" +
-                @$"
-{tab}{tab}{{";
+            return
+                $$"""
+                {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task<IEnumerable<{{ClassName}}>> GetAllAsync()
+                {{tab}}{{tab}}{
+                """;
         }
 
-
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return  $"{tab}{tab}{tab}var {_stringTransform.PluralizeToLower(ClassName)} = " +
                     $"await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"QueryAsync<{ClassName}>(sql,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return $"{tab}{tab}{tab}return {_stringTransform.PluralizeToLower(ClassName)};";
         }

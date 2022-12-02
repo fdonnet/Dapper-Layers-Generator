@@ -26,50 +26,53 @@ namespace Dapper_Layers_Generator.Core.Generators
                 if (!PkColumns.Any())
                     throw new ArgumentException($"You cannot run the Delete by PkList Generator for table {Table.Name}, no pk defined");
 
-                var output = new StringBuilder();
-                output.Append(GetMethodDef());
+                var output = string.Empty;
 
                 if (PkColumns.Count() == 1 || !IsBase)
                 {
-                    output.Append(Environment.NewLine);
-                    output.Append(GetDapperDynaParamsForPkList());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(@GetBaseSqlForDelete());
-                    output.Append(Environment.NewLine);
-                    output.Append(GetSqlPkListWhereClause());
-                    output.Append(Environment.NewLine);
-                    output.Append(Environment.NewLine);
-                    output.Append(GetDapperCall());
-                    output.Append(GetReturnObj());
-                    output.Append(Environment.NewLine);
-                    output.Append($"{tab}{tab}}}");
-                }
-                output.Append(Environment.NewLine);
-                return output.ToString();
-            }
+                    output =
+                        $$"""
+                        {{WriteDapperDynaParamsForPkList()}}
 
+                        {{WriteBaseSqlForDelete()}}
+                        {{WriteSqlPkListWhereClause()}}
+
+                        {{WriteDapperCall()}}
+                        {{tab}}{{tab}}}
+
+                        """;
+                }
+                return
+                    $$"""
+                    {{WriteMethodDef()}}
+                    {{output}}
+                    """;
+            }
             return string.Empty;
         }
 
-        protected override string GetMethodDef()
+        protected override string WriteMethodDef()
         {
-            return PkColumns.Count() > 1
-    ? $"{tab}{tab}public {(IsBase ? "abstract" : "override async")} " +
-            $"Task DeleteAsync({GetPkMemberNamesStringAndTypeList()}){(IsBase ? ";" : String.Empty)}"
-    : $"{tab}{tab}public {(IsBase ? "virtual" : "override")} " +
-    $"async Task DeleteAsync({GetPkMemberNamesStringAndTypeList()})" +
-    @$"
-{tab}{tab}{{";
+            if (PkColumns.Count() > 1)
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "abstract" : "override async")}} Task DeleteAsync({{GetPkMemberNamesStringAndTypeList()}}){{(IsBase ? ";" : String.Empty)}}
+                    """;
+            else
+                return
+                    $$"""
+                    {{tab}}{{tab}}public {{(IsBase ? "virtual" : "override")}} async Task DeleteAsync({{GetPkMemberNamesStringAndTypeList()}})
+                    {{tab}}{{tab}}{
+                    """;
         }
 
-        protected override string GetDapperCall()
+        protected override string WriteDapperCall()
         {
             return $"{tab}{tab}{tab}_ = await _{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Connection." +
                     $"ExecuteAsync(sql,p,transaction:_{_stringTransform.ApplyConfigTransformMember(_settings.DbContextClassName)}.Transaction);";
         }
 
-        protected override string GetReturnObj()
+        protected override string WriteReturnObj()
         {
             return string.Empty;
         }

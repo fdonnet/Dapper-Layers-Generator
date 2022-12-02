@@ -1,0 +1,25 @@
+﻿		public virtual async Task<Client?> GetByIdAsync(int id)
+		{
+			var p = new DynamicParameters();
+			p.Add("@id",id);
+
+			var sql = 
+			"""
+			SELECT id
+				,firstname
+				,lastname
+				,address
+				,comment
+				,created_at
+				,postal
+				,city
+				,phone
+				,email
+			FROM clients 
+			WHERE id = @id
+			""";
+
+			var client = await _dbContext.Connection.QuerySingleOrDefaultAsync<Client>(sql,p,transaction:_dbContext.Transaction);
+
+			return client;
+		}

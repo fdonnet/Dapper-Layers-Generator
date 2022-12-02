@@ -1,0 +1,64 @@
+﻿		//Please use this bulk by batch depending on the mem available 1000 / 1500 rows
+		public override async Task DeleteBulkAsync(IEnumerable<int> listOfId)
+		{
+			var isTransAlreadyOpen = _dbContext.Transaction != null;
+
+			if (!isTransAlreadyOpen)
+				await _dbContext.OpenTransactionAsync();
+
+			var bulkCopy = new MySqlBulkCopy((MySqlConnection)_dbContext.Connection
+				, (MySqlTransaction?)_dbContext.Transaction);
+
+			var sqltmp = 
+			$"""
+			CREATE TEMPORARY TABLE `tmp_bulkdelete_clients`
+			(
+				id int(11)
+			);
+			""";
+			
+			_ = await _dbContext.Connection.ExecuteAsync(sqltmp,transaction:_dbContext.Transaction);;
+
+			var table = new DataTable();
+			table.Columns.Add("id",typeof(int));
+			bulkCopy.DestinationTableName = "tmp_bulkdelete_clients";
+			bulkCopy.BulkCopyTimeout = 600;
+
+			foreach(var identity in listOfId)
+			{
+				DataRow r = table.NewRow();
+				r["id"] = identity;
+				table.Rows.Add(r);
+			}
+
+			List<MySqlBulkCopyColumnMapping> colMappings = new();
+			int i = 0;
+			foreach (DataColumn col in table.Columns)
+			{
+				colMappings.Add(new MySqlBulkCopyColumnMapping(i, col.ColumnName));
+				i++;
+			}
+			
+			bulkCopy.ColumnMappings.AddRange(colMappings);
+
+			await bulkCopy.WriteToServerAsync(table);
+
+			var sql = 
+			"""
+			DELETE t1 FROM `clients` t1
+			INNER JOIN `tmp_bulkdelete_clients` t2 ON 
+			t1.`id` = t2.`id`;
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,transaction:_dbContext.Transaction);
+
+			var sqlDrop = "DROP TABLE `tmp_bulkdelete_clients`;";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sqlDrop,transaction:_dbContext.Transaction);
+
+			if (!isTransAlreadyOpen)
+			{
+				_dbContext.CommitTransaction();
+				_dbContext.Connection.Close();
+			}
+		}

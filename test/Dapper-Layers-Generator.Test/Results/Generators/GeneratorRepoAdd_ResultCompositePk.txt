@@ -1,0 +1,22 @@
+﻿		public virtual async Task AddAsync(DamageFailure damageFailure)
+		{
+			var p = new DynamicParameters();
+			p.Add("@damage_id", damageFailure.DamageId);
+			p.Add("@failure_id", damageFailure.FailureId);
+
+			var sql = 
+			"""
+			INSERT INTO damages_failures
+			(
+				damage_id
+				,failure_id
+			)
+			VALUES
+			(
+				@damage_id
+				,@failure_id
+			)
+			""";
+
+			_ = await _dbContext.Connection.ExecuteAsync(sql,p,transaction:_dbContext.Transaction);
+		}
