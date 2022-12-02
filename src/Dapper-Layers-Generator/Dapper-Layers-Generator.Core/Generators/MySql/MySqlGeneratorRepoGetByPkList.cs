@@ -33,7 +33,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 var output = new StringBuilder();
                 output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParamsForPkList());
+                output.Append(WriteDapperDynaParamsForPkList());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(WriteReturnObj());
@@ -46,14 +46,14 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
             return string.Empty;
         }
 
-        protected override string GetSqlPkListWhereClause()
+        protected override string WriteSqlPkListWhereClause()
         {
-            return PkColumns.Count() > 1 ? string.Empty : base.GetSqlPkListWhereClause();
+            return PkColumns.Count() > 1 ? string.Empty : base.WriteSqlPkListWhereClause();
         }
 
-        protected override string GetDapperDynaParamsForPkList()
+        protected override string WriteDapperDynaParamsForPkList()
         {
-            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Call bulk for composite pk*/" : base.GetDapperDynaParamsForPkList();
+            return PkColumns.Count() > 1 ? @$"{tab}{tab}{{/*Call bulk for composite pk*/" : base.WriteDapperDynaParamsForPkList();
         }
 
         protected override string WriteReturnObj()

@@ -37,7 +37,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(GetCreateDataTable());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetBulkCallMySql());
+                output.Append(WriteBulkCallMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(@GetUpdateFromTmpTable());

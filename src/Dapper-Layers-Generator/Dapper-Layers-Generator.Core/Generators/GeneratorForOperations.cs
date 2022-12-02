@@ -15,7 +15,7 @@ namespace Dapper_Layers_Generator.Core.Generators
 
         }
 
-        protected string GetBaseSqlForSelect(string tableIdentifier = "")
+        protected string WriteBaseSqlForSelect(string tableIdentifier = "")
         {
             if (ColumnForGetOperations == null || !ColumnForGetOperations.Any())
                 throw new ArgumentException($"No column available for select for this table{Table.Name}, genererator crash");
@@ -23,7 +23,7 @@ namespace Dapper_Layers_Generator.Core.Generators
             return
                 $$"""
                 {{tab}}{{tab}}{{tab}}var sql = @"
-                {{tab}}{{tab}}{{tab}}SELECT {{@GetColumnListStringForSelect(tableIdentifier)}}
+                {{tab}}{{tab}}{{tab}}SELECT {{WriteColumnListStringForSelect(tableIdentifier)}}
                 {{tab}}{{tab}}{{tab}}FROM {{ColAndTableIdentifier + Table.Name + ColAndTableIdentifier}} {{tableIdentifier.Replace(".", "")}}
                 """;
         }
@@ -47,7 +47,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """";
         }
 
-        protected virtual string GetBaseSqlForDelete()
+        protected virtual string WriteBaseSqlForDelete()
         {
             return
                 $$"""
@@ -73,7 +73,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """";
         }
 
-        protected string GetBaseSqlForUpdate()
+        protected string WriteBaseSqlForUpdate()
         {
             if (ColumnForUpdateOperations == null || !ColumnForUpdateOperations.Any())
                 throw new ArgumentException($"No column available for update for this table{Table.Name}, genererator crash");
@@ -82,11 +82,11 @@ namespace Dapper_Layers_Generator.Core.Generators
                 $"""
                 {tab}{tab}{tab}var sql = @"
                 {tab}{tab}{tab}UPDATE {ColAndTableIdentifier}{Table.Name}{ColAndTableIdentifier}
-                {tab}{tab}{tab}SET {GetColumnListStringForUpdate()}
+                {tab}{tab}{tab}SET {WriteColumnListStringForUpdate()}
                 """;
         }
 
-        private string GetColumnListStringForUpdate()
+        private string WriteColumnListStringForUpdate()
         {
             var output = string.Empty;
             var cols = ColumnForUpdateOperations!.Where(c => !c.IsAutoIncrement && !c.IsPrimary);
@@ -95,7 +95,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 cols!.OrderBy(c => c.Position).Select(c => $"{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier} = @{c.Name}"));
         }
 
-        protected virtual string GetDapperDynaParamsForPk()
+        protected virtual string WriteDapperDynaParamsForPk()
         {
             var spParams = String.Join(Environment.NewLine, PkColumns.Select(col =>
             {
@@ -109,7 +109,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetDapperDynaParamsForPkList()
+        protected virtual string WriteDapperDynaParamsForPkList()
         {
             return
                 $"""
@@ -134,7 +134,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        private string GetColumnListStringForSelect(string tableIdentifier = "")
+        private string WriteColumnListStringForSelect(string tableIdentifier = "")
         {
             return String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab},",
                 ColumnForGetOperations!.OrderBy(c => c.Position).Select(c => $"{tableIdentifier}{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
@@ -148,7 +148,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 cols!.OrderBy(c => c.Position).Select(c => $"{ColAndTableIdentifier}{c.Name}{ColAndTableIdentifier}"));
         }
 
-        protected virtual string GetSqlWhereClauseForPk()
+        protected virtual string WriteSqlWhereClauseForPk()
         {
             var whereClause = String.Join(Environment.NewLine + $"{tab}{tab}{tab}AND ", PkColumns.Select(col =>
             {
@@ -161,7 +161,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetSqlPkListWhereClause()
+        protected virtual string WriteSqlPkListWhereClause()
         {
             return
                 $"""
@@ -209,7 +209,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                 """;
         }
 
-        protected virtual string GetCreateDataTableForPkMySql(string opCode)
+        protected virtual string WriteCreateDataTableForPkMySql(string opCode)
         {
             var output = new StringBuilder();
             
@@ -249,12 +249,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 {{tab}}{{tab}}{{tab}}bulkCopy.ColumnMappings.AddRange(colMappings);
                 """;
         }
-        protected virtual string GetBulkCallMySql()
+        protected virtual string WriteBulkCallMySql()
         {
             return $"{tab}{tab}{tab}await bulkCopy.WriteToServerAsync(table);";
         }
 
-        protected virtual string GetCreateDbTmpTableForPksMySql(string opCode)
+        protected virtual string WriteCreateDbTmpTableForPksMySql(string opCode)
         {
             //build pk columns
             var createColumns = String.Join(Environment.NewLine + $"{tab}{tab}{tab}{tab}, ", PkColumns.Select(c => c.Name + " " + c.CompleteType));

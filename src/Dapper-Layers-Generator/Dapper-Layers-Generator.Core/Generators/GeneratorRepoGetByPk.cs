@@ -30,12 +30,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 var output = new StringBuilder();
                 output.Append(WriteMethodDef());
                 output.Append(Environment.NewLine);
-                output.Append(GetDapperDynaParamsForPk());
+                output.Append(WriteDapperDynaParamsForPk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(@GetBaseSqlForSelect());
+                output.Append(WriteBaseSqlForSelect());
                 output.Append(Environment.NewLine);
-                output.Append(GetSqlWhereClauseForPk());
+                output.Append(WriteSqlWhereClauseForPk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(WriteDapperCall());

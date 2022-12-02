@@ -28,12 +28,12 @@ namespace Dapper_Layers_Generator.Core.Generators
                 if (PkColumns.Count() == 1 || !IsBase)
                 {
                     output.Append(Environment.NewLine);
-                    output.Append(GetDapperDynaParamsForPkList());
+                    output.Append(WriteDapperDynaParamsForPkList());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
-                    output.Append(@GetBaseSqlForSelect());
+                    output.Append(WriteBaseSqlForSelect());
                     output.Append(Environment.NewLine);
-                    output.Append(GetSqlPkListWhereClause());
+                    output.Append(WriteSqlPkListWhereClause());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
                     output.Append(WriteDapperCall());

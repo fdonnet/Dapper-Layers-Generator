@@ -30,13 +30,13 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(WriteOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCreateDbTmpTableForPksMySql("get"));
+                output.Append(WriteCreateDbTmpTableForPksMySql("get"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCreateDataTableForPkMySql("get"));
+                output.Append(WriteCreateDataTableForPkMySql("get"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetBulkCallMySql());
+                output.Append(WriteBulkCallMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetSelectFromTmpTable());
@@ -78,7 +78,7 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
         protected virtual string GetSelectFromTmpTable()
         {
             var output = new StringBuilder();
-            output.Append(@GetBaseSqlForSelect("t1."));
+            output.Append(WriteBaseSqlForSelect("t1."));
             output.Append(Environment.NewLine);
             output.Append($"{tab}{tab}{tab}INNER JOIN {ColAndTableIdentifier}tmp_bulkget_{Table.Name}{ColAndTableIdentifier} t2 ON " + Environment.NewLine +
                 $"{tab}{tab}{tab}{tab}");

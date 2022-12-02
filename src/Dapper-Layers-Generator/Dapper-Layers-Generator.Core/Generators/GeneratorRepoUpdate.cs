@@ -29,8 +29,8 @@ namespace Dapper_Layers_Generator.Core.Generators
                 output.Append(GetDapperDynaParams());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetBaseSqlForUpdate());
-                output.Append(GetSqlWhereClauseForPk());
+                output.Append(WriteBaseSqlForUpdate());
+                output.Append(WriteSqlWhereClauseForPk());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(WriteDapperCall());

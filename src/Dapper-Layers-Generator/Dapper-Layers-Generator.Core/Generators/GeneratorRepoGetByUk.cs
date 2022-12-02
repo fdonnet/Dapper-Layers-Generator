@@ -36,7 +36,7 @@ namespace Dapper_Layers_Generator.Core.Generators
                     output.Append(GetDapperDynaParams());
                     output.Append(Environment.NewLine);
                     output.Append(Environment.NewLine);
-                    output.Append(@GetBaseSqlForSelect());
+                    output.Append(WriteBaseSqlForSelect());
                     output.Append(Environment.NewLine);
                     output.Append(GetSqlWhereClause());
                     output.Append(Environment.NewLine);

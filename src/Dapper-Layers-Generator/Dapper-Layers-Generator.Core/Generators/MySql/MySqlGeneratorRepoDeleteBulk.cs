@@ -30,13 +30,13 @@ namespace Dapper_Layers_Generator.Core.Generators.MySql
                 output.Append(WriteOpenTransAndInitBulkMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCreateDbTmpTableForPksMySql("delete"));
+                output.Append(WriteCreateDbTmpTableForPksMySql("delete"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetCreateDataTableForPkMySql("delete"));
+                output.Append(WriteCreateDataTableForPkMySql("delete"));
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
-                output.Append(GetBulkCallMySql());
+                output.Append(WriteBulkCallMySql());
                 output.Append(Environment.NewLine);
                 output.Append(Environment.NewLine);
                 output.Append(GetDeleteFromTmpTable());
